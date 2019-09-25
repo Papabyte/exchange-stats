@@ -15,11 +15,15 @@ const mutex = require('ocore/mutex.js');
 		from_id CHAR(20) PRIMARY KEY, \n\
 		to_id CHAR(20))");
 
+
+
+
 	await db.query("CREATE TABLE IF NOT EXISTS blocks_processed (\n\
 		block_height INTEGER  PRIMARY KEY, \n\
 		tx_index INTEGER)")
-
 	await db.query("REPLACE INTO blocks_processed (block_height,tx_index) VALUES (400000,0)");
+
+
 
 	const rows = await db.query("SELECT MAX(block_height) as height,tx_index FROM blocks_processed");
 	console.error("catchup from block " + rows[0].height + " tx index " + rows[0].tx_index);
@@ -89,7 +93,8 @@ function mergeWalletIds(input_addresses,block_height, tx_index){
 	return new Promise(function(resolve){
 		if (input_addresses.length > 1){
 			db.takeConnectionFromPool(async function(conn) {
-				var rows =  await conn.query("SELECT COUNT(address) as count, wallet_id FROM btc_addresses WHERE wallet_id IN(SELECT DISTINCT(wallet_id) FROM btc_addresses \n\
+				var rows =  await conn.query("SELECT COUNT(ROWID) as count, wallet_id FROM btc_addresses  INDEXED BY byWalletId WHERE wallet_id \n\
+				IN(SELECT DISTINCT(wallet_id) FROM btc_addresses \n\
 					WHERE address IN(?))\n\
 				GROUP BY wallet_id ORDER BY count DESC,wallet_id ASC", [input_addresses]); 
 				var arrQueries = [];
