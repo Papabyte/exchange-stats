@@ -4,8 +4,14 @@ const db = require('ocore/db.js');
 const request = require('request');
 const async = require('async');
 const crypto = require('crypto');
+const mutex = require('ocore/mutex.js');
 
-const keepRedirectionFromHeight = 596000;
+
+
+const heightAboveCatchup = 596000;
+
+
+const confirmationsBeforeIndexing = 3;
 
 (async function(){
 	await db.query("CREATE TABLE IF NOT EXISTS btc_addresses (\n\
@@ -44,22 +50,47 @@ const keepRedirectionFromHeight = 596000;
 		block_height INTEGER  PRIMARY KEY, \n\
 		block_time INTEGER,\n\
 		tx_index INTEGERNOT NULL )")
-	await db.query("REPLACE INTO processed_blocks (block_height,tx_index) VALUES (0,0)");
+	await db.query("REPLACE INTO processed_blocks (block_height,tx_index) VALUES ("+ (process.env.testnet || process.env.devnet ? 590000 : 0 )+",0)");
+	if (process.env.delete)
+		await db.query("PRAGMA journal_mode=DELETE");
+	else
+		await db.query("PRAGMA journal_mode=WAL");
 
-	const rows = await db.query("SELECT MAX(block_height) as height,tx_index FROM processed_blocks");
-	console.error("catchup from block " + rows[0].height + " tx index " + rows[0].tx_index);
-	var nextBlock = await downloadNextWhileProcessing(rows[0].height, rows[0].tx_index);
-	for (var i = rows[0].height+1; i<596000; i++){
-		if (i % 200 == 0){
-			await db.query("VACUUM");
-			console.error("db vaccumed");
-		}
-		nextBlock = await	downloadNextWhileProcessing(i, 0, nextBlock);
-	}
 })();
 
+getLastHeightThenProcess();
+setInterval(getLastHeightThenProcess, 60000);
+
+function getLastHeightThenProcess(){
+	getLastBlockHeight(function(error, last_block_height){
+		if (error)
+			return error;
+		processToBlock(last_block_height - confirmationsBeforeIndexing);
+	});
+}
+
+function processToBlock(to_block_height){
+	mutex.lockOrSkip(["process"], async function(unlock){
+		const rows = await db.query("SELECT MAX(block_height) as height,tx_index FROM processed_blocks");
+		console.error("catchup from block " + rows[0].height + " tx index " + rows[0].tx_index);
+		if (rows[0].height >= to_block_height)
+			return;
+
+		var nextBlock = await downloadNextWhileProcessing(rows[0].height, rows[0].tx_index);
+		for (var i = rows[0].height+1; i<=to_block_height; i++){
+			if (i % 200 == 0){
+				await db.query("VACUUM");
+				console.error("db vaccumed");
+			}
+			nextBlock = await	downloadNextWhileProcessing(i, 0, nextBlock);
+		}
+		unlock();
+	});
+}
+
 async function processBlock(objBlock, start_tx_index, handle){
-		console.error("block " + objBlock.height + "txs in this block: " + objBlock.tx.length + " start_tx_index " + start_tx_index);
+		var block_start_time = Date.now();
+		console.error("block " + objBlock.height + " txs in this block: " + objBlock.tx.length + " start_tx_index " + start_tx_index);
 		objBlock.tx.sort(function(a,b){
 			if (a.hash > b.hash)
 				return 1;
@@ -104,7 +135,8 @@ async function processBlock(objBlock, start_tx_index, handle){
 				callback()	
 			})();
 		}, function(){
-			console.error("block " + objBlock.height + " processed");
+			var processingTime = Date.now()-block_start_time;
+			console.error("block " + objBlock.height + " processed in " + processingTime +'ms, ' + (processingTime/objBlock.tx.length).toFixed(4) + " ms per transaction");
 			return handle();
 		});
 }
@@ -119,7 +151,7 @@ function saveTransactions(tx_id, height, from_wallet, value_in, outputs){
 				conn.addQuery(arrQueries,"REPLACE INTO transactions_from (id, wallet_id,amount) VALUES (last_insert_rowid(),(SELECT id FROM btc_wallets WHERE wallet=?),?)",[from_wallet, value_in]);
 			for (var i=0; i<outputs.length; i++){
 				conn.addQuery(arrQueries,"REPLACE INTO transactions_to(id, wallet_id, address, amount) \n\
-				VALUES ((SELECT MAX(id) FROM transactions), (SELECT wallet_id FROM btc_addresses WHERE address=?),?,?)",[outputs[i].address, outputs[i].address, outputs[i].value]);
+				VALUES ((SELECT id FROM transactions WHERE tx_id=?), (SELECT wallet_id FROM btc_addresses WHERE address=?),?,?)",[tx_id, outputs[i].address, outputs[i].address, outputs[i].value]);
 			}
 			conn.addQuery(arrQueries, "COMMIT");
 			async.series(arrQueries, function() {
@@ -152,30 +184,32 @@ function mergeWallets(input_addresses,block_height, block_time, tx_index){
 	return new Promise(function(resolve){
 		if (input_addresses.length > 1){
 			db.takeConnectionFromPool(async function(conn) {
+				var InputaddressesSqlString = input_addresses.join("','");
 				var rows =  await conn.query("SELECT COUNT(ROWID) as count,wallet_id FROM btc_addresses INDEXED BY byWalletId WHERE wallet_id \n\
 				IN(SELECT DISTINCT(wallet_id) FROM btc_addresses \n\
-					WHERE address IN(?))\n\
-				GROUP BY wallet_id ORDER BY count DESC,wallet_id ASC", [input_addresses]); 
+					WHERE address IN('"+InputaddressesSqlString+"'))\n\
+				GROUP BY wallet_id ORDER BY count DESC,wallet_id ASC"); 
 				var arrQueries = [];
 				conn.addQuery(arrQueries, "BEGIN");
 				var wallet_ids_to_update = rows.splice(1).map(function(row){
 					return row.wallet_id
 				});
 				if (wallet_ids_to_update.length > 0){
-					conn.addQuery(arrQueries, "UPDATE btc_addresses SET wallet_id=? WHERE wallet_id IN(?)", [rows[0].wallet_id, wallet_ids_to_update]);
-					conn.addQuery(arrQueries, "UPDATE transactions_from SET wallet_id=? WHERE wallet_id IN(?)", [rows[0].wallet_id, wallet_ids_to_update]);
-					conn.addQuery(arrQueries, "UPDATE transactions_to SET wallet_id=? WHERE wallet_id IN(?)", [rows[0].wallet_id, wallet_ids_to_update]);
-					if (block_height < keepRedirectionFromHeight)
-						conn.addQuery(arrQueries, "DELETE FROM btc_wallets WHERE id IN(?)", [wallet_ids_to_update]);
+						var wallet_ids_to_update_string =  wallet_ids_to_update.join("','");
+
+					conn.addQuery(arrQueries, "UPDATE btc_addresses SET wallet_id=? WHERE wallet_id IN('"+wallet_ids_to_update_string+"')",[rows[0].wallet_id]);
+					conn.addQuery(arrQueries, "UPDATE transactions_from SET wallet_id=? WHERE wallet_id IN('"+wallet_ids_to_update_string+"')",[rows[0].wallet_id]);
+					conn.addQuery(arrQueries, "UPDATE transactions_to SET wallet_id=? WHERE wallet_id IN('"+wallet_ids_to_update_string+"')",[rows[0].wallet_id]);
+					if (block_height < heightAboveCatchup)
+						conn.addQuery(arrQueries, "DELETE FROM btc_wallets WHERE id IN('"+wallet_ids_to_update_string+"')");
 				}
-				conn.addQuery(arrQueries, "UPDATE transactions_to INDEXED BY toByAddress SET wallet_id=?,address=NULL WHERE address IN(?)", [rows[0].wallet_id, input_addresses]);
-				if (block_height > keepRedirectionFromHeight){
+				conn.addQuery(arrQueries, "UPDATE transactions_to INDEXED BY toByAddress SET wallet_id=?,address=NULL WHERE address IN('"+InputaddressesSqlString+"')", [rows[0].wallet_id]);
+				if (block_height >= heightAboveCatchup){
 					wallet_ids_to_update.forEach(function(row){
 						conn.addQuery(arrQueries, "REPLACE INTO redirections (from_id, to_id) VALUES (?,?)",[row, rows[0].wallet_id]);
 					});
 				}
 				conn.addQuery(arrQueries, "REPLACE INTO processed_blocks (block_height,tx_index,block_time) VALUES (?,?,?)",[block_height, tx_index, block_time]);
-
 				conn.addQuery(arrQueries, "COMMIT");
 				async.series(arrQueries, function() {
 					conn.release();
@@ -223,5 +257,20 @@ function downloadBlockAndParse(blockheight, handle){
 		console.error("block " + blockheight + " downloaded");
 		handle(null, objBlock);
 	});
+}
 
+
+function getLastBlockHeight( handle){
+	request({
+		url: "https://blockchain.info/latestblock"
+	}, function(error, response, body) {
+		try {
+			var objLastBlock = JSON.parse(body);
+		} catch (e) {
+			console.error(e);
+			return handle(e);
+		}
+		console.error("last block " + objLastBlock.height + " downloaded");
+		handle(null, objLastBlock.height);
+	});
 }
