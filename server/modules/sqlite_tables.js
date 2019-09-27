@@ -1,0 +1,59 @@
+const db = require('ocore/db.js');
+
+exports.create = async function(){
+	await db.query("CREATE TABLE IF NOT EXISTS btc_addresses (\n\
+		address VARCHAR(70) PRIMARY KEY, \n\
+		wallet_id INTEGER)");
+	await db.query("CREATE INDEX IF NOT EXISTS byWalletId ON btc_addresses(wallet_id)");
+
+	await db.query("CREATE TABLE IF NOT EXISTS redirections (\n\
+		from_id INTEGER PRIMARY KEY, \n\
+		to_id INTEGER)");
+
+	await db.query("CREATE TABLE IF NOT EXISTS btc_wallets (\n\
+		id INTEGER PRIMARY KEY AUTOINCREMENT)");
+
+	await db.query("CREATE TABLE IF NOT EXISTS transactions (\n\
+		id INTEGER PRIMARY KEY AUTOINCREMENT, \n\
+		tx_id CHAR(64) UNIQUE NOT NULL,\n\
+		block_height INTEGER NOT NULL\n\
+		)");
+	await db.query("CREATE TABLE IF NOT EXISTS transactions_from (\n\
+		id INTEGER PRIMARY KEY, \n\
+		wallet_id INTEGER NOT NULL,\n\
+		amount INTEGER NOT NULL)");
+	await db.query("CREATE INDEX IF NOT EXISTS fromByWalletId ON transactions_from(wallet_id)");
+
+	await db.query("CREATE TABLE IF NOT EXISTS transactions_to (\n\
+		id INTEGER, \n\
+		wallet_id INTEGER,\n\
+		address VARCHAR(70),\n\
+		amount INTEGER NOT NULL)");
+	await db.query("CREATE INDEX IF NOT EXISTS toByWalletId ON transactions_to(wallet_id)");
+	await db.query("CREATE INDEX IF NOT EXISTS toByAddress ON transactions_to(address)");
+	await db.query("CREATE INDEX IF NOT EXISTS toById ON transactions_to(id)");
+
+	await db.query("CREATE TABLE IF NOT EXISTS processed_blocks (\n\
+		block_height INTEGER  PRIMARY KEY, \n\
+		block_time INTEGER,\n\
+		tx_index INTEGERNOT NULL )")
+	await db.query("INSERT OR IGNORE INTO processed_blocks (block_height,tx_index) VALUES ("+ (process.env.testnet || process.env.devnet ? 595000 : 0 )+",-1)");
+
+	await db.query("CREATE TABLE IF NOT EXISTS last_exchanges_ranking (\n\
+		exchange_id VARCHAR(60) PRIMARY KEY, \n\
+		name VARCHAR(60),\n\
+		cmc_volume INTEGER,\n\
+		nb_users INTEGER,\n\
+		total_btc_wallet INTEGER,\n\
+		last_day_deposits INTEGER,\n\
+		last_day_withdrawals INTEGER,\n\
+		delivered_by_traded,\n\
+		mau \n\
+		)");
+
+	if (process.env.delete)
+		await db.query("PRAGMA journal_mode=DELETE");
+	else
+		await db.query("PRAGMA journal_mode=WAL");
+
+}

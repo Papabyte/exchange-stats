@@ -38,12 +38,14 @@
 			"name": "Bitstamp",
 			"url": "https://www.bitstamp.net/",
 			"country": "United Kingdom",
-			"start_wallets" : []
+			"start_wallets" : [],
+			"current_wallets" :[244080, 115313]
 	},
 	"bittrex": {
 			"name": "Bittrex",
 			"url": "https://bittrex.com/",
-			"country": "United States"
+			"country": "United States",
+			"current_wallets" :[3965, 72177]
 	},
 	"bleutrade": {
 			"name": "bleutrade",
