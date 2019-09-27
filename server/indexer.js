@@ -49,7 +49,7 @@ const confirmationsBeforeIndexing = 3;
 		block_height INTEGER  PRIMARY KEY, \n\
 		block_time INTEGER,\n\
 		tx_index INTEGERNOT NULL )")
-	await db.query("INSERT OR IGNORE INTO processed_blocks (block_height,tx_index) VALUES ("+ (process.env.testnet || process.env.devnet ? 590000 : 0 )+",-1)");
+	await db.query("INSERT OR IGNORE INTO processed_blocks (block_height,tx_index) VALUES ("+ (process.env.testnet || process.env.devnet ? 594000 : 0 )+",-1)");
 	if (process.env.delete)
 		await db.query("PRAGMA journal_mode=DELETE");
 	else
@@ -77,10 +77,12 @@ function processToBlock(to_block_height){
 
 		var nextBlock = await downloadNextWhileProcessing(rows[0].height, rows[0].tx_index+1);
 		for (var i = rows[0].height+1; i<=to_block_height; i++){
-			if (i % 200 == 0){
+			if (i % 1000 == 0){
 				await db.query("UPDATE transactions_to SET address=NULL WHERE wallet_id IS NOT NULL AND address IS NOT NULL");
-				await db.query("VACUUM");
-				console.error("db vaccumed");
+				if (process.env.vacuum){
+					await db.query("VACUUM");
+					console.error("db vaccumed");
+				}
 			}
 			nextBlock = await	downloadNextWhileProcessing(i, 0, nextBlock);
 		}
@@ -256,6 +258,7 @@ function downloadNextWhileProcessing(blockheight, start_tx_index,  objBlock){
 }
 
 function downloadBlockAndParse(blockheight, handle){
+	console.error("will request block " + blockheight);
 	request({
 		url: "https://blockchain.info/block-height/"+blockheight+"?format=json"
 	}, function(error, response, body) {
@@ -281,7 +284,9 @@ function getLastBlockHeight( handle){
 			console.error(e);
 			return handle(e);
 		}
-		console.error("last block is" + objLastBlock.height);
+		if (error || response.statusCode !== 200) 
+			return handle(error +" " + response);
+
 		handle(null, objLastBlock.height);
 	});
 }
