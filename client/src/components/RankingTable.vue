@@ -1,18 +1,22 @@
 <template>
-	<div>
-		<b-table class="ranking-table"
-			:items="items"
-			:fields="fields"
-			:sort-by.sync="sortBy"
-			:sort-desc.sync="sortDesc"
-			responsive="sm"
-		></b-table>
-
-		<div>
-			Sorting By: <b>{{ sortBy }}</b>, Sort Direction:
-			<b>{{ sortDesc ? 'Descending' : 'Ascending' }}</b>
-		</div>
-	</div>
+	<b-container fluid>
+		<b-row >
+			<b-col offset-lg="1" lg="10" cols="12" class="py-3">
+				<h3 class="text-center">On-chain activity ranking</h3>
+			</b-col>
+		</b-row >
+		<b-row >
+			<b-col offset-lg="1" lg="10" cols="12">
+				<b-table class="ranking-table"
+				:items="items"
+				:fields="fields"
+				:sort-by.sync="sortBy"
+				:sort-desc.sync="sortDesc"
+				responsive
+				></b-table>
+			</b-col>
+		</b-row>
+	</b-container>
 </template>
 
 <script>
@@ -33,10 +37,10 @@
 
 				],
 				items: [
-					{ isActive: true, age: 40, first_name: 'Dickerson', last_bame: 'Macdonald' },
-					{ isActive: false, age: 21, first_name: 'Larsen', last_name: 'Shaw' },
-					{ isActive: false, age: 89, first_name: 'Geneva', last_name: 'Wilson' },
-					{ isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' }
+					{ name: 'Bitstamp', CMC_volume:'1220'},
+					{ name: 'Bittrex', CMC_volume:'12200'},
+					{ name: 'Kraken', CMC_volume:'12200'},
+					{ name: 'Coinbase', CMC_volume:'12200'},
 				]
 			}
 		}

@@ -70,7 +70,7 @@ function processToBlockHeight(to_block_height){
 		const rows = await db.query("SELECT MAX(block_height) as height,tx_index FROM processed_blocks");
 		console.error("catchup from block " + rows[0].height + " tx index " + (rows[0].tx_index+1));
 		if (rows[0].height >= to_block_height)
-			return;
+			return unlock();
 
 		var nextBlock = await downloadNextWhileProcessing(rows[0].height, rows[0].tx_index+1);
 		for (var i = rows[0].height+1; i<=to_block_height; i++){
@@ -161,6 +161,7 @@ function saveTransactionsTo(tx_id, height, outputs){
 function saveInputAddressesAndTransactions(bFirstTreated, input_addresses, tx_id, height, value_in, outputs, tx_index){
 	return new Promise(async function(resolve){
 		if (bFirstTreated){
+			console.error("first treated");
 			const results = await db.query("SELECT 1 FROM transactions WHERE tx_id=?",[tx_id]);
 			if (results[0])
 				return resolve();

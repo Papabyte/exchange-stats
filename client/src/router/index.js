@@ -5,6 +5,8 @@ import lazyLoading from './lazyloading'
 Vue.use(Router)
 
 export default new Router({
+	mode: 'history',
+
 	routes: [
 		{
 			name: 'exchangeStats',
@@ -15,14 +17,23 @@ export default new Router({
 		{
 			name: 'exchangesStats',
 			path: '/stats',
-			component: lazyLoading('components/ExchangesStats'),
-			default: true
+			component: lazyLoading('components/ExchangesStats')
+		},
+		{
+			name: 'explorerInput',
+			path: '/explorer/:url_input',
+			component: lazyLoading('components/Explorer'),
+			props: true
+		},
+		{
+			name: 'explorer',
+			path: '/explorer/',
+			component: lazyLoading('components/Explorer')
 		},
 		{
 			name: 'about',
 			path: '/about',
-			component: lazyLoading('components/About'),
-			default: true
+			component: lazyLoading('components/About')
 		}
 	],
 })
