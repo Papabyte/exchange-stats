@@ -22,4 +22,4 @@ function getTotalWithdrawnFromWallets(arrIds, from_block, to_block ){
 }
 
 exports.getTotalDepositedToWallets = getTotalDepositedToWallets;
-exports.getTotalWithdrawnFromWallets = getTotalWithdrawnFromWallets;
+exports.getTotalWithdrawnFromWallets = getTotalWithdrawnFromWallets
