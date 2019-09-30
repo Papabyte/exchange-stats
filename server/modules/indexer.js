@@ -253,19 +253,21 @@ function downloadNextWhileProcessing(blockheight, start_tx_index,  objBlock){
 }
 
 function downloadBlockAndParse(blockheight, handle){
-	console.error("will request block " + blockheight);
-	request({
-		url: "https://blockchain.info/block-height/"+blockheight+"?format=json"
-	}, function(error, response, body) {
-		try {
-			var objBlock = JSON.parse(body).blocks[0];
-		} catch (e) {
-			console.error(e);
-			return downloadBlockAndParse(blockheight, handle)
-		}
-		console.error("block " + blockheight + " downloaded");
-		handle(null, objBlock);
-	});
+	getBlockHash(blockheight, function(block_hash){
+		console.error("will request block " + block_hash);
+		request({
+			url: "https://blockchain.info/rawblock/"+block_hash+"?format=json"
+		}, function(error, response, body) {
+			try {
+				var objBlock = JSON.parse(body);
+			} catch (e) {
+				console.error(e);
+				return downloadBlockAndParse(blockheight, handle)
+			}
+			console.error("block " + blockheight + " downloaded");
+			handle(null, objBlock);
+		});
+	})
 }
 
 
@@ -294,5 +296,22 @@ function getLastProcessedHeight(){
 		return resolve((await db.query("SELECT MAX(block_height) as height FROM processed_blocks"))[0].height);
 	});
 }
+
+function getBlockHash(block_height, handle){
+
+	request({
+		url: "https://blockstream.info/api/block-height/" + block_height
+	}, function(error, response, body) {
+		if (body.length != 64 ){
+			console.error("wrong hash for " + block_height);
+			return getBlockHash(block_height, handle)
+		}
+
+		console.error("block " + block_height + "has hash " + body);
+		handle(body);
+	});
+
+}
+
 
 exports.getLastProcessedHeight = getLastProcessedHeight;

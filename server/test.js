@@ -53,6 +53,56 @@ var lastBlockHeightProcessed;
 
 })();
 
+if (process.env.testnet){
+	var known_big_wallets = [
+		169757,
+		16598,
+		54496,
+		335116,
+		6414,
+		4606,
+		2126,
+		19468,
+		929793,
+		160120,
+		3798149,
+		198715,
+		87862,
+		29422,
+		1180885,
+		774834,
+		2821054,
+		754332,
+		18352,
+		8372,
+		184410,
+		3172,
+		75559,
+		35160,
+		137094,
+		2598,
+		1668655,
+		165082,
+		154797,
+		865,
+		216339,
+		344028,
+		226639,
+		26298,
+		29356,
+		3438,
+		377025,
+		262283,
+		244,
+		123,
+		9379,
+		244080,
+		3965,
+		72177,
+		115313];
+
+	}
+
 
 getLastHeightThenProcess();
 setInterval(getLastHeightThenProcess, 60000);
@@ -70,7 +120,7 @@ function processToBlockHeight(to_block_height){
 		const rows = await db.query("SELECT MAX(block_height) as height,tx_index FROM processed_blocks");
 		console.error("catchup from block " + rows[0].height + " tx index " + (rows[0].tx_index+1));
 		if (rows[0].height >= to_block_height)
-			return;
+			return unlock();
 
 		var nextBlock = await downloadNextWhileProcessing(rows[0].height, rows[0].tx_index+1);
 		for (var i = rows[0].height+1; i<=to_block_height; i++){
@@ -96,17 +146,12 @@ async function processBlock(objBlock, start_tx_index, handle){
 			else
 				return -1;
 		});
-		var groupedInputs = [];
-		db.takeConnectionFromPool(async function(conn) {
-			var arrQueries = [];
 
-			conn.addQuery(arrQueries, "BEGIN");
 		async.eachOfSeries(objBlock.tx,  function(tx, tx_index, callback){
 			if (tx_index < start_tx_index)
 				return callback();
 			var input_addresses = [];
 			var value_in = 0;
-			
 			tx.inputs.forEach(function(input){
 				if (!input.prev_out || !input.prev_out.addr) // coinbase
 					return;
@@ -125,57 +170,56 @@ async function processBlock(objBlock, start_tx_index, handle){
 			});
 			if (input_addresses.length == 0){ // coinbase
 				(async function(){
-					await saveTransactionsTo(conn, arrQueries,tx.hash, objBlock.height, outputs)
+					await saveTransactionsTo(tx.hash, objBlock.height, outputs)
 				})();
 				return callback();
 			}
 			//it looks eachOfSeries doesn't work serially anymore with async function, so we wrap in anonymous function
 			(async function(){
 			//	console.error(tx_index);
-				await saveInputAddressesAndTransactions(conn, arrQueries,tx_index == start_tx_index, input_addresses, tx.hash, objBlock.height ,value_in, outputs, tx_index,  objBlock.height, objBlock.time);
-				groupedInputs.push(input_addresses);
-				//	await mergeWallets(input_addresses, objBlock.height,objBlock.time, tx_index);// we merge these input addresses in the wallet id that has already the most addresses and set up redirections
+				await saveInputAddressesAndTransactions(tx_index == start_tx_index, input_addresses, tx.hash, objBlock.height ,value_in, outputs, tx_index);
+				await mergeWallets(input_addresses, objBlock.height,objBlock.time, tx_index);// we merge these input addresses in the wallet id that has already the most addresses and set up redirections
 				callback()	
 			})();
-		}, async function(){
-			conn.addQuery(arrQueries, "REPLACE INTO processed_blocks (block_height,tx_index,block_time) VALUES (?,?,?)",[objBlock.height ,objBlock.tx.length, objBlock.time]);
-
-			conn.addQuery(arrQueries, "COMMIT");
-			async.series(arrQueries, async function() {
-				conn.release();
-				await mergeWallets(groupedInputs, objBlock.height, objBlock.time);// we merge these input addresses in the wallet id that has already the most addresses and set up redirections
-
-				var processingTime = Date.now()-block_start_time;
-				lastBlockHeightProcessed = objBlock.height;
-				console.error("block " + objBlock.height + " processed in " + processingTime +'ms, ' + (processingTime/objBlock.tx.length).toFixed(4) + " ms per transaction");
-				return handle();
-			});
-
+		}, function(){
+			var processingTime = Date.now()-block_start_time;
+			lastBlockHeightProcessed = objBlock.height;
+			console.error("block " + objBlock.height + " processed in " + processingTime +'ms, ' + (processingTime/objBlock.tx.length).toFixed(4) + " ms per transaction");
+			return handle();
 		});
-	})
 }
 
-function saveTransactionsTo(conn, arrQueries, tx_id, height, outputs){
+function saveTransactionsTo(tx_id, height, outputs){
 	return new Promise(function(resolve){
+		db.takeConnectionFromPool(function(conn) {
+			var arrQueries = [];
+			conn.addQuery(arrQueries, "BEGIN TRANSACTION");
 			conn.addQuery(arrQueries,"REPLACE INTO transactions (tx_id, block_height) VALUES (?,?)",[tx_id, height]);
 			for (var i=0; i<outputs.length; i++){
 				conn.addQuery(arrQueries,"REPLACE INTO transactions_to(id, wallet_id, address, amount) \n\
 				VALUES ((SELECT id FROM transactions WHERE tx_id=?), (SELECT wallet_id FROM btc_addresses WHERE address=?),?,?)",[tx_id, outputs[i].address, outputs[i].address, outputs[i].value]);
 			}
-
+			conn.addQuery(arrQueries, "COMMIT");
+			async.series(arrQueries, function() {
+				conn.release();
 				resolve();
+			});
 		});
+	});
 }
 
-function saveInputAddressesAndTransactions(conn,arrQueries, bFirstTreated, input_addresses, tx_id, height, value_in, outputs, tx_index,block_height,block_time){
+function saveInputAddressesAndTransactions(bFirstTreated, input_addresses, tx_id, height, value_in, outputs, tx_index){
 	return new Promise(async function(resolve){
-/*		if (bFirstTreated){
+		if (bFirstTreated){
+			console.error("first treated");
 			const results = await db.query("SELECT 1 FROM transactions WHERE tx_id=?",[tx_id]);
 			if (results[0])
 				return resolve();
-		}*/
+		}
 
-
+		db.takeConnectionFromPool(function(conn) {
+			var arrQueries = [];
+			conn.addQuery(arrQueries, "BEGIN TRANSACTION");
 			conn.addQuery(arrQueries,"INSERT INTO btc_wallets DEFAULT VALUES");
 			conn.addQuery(arrQueries,"INSERT INTO transactions (tx_id, block_height) VALUES (?,?)",[tx_id, height]);
 
@@ -188,84 +232,63 @@ function saveInputAddressesAndTransactions(conn,arrQueries, bFirstTreated, input
 				conn.addQuery(arrQueries,"REPLACE INTO transactions_to(id, wallet_id, address, amount) \n\
 				VALUES ((SELECT MAX(id) FROM transactions), (SELECT wallet_id FROM btc_addresses WHERE address=?),?,?)",[outputs[i].address, outputs[i].address, outputs[i].value]);
 			}
-
+			conn.addQuery(arrQueries, "COMMIT");
+			async.series(arrQueries, function() {
+				conn.release();
 				resolve();
+			});
+		});
 	});
 }
 
-function mergeWallets(groupedInputs,block_height, block_time){
+function mergeWallets(input_addresses,block_height, block_time, tx_index){
 	return new Promise(async function(resolve){
-
-		var wallet_ids_ordered_by_count = [];
-
-		async.eachOf(groupedInputs,  function(input_addresses, index, cb_1){
-			var InputaddressesSqlString = input_addresses.join("','");
-			db.takeConnectionFromPool(async function(conn) {
-				var rows =  await conn.query("SELECT COUNT(ROWID) as count,wallet_id FROM btc_addresses INDEXED BY byWalletId WHERE wallet_id \n\
-				IN(SELECT DISTINCT(wallet_id) FROM btc_addresses \n\
-					WHERE address IN('"+InputaddressesSqlString+"'))\n\
-				GROUP BY wallet_id ORDER BY count DESC,wallet_id ASC"); 
-					wallet_ids_ordered_by_count[index] = rows.map(function(row){return row.wallet_id});
-					conn.release();
-					return cb_1();
-			});
-		},
-		function(){
-			db.takeConnectionFromPool(async function(conn) {
-				var arrQueries = [];
-
-				conn.addQuery(arrQueries, "BEGIN");
-
-				groupedInputs.forEach(function(input_addresses, index){
-
-					var wallet_ids_to_update = wallet_ids_ordered_by_count[index].splice(1).map(function(row){
-						return row.wallet_id
-					});
-					if (wallet_ids_to_update.length > 0){
-						var wallet_ids_to_update_string =  wallet_ids_to_update.join("','");
-	
-						conn.addQuery(arrQueries, "UPDATE btc_addresses SET wallet_id=? WHERE wallet_id IN('"+wallet_ids_to_update_string+"')",[wallet_ids_ordered_by_count[index][0].wallet_id]);
-						conn.addQuery(arrQueries, "UPDATE transactions_from SET wallet_id=? WHERE wallet_id IN('"+wallet_ids_to_update_string+"')",[wallet_ids_ordered_by_count[index][0].wallet_id]);
-						conn.addQuery(arrQueries, "UPDATE transactions_to SET wallet_id=? WHERE wallet_id IN('"+wallet_ids_to_update_string+"')",[wallet_ids_ordered_by_count[index][0].wallet_id]);
-					}
-					var InputaddressesSqlString = input_addresses.join("','");
-					conn.addQuery(arrQueries, "UPDATE transactions_to INDEXED BY toByAddress SET wallet_id=?,address=NULL WHERE address IN('"+InputaddressesSqlString+"')", [wallet_ids_ordered_by_count[index][0].wallet_id]);
-					wallet_ids_to_update.forEach(function(row){
-						conn.addQuery(arrQueries, "REPLACE INTO redirections (from_id, to_id) VALUES (?,?)",[row, wallet_ids_ordered_by_count[index][0].wallet_id]);
-					});
-				});
-				conn.addQuery(arrQueries, "COMMIT");
-				async.series(arrQueries, function() {
-					conn.release();
-					resolve();
-				});
-			});
-		});
-		});
-	}
-/*
 		if (input_addresses.length > 1){
 			db.takeConnectionFromPool(async function(conn) {
 				var InputaddressesSqlString = input_addresses.join("','");
-				var rows =  await conn.query("SELECT COUNT(ROWID) as count,wallet_id FROM btc_addresses INDEXED BY byWalletId WHERE wallet_id \n\
-				IN(SELECT DISTINCT(wallet_id) FROM btc_addresses \n\
-					WHERE address IN('"+InputaddressesSqlString+"'))\n\
-				GROUP BY wallet_id ORDER BY count DESC,wallet_id ASC"); 
-				var arrQueries = [];
-				conn.addQuery(arrQueries, "BEGIN");
-				var wallet_ids_to_update = rows.splice(1).map(function(row){
-					return row.wallet_id
+
+				var walletIdRows = await conn.query("SELECT DISTINCT(wallet_id)  FROM btc_addresses \n\
+				WHERE address IN('"+InputaddressesSqlString+"') ORDER BY wallet_id ASC");
+
+				var wallet_ids = walletIdRows.map(function(row){
+					return row.wallet_id;
 				});
+
+				var new_wallet_id = null;
+				for (var i=0; i< wallet_ids.length; i++){
+
+					if (known_big_wallets.includes(wallet_ids[i])){
+						new_wallet_id = wallet_ids[i];
+						console.error('known big wallet ' + new_wallet_id);
+						break;
+					}
+				}
+				if (new_wallet_id){
+					var wallet_ids_to_update = wallet_ids_to_update.filter(function(value){
+						return value  != new_wallet_id;
+					});
+					console.error(wallet_ids_to_update);
+				} else {
+					var rows =  await conn.query("SELECT COUNT(ROWID) as count,wallet_id FROM btc_addresses INDEXED BY byWalletId WHERE wallet_id \n\
+					IN(SELECT DISTINCT(wallet_id) FROM btc_addresses \n\
+						WHERE address IN('"+InputaddressesSqlString+"'))\n\
+					GROUP BY wallet_id ORDER BY count DESC,wallet_id ASC"); 
+					var arrQueries = [];
+					conn.addQuery(arrQueries, "BEGIN");
+					var wallet_ids_to_update = rows.splice(1).map(function(row){
+						return row.wallet_id
+					});
+				}
 				if (wallet_ids_to_update.length > 0){
 					var wallet_ids_to_update_string =  wallet_ids_to_update.join("','");
 
-					conn.addQuery(arrQueries, "UPDATE btc_addresses SET wallet_id=? WHERE wallet_id IN('"+wallet_ids_to_update_string+"')",[rows[0].wallet_id]);
-					conn.addQuery(arrQueries, "UPDATE transactions_from SET wallet_id=? WHERE wallet_id IN('"+wallet_ids_to_update_string+"')",[rows[0].wallet_id]);
-					conn.addQuery(arrQueries, "UPDATE transactions_to SET wallet_id=? WHERE wallet_id IN('"+wallet_ids_to_update_string+"')",[rows[0].wallet_id]);
+					conn.addQuery(arrQueries, "UPDATE btc_addresses SET wallet_id=? WHERE wallet_id IN('"+wallet_ids_to_update_string+"')",[new_wallet_id]);
+					conn.addQuery(arrQueries, "UPDATE transactions_from SET wallet_id=? WHERE wallet_id IN('"+wallet_ids_to_update_string+"')",[new_wallet_id]);
+					conn.addQuery(arrQueries, "UPDATE transactions_to SET wallet_id=? WHERE wallet_id IN('"+wallet_ids_to_update_string+"')",[new_wallet_id]);
 				}
-				conn.addQuery(arrQueries, "UPDATE transactions_to INDEXED BY toByAddress SET wallet_id=?,address=NULL WHERE address IN('"+InputaddressesSqlString+"')", [rows[0].wallet_id]);
+				conn.addQuery(arrQueries, "UPDATE transactions_to INDEXED BY toByAddress SET wallet_id=?,address=NULL WHERE address IN('"+InputaddressesSqlString+"')", [new_wallet_id]);
 				wallet_ids_to_update.forEach(function(row){
-					conn.addQuery(arrQueries, "REPLACE INTO redirections (from_id, to_id) VALUES (?,?)",[row, rows[0].wallet_id]);
+					conn.addQuery(arrQueries, "REPLACE INTO redirections (from_id, to_id) VALUES (?,?)",[row, new_wallet_id]);
 				});
 				conn.addQuery(arrQueries, "REPLACE INTO processed_blocks (block_height,tx_index,block_time) VALUES (?,?,?)",[block_height, tx_index, block_time]);
 				conn.addQuery(arrQueries, "COMMIT");
@@ -280,7 +303,7 @@ function mergeWallets(groupedInputs,block_height, block_time){
 		}
 	});
 }
-*/
+
 function downloadNextWhileProcessing(blockheight, start_tx_index,  objBlock){
 	return new Promise((resolve)=>{
 		if (!objBlock){
@@ -304,19 +327,21 @@ function downloadNextWhileProcessing(blockheight, start_tx_index,  objBlock){
 }
 
 function downloadBlockAndParse(blockheight, handle){
-	console.error("will request block " + blockheight);
-	request({
-		url: "https://blockchain.info/block-height/"+blockheight+"?format=json"
-	}, function(error, response, body) {
-		try {
-			var objBlock = JSON.parse(body).blocks[0];
-		} catch (e) {
-			console.error(e);
-			return downloadBlockAndParse(blockheight, handle)
-		}
-		console.error("block " + blockheight + " downloaded");
-		handle(null, objBlock);
-	});
+	getBlockHash(blockheight, function(block_hash){
+		console.error("will request block " + block_hash);
+		request({
+			url: "https://blockchain.info/rawblock/"+block_hash+"?format=json"
+		}, function(error, response, body) {
+			try {
+				var objBlock = JSON.parse(body);
+			} catch (e) {
+				console.error(e);
+				return downloadBlockAndParse(blockheight, handle)
+			}
+			console.error("block " + blockheight + " downloaded");
+			handle(null, objBlock);
+		});
+	})
 }
 
 
@@ -345,5 +370,22 @@ function getLastProcessedHeight(){
 		return resolve((await db.query("SELECT MAX(block_height) as height FROM processed_blocks"))[0].height);
 	});
 }
+
+function getBlockHash(block_height, handle){
+
+	request({
+		url: "https://blockstream.info/api/block-height/" + block_height
+	}, function(error, response, body) {
+		if (body.length != 64 ){
+			console.error("wrong hash for " + block_height);
+			return getBlockHash(block_height, handle)
+		}
+
+		console.error("block " + block_height + "has hash " + body);
+		handle(body);
+	});
+
+}
+
 
 exports.getLastProcessedHeight = getLastProcessedHeight;
