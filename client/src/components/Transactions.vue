@@ -1,9 +1,9 @@
 <template>
 	<b-container fluid>
 	<b-row >
-		<b-col offset-lg="1" lg="10" cols="12" class="py-3">
-			<div  v-for="(transaction,key) in transactions" v-bind:key="transaction">
-				<Transaction :tx_id="key" :transaction="transaction" />
+		<b-col offset-lg="2" lg="8" cols="12" class="py-3">
+			<div  v-for="(transaction,key,index) in transactions" v-bind:key="key">
+				<Transaction :tx_id="key" :transaction="transaction" :even="index % 2"/>
 			</div>
 		</b-col>
 	</b-row>

@@ -32,4 +32,22 @@ function getLastRanking(handle){
 	});
 }
 
+function getExchangeWalletIds(exchange){
+
+	if (exchanges[exchange] && exchanges[exchange].current_wallets)
+		return exchanges[exchange].current_wallets;
+	else
+		return [];
+}
+
+function getExchangesList(){
+	const arrExchanges = []
+	for (var key in exchanges){
+		arrExchanges.push({id: key, name: exchanges[key].name});
+	}
+	return arrExchanges;
+}
+
 exports.getLastRanking = getLastRanking;
+exports.getExchangeWalletIds = getExchangeWalletIds;
+exports.getExchangesList = getExchangesList;

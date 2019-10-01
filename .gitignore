@@ -32,3 +32,6 @@ server/yarn-error.log*
 # Editor directories and files
 server/.idea
 server/.vscode
+
+zipper/node_modules
+zipper/package-lock.json

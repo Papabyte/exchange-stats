@@ -8,12 +8,13 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import feather from 'vue-icon'
+Vue.use(feather, 'v-icon')
+
 Vue.use(VueAxios, axios)
-
-
 Vue.use(BootstrapVue)
-Vue.config.productionTip = false
 
+Vue.config.productionTip = false
 
 new Vue({
 	el: '#app',

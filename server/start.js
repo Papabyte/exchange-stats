@@ -40,10 +40,30 @@ require('./modules/sqlite_tables.js').create().then(function(){
 		})
 	});
 
-	app.get('/ranking', function(request, response){
+
+	app.get('/exchanges/', function(request, response){
+		exchanges.getExchangesList(function(arrExchangesList){
+			console.error('exchanges');
+			console.error(arrExchangesList);
+
+			return response.send(arrExchangesList);
+			})
+	});
+
+	app.get('/exchange/:exchange', function(request, response){
+		const wallet_ids = exchanges.getExchangeWalletIds(exchange)
+		explorer.getRedirections([wallet_ids], function(redirected_ids){
+			explorer.getTransactionsFromWallets(redirected_ids, 0, function(assocTxsFromWallet){
+				return response.send({txs: assocTxsFromWallet, wallet_ids: redirected_ids});
+			});
+		})
+	});
+
+
+	app.get('/ranking/', function(request, response){
 		exchanges.getLastRanking(function(arrLastRanking){
 		return response.send(arrLastRanking);
-		})
+		});
 	});
 
 

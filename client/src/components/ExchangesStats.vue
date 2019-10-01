@@ -1,6 +1,6 @@
 <template>
 	<div>
-	<NavBar selected_item=0 />
+	<NavBar selected_item='0' />
 	<RankingTable />
 
 </div>

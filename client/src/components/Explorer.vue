@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<NavBar selected_item=1 />
+		<NavBar selected_item='1' />
 		<b-container fluid>
 			<b-row >
 				<b-col offset-lg="1" lg="10" cols="12" class="py-3">
@@ -9,17 +9,26 @@
 			</b-row >
 			<b-row v-if="!url_input" >
 				<b-col offset-lg="3" lg="6" cols="12">
-					<b-form class="form-inline w-100 mt-5" @submit="onSubmit" @reset="onReset">
-						<b-form-input responsive
-							id="input-1"
-							v-model="user_input"
-							type="text"
-							required
-							placeholder="Enter BTC address, transaction id or wallet id."
-							class="mx-2 flex-fill"
-						></b-form-input>
-						<button type="submit" class="btn btn-primary">Go</button>
-					</b-form>
+					<div>
+
+						<b-form class="form-inline w-100 mt-5" @submit="onSubmit">
+							<b-form-input responsive
+								id="input-1"
+								v-model="user_input"
+								type="text"
+								required
+								placeholder="Enter BTC address, transaction id or wallet id."
+								class="mx-2 flex-fill"
+							></b-form-input>
+							<button type="submit" class="btn btn-primary">Go</button>
+						</b-form>
+					</div>
+					<div v-if="arrExchanges">
+						Or browse by exchange:
+						<div v-for="(exchange,index) in arrExchanges" v-bind:key="index">
+								<b-link :to="'/explorer/'+exchange.id">exchange.name</b-link>
+						</div>
+					</div>
 				</b-col>
 			</b-row>
 			<b-row v-else  >
@@ -42,7 +51,20 @@ export default {
 	},
 	data() {
 		return {
-			user_input: ""
+			user_input: "",
+			arrExchanges: null
+		}
+	},
+	created(){
+				this.axios.get('/list-exchanges').then((response) => {
+					console.log(response.data);
+					this.arrExchanges = response.data;
+				});
+
+	},
+	methods:{ 
+		onSubmit(){
+			this.$router.push({ name: 'explorerInput', params: { url_input: this.user_input } })
 		}
 	}
 }
