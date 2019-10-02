@@ -8,8 +8,8 @@
 	</b-row>
 	<b-row class="justify-content-between">
 		<b-col  cols="5" class="py-3">
-			<WalletId label="Wallet: " :id="transaction.from.id"/>
-			<BtcAmount :amount="transaction.from.amount"/>
+			<WalletId v-if="transaction.from && transaction.from.id" label="Wallet: " :id="transaction.from.id"/>
+			<BtcAmount v-if="transaction.from && transaction.from.amount" label="Amount: " :amount="transaction.from.amount"/>
 		</b-col>
 		<b-col class="text-center">
 			<div class="centered">
@@ -19,13 +19,11 @@
 			<b-col  cols="5" class="py-3">
 				<div  v-for="(t_out,index) in transaction.to" :key="index" class="py-2">
 					<WalletId v-if="t_out.id" label="Wallet: " :id="t_out.id"/>
-										<BtcAddress v-if="t_out.address" label="Address: " :address="t_out.address"/>
+					<span v-else>Wallet: unknown yet</span>
 
-
-					<BtcAmount :amount="t_out.amount"/>
+					<BtcAddress v-if="t_out.address" label="Address: " :address="t_out.address"/>
+					<BtcAmount label="Amount: " :amount="t_out.amount"/>
 				</div>
-				{{transaction.to.address}}
-				{{transaction.to.amount}}
 			</b-col>
 	</b-row >
 	</div>

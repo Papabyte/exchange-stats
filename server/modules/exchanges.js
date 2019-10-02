@@ -14,14 +14,15 @@ async function processNewRanking(){
 		var total_24h_withdrawals;
 
 		if (exchange.current_wallets){
-
+			console.error(exchange.current_wallets);
 			var arrWalletIds = exchange.current_wallets;
 			var lastHeight = await indexer.getLastProcessedHeight();
 			total_24h_deposits = await stats.getTotalDepositedToWallets(arrWalletIds, lastHeight - 10 * 6 * 24 , lastHeight);
 			total_24h_withdrawals = await stats.getTotalWithdrawnFromWallets(arrWalletIds, lastHeight - 10 * 6 * 24 , lastHeight);
+			total_btc_wallet = await stats.getTotalOnWallets(arrWalletIds);
 
-			db.query("REPLACE INTO last_exchanges_ranking (exchange_id,name,last_day_deposits, last_day_withdrawals) VALUES (?,?,?,?)", 
-			[key, exchange.name,total_24h_deposits, total_24h_withdrawals]); 
+			db.query("REPLACE INTO last_exchanges_ranking (exchange_id,total_btc_wallet,name,last_day_deposits, last_day_withdrawals) VALUES (?,?,?,?,?)", 
+			[key, total_btc_wallet, exchange.name,total_24h_deposits, total_24h_withdrawals]); 
 		}
 	}
 }
@@ -33,15 +34,22 @@ function getLastRanking(handle){
 }
 
 function getExchangeWalletIds(exchange){
-
 	if (exchanges[exchange] && exchanges[exchange].current_wallets)
 		return exchanges[exchange].current_wallets;
 	else
 		return [];
 }
 
+function getExchangeName(exchange){
+	if (exchanges[exchange] && exchanges[exchange].name)
+		return exchanges[exchange].name;
+	else
+		return null;
+}
+
+
 function getExchangesList(){
-	const arrExchanges = []
+	const arrExchanges = [];
 	for (var key in exchanges){
 		arrExchanges.push({id: key, name: exchanges[key].name});
 	}
@@ -51,3 +59,4 @@ function getExchangesList(){
 exports.getLastRanking = getLastRanking;
 exports.getExchangeWalletIds = getExchangeWalletIds;
 exports.getExchangesList = getExchangesList;
+exports.getExchangeName = getExchangeName;

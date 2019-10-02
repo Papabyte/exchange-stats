@@ -4,7 +4,8 @@ exports.create = function(){
 	return new Promise(async function(resolve){
 	console.error("will create tables if not exist");
 	await db.query("CREATE TABLE IF NOT EXISTS btc_addresses (\n\
-		address VARCHAR(70) PRIMARY KEY, \n\
+		id INTEGER PRIMARY KEY, \n\
+		address VARCHAR(70) UNIQUE, \n\
 		wallet_id INTEGER)");
 	await db.query("CREATE INDEX IF NOT EXISTS byWalletId ON btc_addresses(wallet_id)");
 
@@ -32,17 +33,20 @@ exports.create = function(){
 	await db.query("CREATE TABLE IF NOT EXISTS transactions_to (\n\
 		id INTEGER, \n\
 		wallet_id INTEGER,\n\
-		address VARCHAR(70),\n\
-		amount INTEGER NOT NULL)");
+		address_id INTEGER,\n\
+		amount INTEGER NOT NULL,\n\
+		n INTEGER NOT NULL\n\
+		)");
+		
 	await db.query("CREATE INDEX IF NOT EXISTS toByWalletId ON transactions_to(wallet_id)");
-	await db.query("CREATE INDEX IF NOT EXISTS toByAddress ON transactions_to(address)");
-	await db.query("CREATE INDEX IF NOT EXISTS toById ON transactions_to(id)");
+	await db.query("CREATE UNIQUE INDEX IF NOT EXISTS toById ON transactions_to(id,n)");
+	await db.query("CREATE INDEX IF NOT EXISTS toByAddressId ON transactions_to(address_id)");
 
 	await db.query("CREATE TABLE IF NOT EXISTS processed_blocks (\n\
 		block_height INTEGER  PRIMARY KEY, \n\
 		block_time INTEGER,\n\
 		tx_index INTEGER NOT NULL )")
-	await db.query("INSERT OR IGNORE INTO processed_blocks (block_height,tx_index) VALUES ("+ (process.env.testnet || process.env.devnet ? 595000 : 0 )+",-1)");
+	await db.query("INSERT OR IGNORE INTO processed_blocks (block_height,tx_index) VALUES (0,-1)");
 	if (process.env.delete)
 		await db.query("PRAGMA journal_mode=DELETE");
 	else

@@ -39,18 +39,19 @@
 			"url": "https://www.bitstamp.net/",
 			"country": "United Kingdom",
 			"start_wallets" : [],
-			"current_wallets" :[244080, 115313]
+			"current_wallets" :[50, 22, 89]
 	},
 	"bittrex": {
 			"name": "Bittrex",
 			"url": "https://bittrex.com/",
 			"country": "United States",
-			"current_wallets" :[3965, 72177]
+			"current_wallets" :[10, 45]
 	},
 	"bleutrade": {
 			"name": "bleutrade",
 			"url": "https://bleutrade.com/exchange/",
-			"country": null
+			"country": null,
+			"current_wallets" :[8000]
 	},
 	"bx_thailand": {
 			"name": "BX Thailand",

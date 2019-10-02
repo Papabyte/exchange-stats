@@ -3,10 +3,11 @@ const db = require('ocore/db.js');
 const ITEMS_PER_PAGE = 100;
 
 async function getTransactionsFromWallets(arrIds, page, handle){
-	const idsSqlFilter = arrIds.join("','");
-	var idRows = await db.query("SELECT DISTINCT id from (SELECT id FROM transactions_to WHERE wallet_id IN('"+ idsSqlFilter +"') \n\
-		UNION SELECT id FROM transactions_from WHERE wallet_id IN('"+ idsSqlFilter +"'))s");
-
+	const idsSqlFilter = arrIds.join(",");
+	console.error(idsSqlFilter);
+	var idRows = await db.query("SELECT DISTINCT id from (SELECT id FROM transactions_to WHERE wallet_id IN("+ idsSqlFilter +") \n\
+		UNION SELECT id FROM transactions_from WHERE wallet_id IN("+ idsSqlFilter +"))s");
+console.error(idRows);
 	const count_total = idRows.length;
 	if (count_total == 0)
 		return handle(null);
@@ -23,7 +24,7 @@ async function getTransactionsFromWallets(arrIds, page, handle){
 async function getTransactionFromTxId(tx_id, handle){
 	var idRows = await db.query("SELECT id from transactions WHERE tx_id=?",[tx_id]);
 	if (idRows[0])
-		getTransactionsFromInternalIds(idRows[0].id, handle);
+		getTransactionsFromInternalIds([idRows[0].id], handle);
 	else
 		return handle(null);
 }
@@ -38,13 +39,14 @@ async function getWalletFromAddress(address, handle){
 
 
 async function getTransactionsFromInternalIds(arrIds, handle){
-	const idsSqlFilter = arrIds.join("','");
+	const idsSqlFilter = arrIds.join(",");
 	console.error(idsSqlFilter);
 	const rows = await db.query("SELECT transactions.tx_id, transactions_from.amount AS amount_from,transactions_to.amount AS amount_to,\n\
-	transactions_from.wallet_id AS from_id, transactions_to.wallet_id AS to_id,transactions_to.address FROM transactions  \n\
-	INNER JOIN transactions_from USING(id) \n\
+	transactions_from.wallet_id AS from_id, transactions_to.wallet_id AS to_id,btc_addresses.address FROM transactions  \n\
 	INNER JOIN transactions_to USING(id) \n\
-	WHERE transactions.id IN ('" +idsSqlFilter +"')");
+	INNER JOIN btc_addresses ON btc_addresses.id=transactions_to.address_id \n\
+	LEFT JOIN transactions_from USING(id) \n\
+	WHERE transactions.id IN (" +idsSqlFilter +")");
 
 	console.error(JSON.stringify(rows));
 	const assocTxsFromWallet = {};
@@ -61,19 +63,22 @@ async function getTransactionsFromInternalIds(arrIds, handle){
 
 
 async function getRedirections(arrIds, handle){
-	const idsSqlFilter = arrIds.join("','");
-	const rows = await db.query("SELECT from_id,to_id FROM redirections WHERE from_id IN ('" +idsSqlFilter +"')");
+	if (arrIds.length == 0)
+		return handle([]);
+	const idsSqlFilter = arrIds.join(",");
+	const rows = await db.query("SELECT DISTINCT(to_id) FROM redirections WHERE from_id IN (" +idsSqlFilter +")");
 	if (rows.length == 0){
 		return handle(arrIds);
 	} else {
-		const assocByFromId = {};
+		/*const assocByFromId = {};
 		rows.forEach(function(row){
-			assocByFromId[row.from_id] = row.from_id.to_id;
+			assocByFromId[row.from_id] = row.to_id;
 		});
+
 		arrIds.forEach(function(row){
 			row = assocByFromId[row.from_id] ? assocByFromId[row.to_id] : row;
-		});
-		handle(arrIds);
+		});*/
+		return handle(rows.map(function(row){return row.to_id}));
 	}
 }
 

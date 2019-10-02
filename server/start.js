@@ -1,6 +1,7 @@
 const express = require('express')
 //const ocore = require('./node_modules/ocore/');
 const validationUtils = require("ocore/validation_utils.js");
+const aa_handler = require("./modules/aa_handler.js");
 
 const conf = require('ocore/conf.js');
 require('./modules/sqlite_tables.js').create().then(function(){
@@ -34,6 +35,9 @@ require('./modules/sqlite_tables.js').create().then(function(){
 			return response.status(400).send('Wrong wallet id');
 
 		explorer.getRedirections([id], function(redirected_ids){
+			console.error("redirected_ids");
+
+			console.error(redirected_ids);
 			explorer.getTransactionsFromWallets(redirected_ids, 0, function(assocTxsFromWallet){
 				return response.send({txs: assocTxsFromWallet, redirected_id: redirected_ids[0]});
 			});
@@ -41,26 +45,33 @@ require('./modules/sqlite_tables.js').create().then(function(){
 	});
 
 
-	app.get('/exchanges/', function(request, response){
-		exchanges.getExchangesList(function(arrExchangesList){
-			console.error('exchanges');
-			console.error(arrExchangesList);
-
-			return response.send(arrExchangesList);
-			})
+	app.get('/exchanges', function(request, response){
+		console.error('exchanges');
+			return response.send(	exchanges.getExchangesList());
 	});
 
 	app.get('/exchange/:exchange', function(request, response){
-		const wallet_ids = exchanges.getExchangeWalletIds(exchange)
-		explorer.getRedirections([wallet_ids], function(redirected_ids){
+
+		const wallet_ids = exchanges.getExchangeWalletIds(request.params.exchange);
+		explorer.getRedirections(wallet_ids, function(redirected_ids){
 			explorer.getTransactionsFromWallets(redirected_ids, 0, function(assocTxsFromWallet){
-				return response.send({txs: assocTxsFromWallet, wallet_ids: redirected_ids});
+				return response.send({txs: assocTxsFromWallet, wallet_ids: redirected_ids, name: exchanges.getExchangeName(request.params.exchange)});
 			});
 		})
 	});
 
+	app.get('/txid/:tx_id', function(request, response){
+		const tx_id = request.params.tx_id;
+		console.error(tx_id);
+		if (!validationUtils.isValidHexadecimal(tx_id, 64))
+			return response.status(400).send('Wrong tx id');
+		explorer.getTransactionFromTxId(tx_id, function(assocTxs){
+			return response.send({txs: assocTxs});
+		});
+	});
+	
 
-	app.get('/ranking/', function(request, response){
+	app.get('/ranking', function(request, response){
 		exchanges.getLastRanking(function(arrLastRanking){
 		return response.send(arrLastRanking);
 		});

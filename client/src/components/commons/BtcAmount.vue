@@ -1,13 +1,13 @@
 <template>
 	<div>
-Amount: {{amount/100000000}} BTC
-</div>
+		<span v-if="label"> {{label}}</span>{{amount/100000000}} BTC
+	</div>
 </template>
 
 <script>
 
 export default {
-	props: ['amount']
+	props: ['amount', 'label']
 }
 </script>
 

@@ -2,7 +2,7 @@
 	<div>
 		<NavBar selected_item='1' />
 		<b-container fluid>
-			<b-row >
+			<b-row v-if="!url_input">
 				<b-col offset-lg="1" lg="10" cols="12" class="py-3">
 					<h3 class="text-center">Wallet explorer</h3>
 				</b-col>
@@ -23,11 +23,13 @@
 							<button type="submit" class="btn btn-primary">Go</button>
 						</b-form>
 					</div>
-					<div v-if="arrExchanges">
+					<div v-if="arrExchanges" class="pt-4">
 						Or browse by exchange:
-						<div v-for="(exchange,index) in arrExchanges" v-bind:key="index">
-								<b-link :to="'/explorer/'+exchange.id">exchange.name</b-link>
-						</div>
+							<b-row class="py-4" align-h="start">
+							<div v-for="(exchange,index) in arrExchanges" v-bind:key="index">
+								<b-col >	<b-link :to="'/explorer/'+exchange.id">{{exchange.name}}</b-link></b-col>
+							</div>
+							</b-row >
 					</div>
 				</b-col>
 			</b-row>
@@ -55,16 +57,27 @@ export default {
 			arrExchanges: null
 		}
 	},
+	watch: {
+		$route(route) {
+			this.getExchanges();
+		}
+	},
 	created(){
-				this.axios.get('/list-exchanges').then((response) => {
-					console.log(response.data);
-					this.arrExchanges = response.data;
-				});
-
+		this.getExchanges();
 	},
 	methods:{ 
 		onSubmit(){
 			this.$router.push({ name: 'explorerInput', params: { url_input: this.user_input } })
+		},
+		getExchanges(){
+			if (!this.url_input){
+					this.axios.get('/exchanges').then((response) => {
+						console.log(response.data);
+						this.arrExchanges = response.data.sort(function(a,b){
+							return a.name.toUpperCase() > b.name.toUpperCase();
+						});
+					});
+			}
 		}
 	}
 }
