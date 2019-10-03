@@ -7,15 +7,14 @@ exports.create = function(){
 		id INTEGER PRIMARY KEY, \n\
 		address VARCHAR(70) UNIQUE, \n\
 		wallet_id INTEGER)");
-	await db.query("CREATE INDEX IF NOT EXISTS byWalletId ON btc_addresses(wallet_id)");
-
-	await db.query("CREATE TABLE IF NOT EXISTS redirections (\n\
-		from_id INTEGER PRIMARY KEY, \n\
-		to_id INTEGER)");
+	await db.query("CREATE INDEX IF NOT EXISTS byWalletId ON btc_addresses(wallet_id) WHERE wallet_id IS NOT NULL");
 
 	await db.query("CREATE TABLE IF NOT EXISTS btc_wallets (\n\
 		id INTEGER PRIMARY KEY AUTOINCREMENT,\n\
-		addr_count INTEGER DEFAULT 1)");
+		addr_count INTEGER DEFAULT 1, \n\
+		redirection INTEGER\n\
+		)");
+	await db.query("CREATE INDEX IF NOT EXISTS walletByRedirection ON btc_wallets(redirection) WHERE redirection IS NOT NULL");
 
 	await db.query("CREATE TABLE IF NOT EXISTS transactions (\n\
 		id INTEGER PRIMARY KEY AUTOINCREMENT, \n\
@@ -26,19 +25,19 @@ exports.create = function(){
 
 	await db.query("CREATE TABLE IF NOT EXISTS transactions_from (\n\
 		id INTEGER PRIMARY KEY, \n\
-		wallet_id INTEGER NOT NULL,\n\
+		wallet_id INTEGER,\n\
 		amount INTEGER NOT NULL)");
-	await db.query("CREATE INDEX IF NOT EXISTS fromByWalletId ON transactions_from(wallet_id)");
+	await db.query("CREATE INDEX IF NOT EXISTS fromByWalletId ON transactions_from(wallet_id) WHERE wallet_id IS NOT NULL");
 
 	await db.query("CREATE TABLE IF NOT EXISTS transactions_to (\n\
 		id INTEGER, \n\
 		wallet_id INTEGER,\n\
 		address_id INTEGER,\n\
 		amount INTEGER NOT NULL,\n\
-		n INTEGER NOT NULL\n\
+		n SMALLINT NOT NULL\n\
 		)");
 		
-	await db.query("CREATE INDEX IF NOT EXISTS toByWalletId ON transactions_to(wallet_id)");
+	await db.query("CREATE INDEX IF NOT EXISTS toByWalletId ON transactions_to(wallet_id) WHERE wallet_id IS NOT NULL");
 	await db.query("CREATE UNIQUE INDEX IF NOT EXISTS toById ON transactions_to(id,n)");
 	await db.query("CREATE INDEX IF NOT EXISTS toByAddressId ON transactions_to(address_id)");
 
@@ -51,7 +50,6 @@ exports.create = function(){
 		await db.query("PRAGMA journal_mode=DELETE");
 	else
 		await db.query("PRAGMA journal_mode=WAL");
-
 	await db.query("CREATE TABLE IF NOT EXISTS last_exchanges_ranking (\n\
 		exchange_id VARCHAR(60) PRIMARY KEY, \n\
 		name VARCHAR(60),\n\

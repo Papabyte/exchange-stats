@@ -4,6 +4,10 @@ const myWitnesses = require('ocore/my_witnesses.js');
 
 const network = require('ocore/network.js');
 const db = require('ocore/db.js');
+
+var currentPools = {};
+var currentChallenges = {};
+
 myWitnesses.readMyWitnesses(function (arrWitnesses) {
 	if (arrWitnesses.length > 0)
 		return start();
@@ -18,6 +22,15 @@ function start(){
 	db.query("INSERT "+db.getIgnore()+" INTO my_watched_addresses (address) VALUES (?)", [conf.aa_address], function(){
 			network.addLightWatchedAddress(conf.address);
 	});
+	network.requestFromLightVendor('light/get_aa_state_vars', {address: conf.aa_address},function(error, request, objStateVars){
+
+		console.error("objStateVars");
+
+		console.error(objStateVars);
+
+
+	});
+
 }
 
 

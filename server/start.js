@@ -2,8 +2,10 @@ const express = require('express')
 //const ocore = require('./node_modules/ocore/');
 const validationUtils = require("ocore/validation_utils.js");
 const aa_handler = require("./modules/aa_handler.js");
-
 const conf = require('ocore/conf.js');
+
+const validate = require('bitcoin-address-validation');
+
 require('./modules/sqlite_tables.js').create().then(function(){
 
 	console.error("before indexer");
@@ -40,6 +42,18 @@ require('./modules/sqlite_tables.js').create().then(function(){
 			console.error(redirected_ids);
 			explorer.getTransactionsFromWallets(redirected_ids, 0, function(assocTxsFromWallet){
 				return response.send({txs: assocTxsFromWallet, redirected_id: redirected_ids[0]});
+			});
+		})
+	});
+
+
+	app.get('/address/:address', function(request, response){
+		const address = request.params.address;
+		if (!validate(address))
+			return response.status(400).send('Wrong BTC address');
+		explorer.getWalletIdFromAddress(address, function(wallet_id){
+			explorer.getTransactionsFromWallets([wallet_id], 0, function(assocTxsFromWallet){
+				return response.send({txs: assocTxsFromWallet, redirected_id: wallet_id});
 			});
 		})
 	});

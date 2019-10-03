@@ -46,6 +46,7 @@
 
 <script>
 import Transaction from './Transaction.vue'
+import validate from 'bitcoin-address-validation';
 
 export default {
 	components: {
@@ -97,6 +98,21 @@ export default {
 					this.count_total = null;
 					this.isSpinnerActive = false;
 				});
+
+			} else if (validate(this.request_input)) { // it's a BTC address
+				this.title = "Looking for known wallet for " + this.request_input;
+				this.axios.get('/address/' + this.request_input).then((response) => {
+										console.log(JSON.stringify(response.data));
+
+				this.title = "Transactions for wallet " + response.data.redirected_id;
+
+				if (response.data.txs){
+						this.transactions = response.data.txs.txs;
+						this.count_total = response.data.txs.count_total;
+				}
+					this.isSpinnerActive = false;
+				});
+
 			}  else if (this.request_input) { // should be an exchange
 				this.axios.get('/exchange/' + this.request_input).then((response) => {
 					this.title = "Transactions for exchange " + response.data.name;

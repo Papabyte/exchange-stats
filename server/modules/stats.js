@@ -30,10 +30,22 @@ function getTotalOnWallets(arrIds){
 		if (arrIds.length ===0)
 			return (0);
 		const idsSqlFilter = arrIds.join(",");
-		const rows = await db.query("SELECT (SELECT SUM(amount) FROM transactions_from WHERE wallet_id IN("+idsSqlFilter+")) - (SELECT SUM(amount) FROM transactions_to WHERE wallet_id IN("+idsSqlFilter+")) as amount");
+		const rows = await db.query("SELECT (SELECT SUM(amount) FROM transactions_to WHERE wallet_id IN("+idsSqlFilter+")) - (SELECT SUM(amount) FROM transactions_from WHERE wallet_id IN("+idsSqlFilter+")) as amount");
 		return resolve(rows[0] && rows[0].amount ? rows[0].amount : 0);
 	})
 }
+
+
+function getTotalDepositAddresses(arrIds){
+	return new Promise(async function(resolve){
+		if (arrIds.length ===0)
+			return (0);
+		const idsSqlFilter = arrIds.join(",");
+		const rows = await db.query("SELECT (SELECT SUM(amount) FROM transactions_to WHERE wallet_id IN("+idsSqlFilter+")) - (SELECT SUM(amount) FROM transactions_to WHERE wallet_id IN("+idsSqlFilter+")) as amount");
+		return resolve(rows[0] && rows[0].amount ? rows[0].amount : 0);
+	})
+}
+
 
 exports.getTotalDepositedToWallets = getTotalDepositedToWallets;
 exports.getTotalWithdrawnFromWallets = getTotalWithdrawnFromWallets;

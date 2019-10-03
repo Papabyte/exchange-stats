@@ -18,6 +18,10 @@
 
      		 <BtcAmount :amount="data.item.total_btc_wallet"/>
       </template>
+			  <template v-slot:cell(cmc_volume)="data">
+
+     		 <BtcAmount :amount="data.item.total_btc_wallet"/>
+      </template>
 			
 			      <template v-slot:cell(action)="data">
 							  <b-link :to="'/explorer/'+ data.item.exchange_id">
@@ -45,7 +49,7 @@ import BtcAmount from './commons/BtcAmount.vue';
 				sortDesc: false,
 				fields: [
 					{ key: 'name', sortable: true ,},
-					{ key: 'CMC_volume', sortable: true },
+					{ key: 'cmc_volume', sortable: true },
 					{ key: 'nb_users', sortable: true },
 					{ key: 'total_btc_wallet', sortable: true },
 					{ key: 'last_day_deposits', sortable: true },

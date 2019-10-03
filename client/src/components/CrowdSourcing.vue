@@ -1,6 +1,6 @@
 <template>
 	<div>
-	<NavBar selected_item='3' />
+	<NavBar selected_item='2' />
 	About
 	</div>
 </template>

@@ -2,8 +2,14 @@
 <b-container fluid :class="{even:even, odds:!even}">
 	<div class="py-4">
 	<b-row>
-		<b-col  cols="12" >
+		<b-col  cols="8" >
 			<TxId label="Transaction: " :tx_id="tx_id"/>
+		</b-col>
+			<b-col  cols="2 text-center" >
+			Time: {{transaction.time}}
+		</b-col>
+				<b-col  cols="2 text-center" >
+			Block: {{transaction.height}}
 		</b-col>
 	</b-row>
 	<b-row class="justify-content-between">

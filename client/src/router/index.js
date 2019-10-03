@@ -34,6 +34,11 @@ export default new Router({
 			name: 'about',
 			path: '/about',
 			component: lazyLoading('components/About')
+		}	,
+		{
+			name: 'crowdsourcing',
+			path: '/crowdsourcing',
+			component: lazyLoading('components/CrowdSourcing')
 		}
 	],
 })

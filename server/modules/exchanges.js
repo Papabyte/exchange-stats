@@ -1,6 +1,7 @@
 const exchanges = require('../exchanges.json');
 const indexer = require('./indexer.js');
 const stats = require('./stats.js');
+const api = require('./coingecko_api.js');
 
 const db = require('ocore/db.js');
 
@@ -20,9 +21,16 @@ async function processNewRanking(){
 			total_24h_deposits = await stats.getTotalDepositedToWallets(arrWalletIds, lastHeight - 10 * 6 * 24 , lastHeight);
 			total_24h_withdrawals = await stats.getTotalWithdrawnFromWallets(arrWalletIds, lastHeight - 10 * 6 * 24 , lastHeight);
 			total_btc_wallet = await stats.getTotalOnWallets(arrWalletIds);
-
-			db.query("REPLACE INTO last_exchanges_ranking (exchange_id,total_btc_wallet,name,last_day_deposits, last_day_withdrawals) VALUES (?,?,?,?,?)", 
-			[key, total_btc_wallet, exchange.name,total_24h_deposits, total_24h_withdrawals]); 
+			var objInfo = await api.getExchangeInfo(key);
+			db.query("REPLACE INTO last_exchanges_ranking (exchange_id,total_btc_wallet,name,last_day_deposits, last_day_withdrawals, cmc_volume) VALUES (?,?,?,?,?,?)", 
+			[
+				key, 
+				total_btc_wallet, 
+				exchange.name,
+				total_24h_deposits, 
+				total_24h_withdrawals,
+				objInfo && objInfo.trade_volume_24h_btc_normalized ? Math.round(objInfo.trade_volume_24h_btc_normalized * 100000000) : null
+			]); 
 		}
 	}
 }
