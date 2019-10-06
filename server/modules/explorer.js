@@ -68,10 +68,11 @@ async function getTransactionsFromInternalIds(arrIds, handle){
 async function getRedirections(arrIds, handle){
 	if (arrIds.length == 0)
 		return handle([]);
+		console.log("getRedirections");
+		console.log(arrIds);
 	const idsSqlFilter = arrIds.join(",");
 	const rows = await db.query("SELECT DISTINCT(redirection_id) FROM (SELECT \n\
-		CASE redirection\n\
-		WHEN NOT NULL THEN redirection \n\
+		CASE WHEN redirection IS NOT NULL THEN redirection \n\
 		ELSE id \n\
 		END redirection_id\n\
 	 FROM btc_wallets WHERE id IN (" +idsSqlFilter +"))s");
@@ -81,7 +82,6 @@ async function getRedirections(arrIds, handle){
 		return handle(rows.map(function(row){return row.redirection_id}));
 	}
 }
-
 exports.getTransactionsFromWallets = getTransactionsFromWallets;
 exports.getRedirections = getRedirections;
 exports.getTransactionFromTxId = getTransactionFromTxId;

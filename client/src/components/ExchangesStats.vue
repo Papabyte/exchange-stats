@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="main">
 	<NavBar selected_item='0' />
 	<RankingTable />
 
@@ -19,6 +19,3 @@ export default {
 }
 </script>
 
-<style lang='scss'>
-
-</style>

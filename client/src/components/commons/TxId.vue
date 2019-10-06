@@ -2,7 +2,7 @@
 <div>
 	
 <div class="d-inline">
- <span v-if="label">{{label}}</span><span class="tx_id">{{tx_id}}</span>
+ <span  v-if="label">{{label}}</span><span class="tx_id text-break">{{tx_id}}</span>
 </div>
 	<div class="d-inline">
 		<b-link target="_blank" :href="'https://blockstream.info/tx/'+tx_id">

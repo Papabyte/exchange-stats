@@ -16,7 +16,7 @@ require('./modules/sqlite_tables.js').create().then(function(){
 
 	const app = express()
 
-	app.get('/wallet/:id/:page', function(request, response){
+	app.get('/api/wallet/:id/:page', function(request, response){
 		const id = Number(request.params.id);
 		const page = request.params.page ? Number(request.params.page) : 0;
 		if (!validationUtils.isNonnegativeInteger(id))
@@ -31,7 +31,7 @@ require('./modules/sqlite_tables.js').create().then(function(){
 		})
 	});
 
-	app.get('/wallet/:id', function(request, response){
+	app.get('/api/wallet/:id', function(request, response){
 		const id = Number(request.params.id);
 		if (!validationUtils.isNonnegativeInteger(id))
 			return response.status(400).send('Wrong wallet id');
@@ -47,7 +47,7 @@ require('./modules/sqlite_tables.js').create().then(function(){
 	});
 
 
-	app.get('/address/:address', function(request, response){
+	app.get('/api/address/:address', function(request, response){
 		const address = request.params.address;
 		if (!validate(address))
 			return response.status(400).send('Wrong BTC address');
@@ -59,12 +59,12 @@ require('./modules/sqlite_tables.js').create().then(function(){
 	});
 
 
-	app.get('/exchanges', function(request, response){
+	app.get('/api/exchanges', function(request, response){
 		console.error('exchanges');
 			return response.send(	exchanges.getExchangesList());
 	});
 
-	app.get('/exchange/:exchange', function(request, response){
+	app.get('/api/exchange/:exchange', function(request, response){
 
 		const wallet_ids = exchanges.getExchangeWalletIds(request.params.exchange);
 		explorer.getRedirections(wallet_ids, function(redirected_ids){
@@ -74,7 +74,7 @@ require('./modules/sqlite_tables.js').create().then(function(){
 		})
 	});
 
-	app.get('/txid/:tx_id', function(request, response){
+	app.get('/api/txid/:tx_id', function(request, response){
 		const tx_id = request.params.tx_id;
 		console.error(tx_id);
 		if (!validationUtils.isValidHexadecimal(tx_id, 64))
@@ -85,12 +85,16 @@ require('./modules/sqlite_tables.js').create().then(function(){
 	});
 	
 
-	app.get('/ranking', function(request, response){
+	app.get('/api/ranking', function(request, response){
 		exchanges.getLastRanking(function(arrLastRanking){
 		return response.send(arrLastRanking);
 		});
 	});
 
+	app.get('/api/pools', function(request, response){
+		console.log('/api/pools');
+		return response.send(aa_handler.getCurrentPools());
+	});
 
 	app.listen(conf.api_port);
 

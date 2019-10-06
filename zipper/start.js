@@ -10,7 +10,7 @@ const client = new Client({
 mainLoop()
 
 async function mainLoop(){
-	var nextBlock = await saveBlocksOndiskAndGetNextHash("0000000000000000381bf59ad65cd596cf7a8cd75c620c0ef7f8c2d4c5ea3dc8");
+	var nextBlock = await saveBlocksOndiskAndGetNextHash("00000000000000000472e4d1c7a6c2dee2738119d0c3edfb97b5264edae09621");
 	while(1){
 		nextBlock = await saveBlocksOndiskAndGetNextHash(nextBlock);
 	}
@@ -19,46 +19,48 @@ async function mainLoop(){
 function saveBlocksOndiskAndGetNextHash(block_hash){
 
 	return new Promise(async function(resolve){
-		client.getBlockByHash(block_hash, { extension: 'json' }).then(async (block) => {
-			console.log("block " + block.height);
-			const txs = block.tx;
+		try {
+			client.getBlockByHash(block_hash, { extension: 'json' }).then(async (block) => {
+				console.log("block " + block.height);
+				const txs = block.tx;
 
-			for (var i=0; i<	txs.length; i++){
-				var tx = txs[i];
-				delete tx.hash;
-				delete tx.version;
-				delete tx.size;
-				delete tx.vsize;
-				delete tx.weight;
-				delete tx.locktime;
-				delete tx.hex;
+				for (var i=0; i<	txs.length; i++){
+					var tx = txs[i];
+					delete tx.hash;
+					delete tx.version;
+					delete tx.size;
+					delete tx.vsize;
+					delete tx.weight;
+					delete tx.locktime;
+					delete tx.hex;
 
-				var vin = tx.vin;
-				for (var j=0; j<	vin.length; j++){
-					delete vin[j].scriptSig;
-					delete vin[j].txinwitness;
-					delete vin[j].sequence;
+					var vin = tx.vin;
+					for (var j=0; j<	vin.length; j++){
+						delete vin[j].scriptSig;
+						delete vin[j].txinwitness;
+						delete vin[j].sequence;
+					}
+					
+					var vout = tx.vout;
+
+					for (var j=0; j<	vout.length; j++){
+						delete vout[j].scriptPubKey.asm;
+						delete vout[j].scriptPubKey.hex;
+						delete vout[j].hex;
+					}
 				}
-				
-				var vout = tx.vout;
 
-				for (var j=0; j<	vout.length; j++){
-					delete vout[j].scriptPubKey.asm;
-					delete vout[j].scriptPubKey.hex;
-					delete vout[j].hex;
-				}
-			}
+				var bufferObject = new Buffer.from(JSON.stringify(block));
+				zlib.gzip(bufferObject, function(err, zippedData) {
+					fs.writeFile("blocks/"+block.height+'.gz',zippedData, ()=>{});
+				})
 
-			var bufferObject = new Buffer.from(JSON.stringify(block));
-			zlib.gzip(bufferObject, function(err, zippedData) {
-				fs.writeFile("blocks/"+block.height+'.gz',zippedData, ()=>{});
+				resolve(block.nextblockhash);
 			})
-
-			resolve(block.nextblockhash);
-		}).catch( (error) => { 
+		} catch(error) { 
 			console.log(error);
 			saveBlocksOndiskAndGetNextHash(block_hash).then(resolve);
-		});
+		}
 	});
 }
 

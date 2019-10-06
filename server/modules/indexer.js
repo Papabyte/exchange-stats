@@ -58,8 +58,8 @@ var lastBlockHeightProcessed;
 	await db.query("INSERT OR IGNORE INTO processed_blocks (block_height,tx_index) VALUES (0,-1)");
 	if (process.env.delete)
 		await db.query("PRAGMA journal_mode=DELETE");
-	else
-		await db.query("PRAGMA journal_mode=WAL");
+	else if (process.env.memory)
+		await db.query("PRAGMA journal_mode=MEMORY");
 
 })();
 
@@ -72,7 +72,7 @@ function getLastHeightThenProcess(){
 		if (error)
 			return error;
 		if (process.env.testnet)
-			processToBlockHeight(last_block_height - 450000);
+			processToBlockHeight(last_block_height - 420000);
 		else
 			processToBlockHeight(last_block_height - confirmationsBeforeIndexing);
 	});
@@ -162,33 +162,35 @@ async function processBlock(objBlock, start_tx_index, handle){
 
 
 function getInputAddressesIdAndValueIn(inputs){
-	return new Promise(async function(resolve){
-		//sqlite returns an error if expression is too deep, so we divide in chunks of 500 inputs
-		function appendRows(inputs){
-			return new Promise(async function(resolve_2){
-				const inputsSlice = inputs.slice(0, 500);
-				const sqlFilter =	inputsSlice.map(function(input){ return " (transactions.tx_id='"+input.tx_id+"' AND transactions_to.n="+input.vout+")";}).join(' OR ');
-				var rows = await db.query("SELECT transactions_to.address_id,amount,tx_id FROM transactions INNER JOIN transactions_to USING(id) WHERE "+ sqlFilter);
-				if (inputs.length > 500)
-					return resolve_2(rows.concat(await appendRows(inputs.slice(500))));
-				else
-					return resolve_2(rows);
+	return new Promise(function(resolve){
+		db.executeInTransaction(async function doWork(conn, cb){
+			//sqlite returns an error if expression is too deep, so we divide in chunks of 500 inputs
+			function appendRows(inputs){
+				return new Promise(async function(resolve_2){
+					const inputsSlice = inputs.slice(0, 500);
+					const sqlFilter =	inputsSlice.map(function(input){ return " (transactions.tx_id='"+input.tx_id+"' AND transactions_to.n="+input.vout+")";}).join(' OR ');
+					var rows = await conn.query("SELECT transactions_to.address_id,amount,tx_id FROM transactions INNER JOIN transactions_to USING(id) WHERE "+ sqlFilter);
+					if (inputs.length > 500)
+						return resolve_2(rows.concat(await appendRows(inputs.slice(500))));
+					else
+						return resolve_2(rows);
+				});
+			}
+			var rows = await appendRows(inputs);
+			if (rows.length != inputs.length){
+				throw Error("input missing " + rows.length + " " +inputs.length);
+			}
+			var value_in = 0;
+			var input_address_ids = rows.map(function(row){
+				value_in+= row.amount;
+				return row.address_id
+			}).filter(function(row){
+				return !!row;
 			});
-		}
-
-		var rows = await appendRows(inputs);
-		if (rows.length != inputs.length){
-			throw Error("input missing " + rows.length + " " +inputs.length);
-		}
-		var value_in = 0;
-		var input_address_ids = rows.map(function(row){
-			value_in+= row.amount;
-			return row.address_id
-		}).filter(function(row){
-			return !!row;
-		 });
-		input_address_ids = [...new Set(input_address_ids)];
-		resolve({input_address_ids:input_address_ids, value_in: value_in});
+			input_address_ids = [...new Set(input_address_ids)];
+			cb();
+			resolve({input_address_ids:input_address_ids, value_in: value_in});
+		});
 	});
 }
 
@@ -265,13 +267,13 @@ function mergeWallets(objInputs, block_height, block_time, tx_index){
 	return new Promise(async function(resolve){
 		if (objInputs.input_address_ids.length > 1){
 			db.takeConnectionFromPool(async function(conn) {
+				await conn.query("BEGIN");
 				var InputaddressesSqlString = objInputs.input_address_ids.join(",");
 				var rows =  await conn.query("SELECT addr_count,id FROM btc_wallets WHERE id \n\
 				IN(SELECT DISTINCT(wallet_id) FROM btc_addresses \n\
 					WHERE btc_addresses.id IN("+InputaddressesSqlString+"))\n\
 					ORDER BY addr_count DESC,id ASC"); 
 				var arrQueries = [];
-				conn.addQuery(arrQueries, "BEGIN");
 
 
 				var wallet_ids_to_update = rows.splice(1).map(function(row){
@@ -340,7 +342,7 @@ function downloadBlockAndParse(blockheight, handle){
 		}
 		zlib.unzip(body, function(err, unZippedData) {
 			if (err) {
-				throw Error("error in unzip decompress using zlib module", err);
+				return downloadBlockAndParse(blockheight, handle);
 			} else{
 				var objBlock = JSON.parse(unZippedData);
 				console.error("block " + blockheight + " downloaded");
