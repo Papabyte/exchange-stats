@@ -8,8 +8,6 @@ const validate = require('bitcoin-address-validation');
 
 require('./modules/sqlite_tables.js').create().then(function(){
 
-	console.error("before indexer");
-
 	const indexer = require('./modules/indexer.js');
 	const explorer = require('./modules/explorer.js');
 	const exchanges = require('./modules/exchanges.js');
@@ -35,10 +33,8 @@ require('./modules/sqlite_tables.js').create().then(function(){
 		const id = Number(request.params.id);
 		if (!validationUtils.isNonnegativeInteger(id))
 			return response.status(400).send('Wrong wallet id');
-
 		explorer.getRedirections([id], function(redirected_ids){
 			console.error("redirected_ids");
-
 			console.error(redirected_ids);
 			explorer.getTransactionsFromWallets(redirected_ids, 0, function(assocTxsFromWallet){
 				return response.send({txs: assocTxsFromWallet, redirected_id: redirected_ids[0]});
@@ -60,16 +56,17 @@ require('./modules/sqlite_tables.js').create().then(function(){
 
 
 	app.get('/api/exchanges', function(request, response){
-		console.error('exchanges');
 			return response.send(	exchanges.getExchangesList());
 	});
 
 	app.get('/api/exchange/:exchange', function(request, response){
-
-		const wallet_ids = exchanges.getExchangeWalletIds(request.params.exchange);
+		const exchange = request.params.exchange;
+		if(!validationUtils.isNonemptyString(exchange))
+			return response.status(400).send('Wrong exchange id');
+		const wallet_ids = exchanges.getExchangeWalletIds(exchange);
 		explorer.getRedirections(wallet_ids, function(redirected_ids){
 			explorer.getTransactionsFromWallets(redirected_ids, 0, function(assocTxsFromWallet){
-				return response.send({txs: assocTxsFromWallet, wallet_ids: redirected_ids, name: exchanges.getExchangeName(request.params.exchange)});
+				return response.send({txs: assocTxsFromWallet, wallet_ids: redirected_ids, name: exchanges.getExchangeName(exchange)});
 			});
 		})
 	});
@@ -92,31 +89,30 @@ require('./modules/sqlite_tables.js').create().then(function(){
 	});
 
 	app.get('/api/pools', function(request, response){
-		console.log('/api/pools');
 		return response.send(aa_handler.getCurrentPools());
+	});
+
+	app.get('/api/challenges/:exchange', function(request, response){
+		const exchange = request.params.exchange;
+		if(!validationUtils.isNonemptyString(exchange))
+			return response.status(400).send('Wrong exchange id');
+		return response.send(aa_handler.getCurrentChallengesForExchange(exchange));
+	});
+
+	app.get('/api/challenges', function(request, response){
+		console.log('/api/challenges');
+		return response.send(aa_handler.getCurrentChallenges());
+	});
+
+	app.get('/api/getredirection/:id', function(request, response){
+		const id = Number(request.params.id);
+		if (!validationUtils.isNonnegativeInteger(id))
+			return response.status(400).send('Wrong wallet id');
+		explorer.getRedirections([id], function(ids){
+			return response.send({redirected_id: ids[0]});
+		});
 	});
 
 	app.listen(conf.api_port);
 
 });
-
-
-
-
-
-/*
-const fs = require('fs');
-const assocExchanges = {};
-var count = 0;
-exchanges.forEach(function(row){
-
-	assocExchanges[row.id] = {};
-	assocExchanges[row.id].name = row.name;
-	assocExchanges[row.id].url = row.url;
-	assocExchanges[row.id].country = row.country;
-	count++;
-	
-});
-fs.writeFile( 'echa.json', JSON.stringify(assocExchanges), ()=>{});
-console.log(count);
-*/

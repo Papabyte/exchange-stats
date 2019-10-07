@@ -5,18 +5,22 @@ const api = require('./coingecko_api.js');
 
 const db = require('ocore/db.js');
 
+var assocWalletIdsByExchange = null;
 
 processNewRanking();
 
 async function processNewRanking(){
+
+	if (!assocWalletIdsByExchange)
+		return setTimeout(processNewRanking, 1000); //wait that aa handler set assocWalletIdsByExchange
+
 	for (var key in exchanges){
 		var exchange = exchanges[key];
 		var total_24h_deposits=null;
 		var total_24h_withdrawals=null;
 		var total_btc_wallet=null;
-		if (exchange.current_wallets){
-			console.error(exchange.current_wallets);
-			var arrWalletIds = exchange.current_wallets;
+		if (assocWalletIdsByExchange[exchange]){
+			var arrWalletIds = assocWalletIdsByExchange[exchange];
 			var lastHeight = await indexer.getLastProcessedHeight();
 			total_24h_deposits = await stats.getTotalDepositedToWallets(arrWalletIds, lastHeight - 10 * 6 * 24 , lastHeight);
 			total_24h_withdrawals = await stats.getTotalWithdrawnFromWallets(arrWalletIds, lastHeight - 10 * 6 * 24 , lastHeight);
@@ -50,8 +54,8 @@ function getLastRanking(handle){
 }
 
 function getExchangeWalletIds(exchange){
-	if (exchanges[exchange] && exchanges[exchange].current_wallets)
-		return exchanges[exchange].current_wallets;
+	if (exchanges[exchange] && assocWalletIdsByExchange[exchange])
+		return exchanges[exchange].current_wallets = assocWalletIdsByExchange[exchange];
 	else
 		return [];
 }
@@ -72,7 +76,13 @@ function getExchangesList(){
 	return arrExchanges;
 }
 
+
+function setWalletIdsByExchange(obj){
+	assocWalletIdsByExchange = obj;
+}
+
 exports.getLastRanking = getLastRanking;
 exports.getExchangeWalletIds = getExchangeWalletIds;
 exports.getExchangesList = getExchangesList;
 exports.getExchangeName = getExchangeName;
+exports.setWalletIdsByExchange = setWalletIdsByExchange;

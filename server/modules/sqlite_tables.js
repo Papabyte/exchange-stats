@@ -36,8 +36,8 @@ exports.create = function(){
 		amount INTEGER NOT NULL,\n\
 		n SMALLINT NOT NULL\n\
 		)");
-		
-	await db.query("CREATE INDEX IF NOT EXISTS toByWalletId ON transactions_to(wallet_id) WHERE wallet_id IS NOT NULL");
+
+	await db.query("CREATE INDEX IF NOT EXISTS toByWalletId ON transactions_to(wallet_id ,address_id)");
 	await db.query("CREATE UNIQUE INDEX IF NOT EXISTS toById ON transactions_to(id,n)");
 	await db.query("CREATE INDEX IF NOT EXISTS toByAddressId ON transactions_to(address_id)");
 
@@ -50,6 +50,7 @@ exports.create = function(){
 		await db.query("PRAGMA journal_mode=DELETE");
 	else
 		await db.query("PRAGMA journal_mode=WAL");
+
 	await db.query("CREATE TABLE IF NOT EXISTS last_exchanges_ranking (\n\
 		exchange_id VARCHAR(60) PRIMARY KEY, \n\
 		name VARCHAR(60),\n\

@@ -12,12 +12,12 @@ import feather from 'vue-icon'
 
 import "@/assets/global.css"
 
-Vue.use(feather, 'v-icon')
+Vue.use(feather, 'v-icon');
 
-Vue.use(VueAxios, axios)
-Vue.use(BootstrapVue)
+Vue.use(VueAxios, axios);
+Vue.use(BootstrapVue);
 
-Vue.config.productionTip = false
+Vue.config.productionTip = false;
 
 new Vue({
 	el: '#app',

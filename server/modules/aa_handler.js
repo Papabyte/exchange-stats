@@ -5,48 +5,47 @@ const myWitnesses = require('ocore/my_witnesses.js');
 const network = require('ocore/network.js');
 const db = require('ocore/db.js');
 
+const exchanges = require('./exchanges.js')
+
 var currentPools = [];
 var assocCurrentPoolsByExchange = {};
 
 var currentChallenges = [];
 var assocCurrentChallengesByExchange = {};
-var assocCurrentWalletIdsByExchange = {};
 
 myWitnesses.readMyWitnesses(function (arrWitnesses) {
 	if (arrWitnesses.length > 0)
 		return start();
-	console.log('will init witnesses', conf.initial_witnesses);
 	myWitnesses.insertWitnesses(conf.initial_witnesses, start);
 }, 'ignore');
 
 
 function start(){
 	light_wallet.setLightVendorHost(conf.hub);
-
 	db.query("INSERT "+db.getIgnore()+" INTO my_watched_addresses (address) VALUES (?)", [conf.aa_address], function(){
-			network.addLightWatchedAddress(conf.address);
+		network.addLightWatchedAddress(conf.address);
+		refresh(),
+		setInterval(refresh, 60 *1000);
 	});
+}
+
+function refresh(){
 	network.requestFromLightVendor('light/get_aa_state_vars', {address: conf.aa_address},function(error, request, objStateVars){
 
-
-		const pairKeys = extractPairKeys(objStateVars);
-		
 		indexChallenges(objStateVars);
 		indexRewardPools(objStateVars);
-
-
 		console.error("currentPools");
 		console.error(JSON.stringify(currentPools));
+		console.error("currentChallenges");
+		console.error(JSON.stringify(currentChallenges));
+		
 		console.error("assocCurrentPoolsByExchange");
 		console.error(JSON.stringify(assocCurrentPoolsByExchange));
 		console.error("assocCurrentChallengesByExchange");
 		console.error(JSON.stringify(assocCurrentChallengesByExchange));
-		console.error("assocCurrentWalletIdsByExchange");
-		console.error(JSON.stringify(assocCurrentWalletIdsByExchange));
 	});
 
 }
-
 
 function indexRewardPools(objStateVars){
 
@@ -63,7 +62,7 @@ function indexRewardPools(objStateVars){
 			if (objStateVars[poolKey+'_exchange'] != undefined)
 				pool.exchange = objStateVars[poolKey+'_exchange'];
 			else
-				pool.exchange = 'all';
+				pool.exchange = 'any';
 			pools.push(pool);
 			if (!assocPoolsByExchange[pool.exchange])
 				assocPoolsByExchange[pool.exchange] = [];
@@ -85,7 +84,7 @@ function indexChallenges(objStateVars){
 	challengeKeys.forEach(function(key){
 
 		const challenge = {};
-		challenge.status = objStateVars;
+		challenge.status = objStateVars[key];
 		const pairKey = convertChallengeKeyToPairKey(key)
 		const exchange = objStateVars[pairKey + "_exchange"];
 		const wallet_id = objStateVars[pairKey + "_wallet_id"];
@@ -94,15 +93,19 @@ function indexChallenges(objStateVars){
 
 		if(!assocWalletIdsByExchange[exchange])
 			assocWalletIdsByExchange[exchange] = [];
-		if (objStateVars[pairKey + "_committed_outcome"] == "yes")
+		if (objStateVars[pairKey + "_committed_outcome"] == "in")
 			assocWalletIdsByExchange[exchange].push(wallet_id);
-
 
 		if (challenge.status == "onreview"){
 			const outcome = objStateVars[key+ "_outcome"]
 			challenge.outcome = outcome;
+			challenge.committed_outcome = objStateVars[pairKey + "_committed_outcome"];
+			challenge.initial_outcome = objStateVars[key + "_initial_outcome"];
 			challenge.staked_on_outcome = objStateVars[key + "_total_staked_on_" + outcome];
+			challenge.staked_on_opposite = objStateVars[key + "_total_staked_on_" + (outcome == "in" ? "out" :"in") ];
+			challenge.countdown_start= objStateVars[key + "_countdown_start"];
 			challenge.total_staked = objStateVars[key + "_total_staked"];
+
 		}
 
 		challenges.push(challenge);
@@ -113,7 +116,7 @@ function indexChallenges(objStateVars){
 
 	currentChallenges = challenges;
 	assocCurrentChallengesByExchange = assocChallengesByExchange;
-	assocCurrentWalletIdsByExchange = assocWalletIdsByExchange;
+	exchanges.setWalletIdsByExchange(assocWalletIdsByExchange);;
 
 }
 
@@ -179,6 +182,11 @@ function extractPoolKeys(objStateVars){
  function getCurrentChallenges(){
 	return currentChallenges;
  }
+ function getCurrentChallengesForExchange(exchange){
+	return assocCurrentChallengesByExchange[exchange] || [];
+ }
+
 
  exports.getCurrentPools = getCurrentPools;
  exports.getCurrentChallenges = getCurrentChallenges;
+ exports.getCurrentChallengesForExchange = getCurrentChallengesForExchange;
