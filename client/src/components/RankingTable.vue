@@ -1,7 +1,7 @@
 <template>
 	<b-container fluid>
 		<b-row >
-		<EditWalletModal :exchange="clicked_exchange"/>
+		<EditWalletModal :prop_exchange="clicked_exchange"/>
 			<b-col offset-lg="1" lg="10" cols="12" class="py-3">
 				<b-row >
 					<b-col cols="12" class="py-3">
@@ -39,7 +39,7 @@
 									Explore wallet
 								</b-button>
 							</b-link>
-							<b-button v-else size="sm"  v-on:click="clicked_exchange=data.item.exchange_id" v-b-modal.addWallet>Add wallet</b-button>
+							<b-button v-else size="sm"  v-on:click="clicked_exchange=data.item.exchange_id" v-b-modal.editWallet>Add wallet</b-button>
 						</template>
 					</b-table>
 				</b-row>

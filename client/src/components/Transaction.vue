@@ -15,7 +15,7 @@
 				<b-col  cols="5" class="py-3 text-left">
 					<div class="w-100 px-4">
 						<WalletId v-if="transaction.from && transaction.from.id" label="Wallet: " :id="transaction.from.id"/>
-						<BtcAmount v-if="transaction.from && transaction.from.amount" label="Amount: " :amount="transaction.from.amount"/>
+						<BtcAmount v-if="transaction.from && transaction.from.amount" label="Amount: " :amount="transaction.from.amount" :isNegative="about_ids.indexOf(transaction.from.id)>-1"/>
 					</div>
 				</b-col>
 				<b-col cols="2" class="text-center">
@@ -28,7 +28,7 @@
 						<WalletId v-if="t_out.id" label="Wallet: " :id="t_out.id"/>
 						<span v-else>Wallet: unknown yet</span>
 						<BtcAddress v-if="t_out.address" label="Address: " :address="t_out.address"/>
-						<BtcAmount label="Amount: " :amount="t_out.amount"/>
+						<BtcAmount label="Amount: " :amount="t_out.amount" :isPositive="about_ids.indexOf(t_out.id)>-1"/>
 					</div>
 				</b-col>
 			</b-row >
@@ -49,13 +49,14 @@ export default {
 		TxId,
 		BtcAddress
 	},
-	props: ['transaction','tx_id','no_border'],
+	props: ['transaction','tx_id','no_border','about_wallet_ids'],
 	data() {
 		return {
+			about_ids: this.about_wallet_ids || []
 		}
 	},
 	created() {
-		console.log(JSON.stringify(this.transaction));
+		console.log(this.about_ids);
 	}
 }
 </script>

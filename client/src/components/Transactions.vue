@@ -1,16 +1,22 @@
 <template>
 	<b-container fluid>
+		<EditWalletModal :prop_exchange="exchange"  :prop_wallet_id="clicked_wallet" remove="1"/>
 		<b-row v-if="title">
 			<b-col offset-lg="1" lg="10" cols="12" class="py-3">
 			<h3 class="text-center">{{title}}</h3>
 			</b-col>
 		</b-row >
 		<b-col offset-lg="1" lg="10" cols="12" class="py-3">
-				<b-row v-if="knownWallets && !isSpinnerActive">
-				 Known wallets:
+				<b-row v-if="exchangeWallets && !isSpinnerActive">
+				 Wallets for this exchange:
 					<b-row class="pl-3" align-h="start">
-						<div v-for="(wallet,index) in knownWallets" v-bind:key="index">
-							<b-col ><b-link :to="'/explorer/'+wallet">{{wallet}}</b-link></b-col>
+						<div v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
+							<b-col >
+								<b-link :to="'/explorer/'+wallet">{{wallet}}</b-link>
+							<b-button size="sm"  v-on:click="clicked_wallet=wallet" v-b-modal.editWallet>remove wallet</b-button>
+
+							</b-col>
+
 						</div>
 					</b-row >
 				</b-row>
@@ -27,7 +33,7 @@
 			<b-col offset-lg="1" lg="10" cols="12" class="py-3 main-col">
 				<b-row  class="text-center">
 					<div  class="w-100" v-for="(transaction,key,index) in transactions" v-bind:key="key">
-					<Transaction :tx_id="key" :transaction="transaction" :no_border="index == (Object.keys(transactions).length-1)"/>
+					<Transaction :tx_id="key" :transaction="transaction" :no_border="index == (Object.keys(transactions).length-1)" :about_wallet_ids="redirected_ids"/>
 				</div>
 				</b-row>
 			</b-col>
@@ -42,10 +48,12 @@
 <script>
 import Transaction from './Transaction.vue'
 import validate from 'bitcoin-address-validation';
+import EditWalletModal from './commons/EditWalletModal.vue';
 
 export default {
 	components: {
-		Transaction
+		Transaction,
+		EditWalletModal
 	},
 	props: ['request_input'],
 	data() {
@@ -53,10 +61,13 @@ export default {
 			transactions: null,
 			count_total: null,
 			exchangeName: null,
-			knownWallets: null,
+			exchange :null,
+			exchangeWallets: null,
+			clicked_wallet: null,
 			title: null,
 			isSpinnerActive: true,
-			failoverText: null
+			failoverText: null,
+			redirected_ids: []
 		}
 	},
 	created() {
@@ -74,9 +85,11 @@ export default {
 			this.transactions = null;
 			this.count_total = null;
 			this.exchangeName = null;
-			this.knownWallets = null;
+			this.exchangeWallets = null;
+			this.exchange = null;
 			this.title = null;
 			this.failoverText =null;
+			this.redirected_ids = [];
 			if (Number(this.request_input)) { // it's a wallet id
 				this.title = "Transactions for wallet " + this.request_input;
 				this.axios.get('/api/wallet/' + this.request_input).then((response) => {
@@ -85,6 +98,8 @@ export default {
 				if (response.data.txs){
 					this.transactions = response.data.txs.txs;
 					this.count_total = response.data.txs.count_total;
+					this.redirected_ids = [response.data.redirected_id];
+
 				} else {
 					this.failoverText = "No transaction found for wallet " + this.request_input;
 				}
@@ -110,6 +125,7 @@ export default {
 				if (response.data.txs){
 						this.transactions = response.data.txs.txs;
 						this.count_total = response.data.txs.count_total;
+						this.redirected_ids = [response.data.redirected_id];
 				} else {
 					this.failoverText = "No wallet known for address " + this.request_input  + ".";
 				}
@@ -122,7 +138,9 @@ export default {
 					if (response.data.txs){
 						this.transactions = response.data.txs.txs;
 						this.count_total = response.data.txs.count_total;
-						this.knownWallets = response.data.wallet_ids;
+						this.exchangeWallets = response.data.wallet_ids;
+						this.redirected_ids = response.data.redirected_ids;
+						this.exchange = this.request_input;
 					} else if (!response.data.wallet_ids.length == 0){
 						this.failoverText = "No wallet known for exchange " + response.data.name + ".";
 					} else {

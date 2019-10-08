@@ -58,6 +58,8 @@ function indexRewardPools(objStateVars){
 		if(objStateVars[poolKey+'_number_of_rewards'] > 0){
 			const pool = {};
 			pool.number_rewards = objStateVars[poolKey+'_number_of_rewards'];
+			pool.pool_id = poolKey.split('_')[1];
+
 			pool.reward_amount = objStateVars[poolKey+'_reward_amount'];
 			if (objStateVars[poolKey+'_exchange'] != undefined)
 				pool.exchange = objStateVars[poolKey+'_exchange'];
@@ -96,7 +98,7 @@ function indexChallenges(objStateVars){
 		if (objStateVars[pairKey + "_committed_outcome"] == "in")
 			assocWalletIdsByExchange[exchange].push(wallet_id);
 
-		if (challenge.status == "onreview"){
+	//	if (challenge.status == "onreview"){
 			const outcome = objStateVars[key+ "_outcome"]
 			challenge.outcome = outcome;
 			challenge.committed_outcome = objStateVars[pairKey + "_committed_outcome"];
@@ -106,7 +108,7 @@ function indexChallenges(objStateVars){
 			challenge.countdown_start= objStateVars[key + "_countdown_start"];
 			challenge.total_staked = objStateVars[key + "_total_staked"];
 
-		}
+	//	}
 
 		challenges.push(challenge);
 		if(!assocChallengesByExchange[challenge.exchange])
@@ -181,12 +183,32 @@ function extractPoolKeys(objStateVars){
 
  function getCurrentChallenges(){
 	return currentChallenges;
- }
- function getCurrentChallengesForExchange(exchange){
-	return assocCurrentChallengesByExchange[exchange] || [];
- }
+}
 
+function getCurrentChallengesForExchange(exchange){
+	return assocCurrentChallengesByExchange[exchange] || [];
+}
+
+function getBestPoolForExchange(exchange){
+	var bestPool = {
+		reward_amount: 0
+	};
+	for (var key in assocCurrentPoolsByExchange[exchange]){
+		console.log(assocCurrentPoolsByExchange[exchange][key]);
+		if (assocCurrentPoolsByExchange[exchange][key].reward_amount > bestPool.reward_amount)
+		bestPool = assocCurrentPoolsByExchange[exchange][key];
+	}
+
+	for (var key in assocCurrentPoolsByExchange["any"]){
+		console.log(assocCurrentPoolsByExchange["any"][key]);
+		if (assocCurrentPoolsByExchange["any"][key].reward_amount > bestPool.reward_amount)
+		bestPool = assocCurrentPoolsByExchange["any"][key];
+	}
+	return bestPool;
+}
+ 
 
  exports.getCurrentPools = getCurrentPools;
  exports.getCurrentChallenges = getCurrentChallenges;
  exports.getCurrentChallengesForExchange = getCurrentChallengesForExchange;
+ exports.getBestPoolForExchange = getBestPoolForExchange;

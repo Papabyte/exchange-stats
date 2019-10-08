@@ -66,7 +66,7 @@ require('./modules/sqlite_tables.js').create().then(function(){
 		const wallet_ids = exchanges.getExchangeWalletIds(exchange);
 		explorer.getRedirections(wallet_ids, function(redirected_ids){
 			explorer.getTransactionsFromWallets(redirected_ids, 0, function(assocTxsFromWallet){
-				return response.send({txs: assocTxsFromWallet, wallet_ids: redirected_ids, name: exchanges.getExchangeName(exchange)});
+				return response.send({txs: assocTxsFromWallet, wallet_ids: wallet_ids, redirected_ids: redirected_ids, name: exchanges.getExchangeName(exchange)});
 			});
 		})
 	});
@@ -91,6 +91,15 @@ require('./modules/sqlite_tables.js').create().then(function(){
 	app.get('/api/pools', function(request, response){
 		return response.send(aa_handler.getCurrentPools());
 	});
+
+	app.get('/api/pool/:exchange', function(request, response){
+		const exchange = request.params.exchange;
+		if(!validationUtils.isNonemptyString(exchange))
+			return response.status(400).send('Wrong exchange id');
+		return response.send(aa_handler.getBestPoolForExchange(exchange));
+	});
+	
+
 
 	app.get('/api/challenges/:exchange', function(request, response){
 		const exchange = request.params.exchange;

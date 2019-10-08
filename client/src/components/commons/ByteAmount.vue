@@ -1,7 +1,5 @@
 <template>
-	<div>
-		<span v-if="label"> {{label}}</span>{{amount/1000000000}} GB
-	</div>
+	<span><span v-if="label"> {{label}}</span>{{amount/1000000000}} GB</span>
 </template>
 
 <script>

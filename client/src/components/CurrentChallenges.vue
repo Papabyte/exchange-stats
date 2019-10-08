@@ -1,5 +1,6 @@
 <template>
 	<b-container fluid>
+		<ContestOperationModal :prop_operation_item="clicked_item"/>
 		<b-row class="main-col">
 	<b-pagination
 					v-model="currentPage"
@@ -30,10 +31,10 @@
 							<ByteAmount :amount="data.item.total_staked" />
 						</template>
 						<template v-slot:cell(action)="data">
-						<b-button v-if="data.item.status == 'onreview' && !data.item.is_commitable" class="mr-2" size="s">contest</b-button>
+						<b-button v-if="data.item.status == 'onreview' && !data.item.is_commitable" v-on:click="clicked_item=data.item" class="mr-2" size="s" v-b-modal.contestOperation>contest</b-button>
 						<b-button v-if="data.item.status == 'onreview' && data.item.is_commitable" v-on:click="commit(data.item)" class="mr-2" size="s">commit</b-button>
-
 						<b-button v-if="data.item.status == 'onreview'"  class="mr-2" size="s">view proofs</b-button>
+						<b-button v-if="data.item.status == 'committed'" v-on:click="claim(data.item)" class="mr-2" size="s">claim a gain</b-button>
 
 						</template>
 					</b-table>
@@ -44,13 +45,16 @@
 <script>
 const conf = require("../conf.js");
 import ByteAmount from './commons/ByteAmount.vue';
+import ContestOperationModal from './commons/ContestOperationModal.vue';
 
 	export default {
 		components: {
-			ByteAmount
+			ByteAmount,
+			ContestOperationModal
 		},
 		data() {
 			return {
+				clicked_item: null,
 				pools : null,
 				isSpinnerActive: true,
 					currentPage:0,
@@ -77,7 +81,7 @@ import ByteAmount from './commons/ByteAmount.vue';
 					console.log("challenges " +JSON.stringify(response.data));
 					response.data.forEach((row)=>{
 						const item = {};
-						if (row.status == "onreview"){
+						//if (row.status == "onreview"){
 							item.status = row.status ;
 							if (row.initial_outcome == "in"){
 								item.operation = "Add wallet " + row.wallet_id + " to exchange " + row.wallet_id +"?";
@@ -87,6 +91,7 @@ import ByteAmount from './commons/ByteAmount.vue';
 								item.operation = "Remove wallet " + row.wallet_id + " from exchange " + row.wallet_id +"?";
 								item.outcome = row.outcome == "out" ? "yes" : "no";
 							}
+							item.isRemovingOperation = row.outcome == "out";
 							item.initial_outcome = row.initial_outcome;
 							item.staked_on_outcome = row.staked_on_outcome;
 							item.total_staked = row.total_staked;
@@ -95,7 +100,7 @@ import ByteAmount from './commons/ByteAmount.vue';
 							if ((new Date().getTime() / 1000 - row.countdown_start) > conf.challenge_period_length){
 								item.is_commitable = true;
 							}
-						}
+					//	}
 						this.items.push(item);
 						
 					})
@@ -105,6 +110,23 @@ import ByteAmount from './commons/ByteAmount.vue';
 		methods:{
 
 			commit(item){
+				const base64url = require('base64url');
+				const data = {
+						number_of_rewards: this.nb_reward,
+						exchange: item.exchange,
+						commit: true
+				};
+				if (item.initial_outcome == "in")
+					data.add_wallet_id= item.wallet_id;
+				else
+					data.remove_wallet_id= item.wallet_id;
+
+				const json_string = JSON.stringify(data);
+				const base64data = base64url(json_string);
+				const href = (conf.testnet ? "byteball-tn" :"byteball")+":"+conf.aa_address+"?amount=10000&base64data="+base64data;
+				window.open(href, '_blank');
+			},
+			claim(item){
 				const base64url = require('base64url');
 				const data = {
 						number_of_rewards: this.nb_reward,
