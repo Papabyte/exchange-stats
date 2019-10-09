@@ -1,24 +1,31 @@
 <template>
 	<b-container fluid>
-		<EditWalletModal :prop_exchange="exchange"  :prop_wallet_id="clicked_wallet" remove="1"/>
+		<EditWalletModal :prop_exchange="exchange" :prop_wallet_id="wallet_id"  :remove="!wallet_id"/>
 		<b-row v-if="title">
 			<b-col offset-lg="1" lg="10" cols="12" class="py-3">
 			<h3 class="text-center">{{title}}</h3>
 			</b-col>
 		</b-row >
 		<b-col offset-lg="1" lg="10" cols="12" class="py-3">
+			<b-row class="text-center" v-if="!isSpinnerActive&&failoverText">
+				{{failoverText}}
+			</b-row>
 				<b-row v-if="exchangeWallets && !isSpinnerActive">
 				 Wallets for this exchange:
 					<b-row class="pl-3" align-h="start">
 						<div v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
 							<b-col >
 								<b-link :to="'/explorer/'+wallet">{{wallet}}</b-link>
-							<b-button size="sm"  v-on:click="clicked_wallet=wallet" v-b-modal.editWallet>remove wallet</b-button>
+							<b-button size="sm" v-b-modal.editWallet>remove wallet</b-button>
 
 							</b-col>
-
 						</div>
 					</b-row >
+				</b-row>
+
+				<b-row v-if="wallet_id">
+							<b-button size="sm"  v-b-modal.editWallet>add to exchange</b-button>
+
 				</b-row>
 			<b-row v-if="count_total  && !isSpinnerActive">
 			{{count_total}} transaction{{count_total > 1 ? 's' : ''}} found.
@@ -39,14 +46,12 @@
 			</b-col>
 
 		</b-row>
-					<b-row class="text-center" v-if="!isSpinnerActive&&failoverText">
-					{{failoverText}}
-			</b-row>
+
 	</b-container>
 </template>
 
 <script>
-import Transaction from './Transaction.vue'
+import Transaction from './ExplorerTransaction.vue'
 import validate from 'bitcoin-address-validation';
 import EditWalletModal from './commons/EditWalletModal.vue';
 
@@ -62,13 +67,14 @@ export default {
 			count_total: null,
 			exchangeName: null,
 			exchange :null,
+			wallet_id: null,
 			exchangeWallets: null,
 			clicked_wallet: null,
 			title: null,
 			isSpinnerActive: true,
 			failoverText: null,
 			redirected_ids: []
-		}
+			}
 	},
 	created() {
 		this.getTransactions();
@@ -90,15 +96,16 @@ export default {
 			this.title = null;
 			this.failoverText =null;
 			this.redirected_ids = [];
+			this.wallet_id = null;
 			if (Number(this.request_input)) { // it's a wallet id
 				this.title = "Transactions for wallet " + this.request_input;
 				this.axios.get('/api/wallet/' + this.request_input).then((response) => {
 				this.title = "Transactions for wallet " + response.data.redirected_id;
-
 				if (response.data.txs){
 					this.transactions = response.data.txs.txs;
 					this.count_total = response.data.txs.count_total;
 					this.redirected_ids = [response.data.redirected_id];
+					this.wallet_id = response.data.redirected_id;
 
 				} else {
 					this.failoverText = "No transaction found for wallet " + this.request_input;
@@ -108,7 +115,6 @@ export default {
 			} else if (isTxId(this.request_input)) { // it's a tx id
 				this.title = "Transaction " + this.request_input;
 				this.axios.get('/api/txid/' + this.request_input).then((response) => {
-					console.log(response.data);
 					if (response.data.txs){
 						this.transactions = response.data.txs;
 						this.count_total = null;
@@ -126,6 +132,7 @@ export default {
 						this.transactions = response.data.txs.txs;
 						this.count_total = response.data.txs.count_total;
 						this.redirected_ids = [response.data.redirected_id];
+						this.wallet_id = response.data.redirected_id;
 				} else {
 					this.failoverText = "No wallet known for address " + this.request_input  + ".";
 				}

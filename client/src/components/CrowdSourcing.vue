@@ -4,8 +4,8 @@
 			<b-container fluid >
 							<b-row >
 				<b-col offset-lg="2" lg="8"  cols="12" class="py-3">
-					<h3 class="text-center">Current challenges</h3>
-						<CurrentChallenges />
+					<h3 class="text-center">Current operations</h3>
+						<CurrentOperations />
 				</b-col>
 			</b-row >
 			<b-row >
@@ -19,15 +19,15 @@
 </template>
 
 <script>
-import NavBar from './NavBar.vue'
-import CurrentPools from './CurrentPools.vue'
-import CurrentChallenges from './CurrentChallenges.vue'
+import NavBar from './commons/NavBar.vue'
+import CurrentPools from './CrowdSourcingPools.vue'
+import CurrentOperations from './CrowdSourcingOperations.vue'
 
 export default {
 	components: {
 		NavBar,
 		CurrentPools,
-		CurrentChallenges
+		CurrentOperations
 	}
 }
 </script>

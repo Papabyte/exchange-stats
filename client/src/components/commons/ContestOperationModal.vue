@@ -1,20 +1,39 @@
 <template>
 	
 
-	<b-modal id="contestOperation" :title="getTitle" @ok="handleOk">
-		<b-container fluid >
+	<b-modal id="contestOperation" :title="getTitle" @close="link=false" :hide-footer="!!link" @ok="handleOk">
+		<b-container v-if="!link" fluid >
 				<b-row class="pt-3" >
 				<label for="range-1">Amount to stake</label>
-			<b-form-input id="range-1" v-model="amount" type="range" min="0.000001" :max="maxStake" :step="maxStake/100"></b-form-input>
-				<byteAmount :amount="stakeAmount"/>
+			<b-form-input id="range-1" v-model="stakeAmountGb" type="range" min="0.000001" :max="reversalStakeGb*1.01" :step="reversalStakeGb/100"></b-form-input>
 			</b-row >
 			<b-row>
 				<span v-if="text_error" class="pt-3">{{text_error}}</span>
-				<div v-if="rewardAmount>0" class="pt-3">
-					Stake <ByteAmount :amount="stakeAmount" />, gain <ByteAmount :amount="rewardAmount" /> if wallet {{wallet}} is successfully {{remove ? "removed" : "added"}} from exchange {{exchange}}
+				<div class="pt-3">
+					Stake <ByteAmount :amount="stakeAmountGb*1000000000" />, gain <ByteAmount :amount="potentialGainAmount" /> if outcome is eventually reversed.
 				</div>
 			</b-row >
-
+			<b-row v-if="amountLeftToReverse>0">
+			<div class="pt-3">
+					<ByteAmount :amount="amountLeftToReverse" /> still to stake to reverse outcome.
+			</div>
+			</b-row >
+			<b-row>
+				<UrlInputs v-on:url_1_update="update_url_1" v-on:url_2_update="update_url_2"/>
+			</b-row >
+		</b-container>
+		<b-container v-else fluid >
+			<b-row class="pt-3">
+				By clicking the link below, your Obyte wallet will open and ready to send a transaction for contesting the operation.
+			</b-row >
+		<b-row class="pt-3">
+			<span class="text-break">
+				<a :href="link">{{link}}</a>
+			</span>
+			</b-row >
+			<b-row class="py-3">
+				It will be taken into account after a few minutes when the transaction is confirmed. Note that it could be canceled if meanwhile another user contested the operation. In this case, the AA would bounce the transaction to refund you.
+			</b-row >
 		</b-container>
 
 	</b-modal>
@@ -37,10 +56,13 @@ export default {
 			isOperationAllowed: false,
 			isCheckButtonActive: true,
 			isSpinnerActive: false,
-			rewardAmount: false,
 			coeff: conf.coef_challenge,
-			maxStake:0,
-			amount: 0
+			reversalStakeGb:0,
+			stakeAmountGb: 0,
+			stakeAmount: 0,
+			link: false,
+			url_1: null,
+			url_2: null
 		}
 	},
 	watch:{
@@ -48,8 +70,8 @@ export default {
 			console.log("watched");
 			console.log(this.prop_operation_item.staked_on_outcome);
 						console.log(conf.challenge_coef);
-			this.maxStake = (conf.challenge_coef*this.prop_operation_item.staked_on_outcome+10000)/1000000000;
-			this.amount = this.maxStake;
+			this.reversalStakeGb = (conf.challenge_coef*this.prop_operation_item.staked_on_outcome+10000)/1000000000;
+			this.stakeAmountGb = this.reversalStakeGb;
 
 			this.reset();
 		}
@@ -65,14 +87,26 @@ export default {
 			else
 				return ("Contest adding of wallet "+ this.prop_operation_item.wallet_id + " to exchange " + this.prop_operation_item.exchange);
 		},
-		stakeAmount:function(){
-
-			return this.amount*1000000000;
+		amountLeftToReverse: function(){
+				return ((this.reversalStakeGb - this.stakeAmountGb) * 1000000000).toPrecision(6) || 0;
+		},
+		newTotalOppositeStake: function(){
+			return this.stakeAmountGb*1000000000 + (this.prop_operation_item.total_staked - this.prop_operation_item.staked_on_outcome);
+		},
+		newTotalStake: function(){
+			return this.prop_operation_item.total_staked + this.stakeAmountGb*1000000000;
+		},
+		potentialGainAmount: function(){
+			return this.stakeAmountGb*1000000000 / this.newTotalOppositeStake *  this.newTotalStake - this.stakeAmountGb*1000000000;
 		}
-
-
 	},
 	methods:{
+		update_url_1(value){
+			this.url_1 = value;
+		},
+		update_url_2(value){
+			this.url_2 = value;
+		},
 		reset(){
 			this.isSpinnerActive = false;
 			this.isCheckButtonActive = true;
@@ -84,22 +118,23 @@ export default {
 		check(){
 
 		},
-		handleOk(){
-			console.log("ok");
+		handleOk(bvModalEvt){
+				bvModalEvt.preventDefault()	;
 				const base64url = require('base64url');
 				const data = {
 						exchange: this.prop_operation_item.exchange,
+						url_1: this.url_1,
+						url_2: this.url_2
 				};
 
 				if (this.prop_operation_item.isRemovingOperation)
 					data.add_wallet_id = this.prop_operation_item.wallet_id;
 				else
 					data.remove_wallet_id = this.prop_operation_item.wallet_id;
-
 				const json_string = JSON.stringify(data);
 				const base64data = base64url(json_string);
-				const href = (conf.testnet ? "byteball-tn" :"byteball")+":"+conf.aa_address+"?amount="
-					+this.stakeAmount+"&base64data="+base64data;
+				this.link = (conf.testnet ? "byteball-tn" :"byteball")+":"+conf.aa_address+"?amount="
+					+Math.round(this.stakeAmountGb*1000000000)+"&base64data="+base64data;
 				window.open(href, '_blank');
 		}
 	}

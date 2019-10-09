@@ -101,16 +101,16 @@ require('./modules/sqlite_tables.js').create().then(function(){
 	
 
 
-	app.get('/api/challenges/:exchange', function(request, response){
+	app.get('/api/operations/:exchange', function(request, response){
 		const exchange = request.params.exchange;
 		if(!validationUtils.isNonemptyString(exchange))
 			return response.status(400).send('Wrong exchange id');
-		return response.send(aa_handler.getCurrentChallengesForExchange(exchange));
+		return response.send(aa_handler.getCurrentOperationsForExchange(exchange));
 	});
 
-	app.get('/api/challenges', function(request, response){
-		console.log('/api/challenges');
-		return response.send(aa_handler.getCurrentChallenges());
+	app.get('/api/operations', function(request, response){
+		console.log('/api/operations');
+		return response.send(aa_handler.getCurrentOperations());
 	});
 
 	app.get('/api/getredirection/:id', function(request, response){

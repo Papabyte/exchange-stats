@@ -7,7 +7,7 @@ exports.api_port = process.env.testnet ? 1245 : 5000;
 
 exports.hub = process.env.testnet ? 'obyte.org/bb-test' : 'obyte.org/bb';
 
-exports.aa_address = process.env.testnet ? 'Z47PHYSDXWPXSXKHHXSQYD7QAFM7ZIN3' : '';
+exports.aa_address = process.env.testnet ? 'IA36KBPVNEEXTUPJ4ZFTFJRYZL235QKQ' : '';
 
 exports.initial_witnesses = !process.env.testnet ? [
 	'BVVJ2K7ENPZZ3VYZFWQWK7ISPCATFIW3',

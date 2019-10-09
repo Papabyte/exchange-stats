@@ -40,8 +40,8 @@
 </template>
 
 <script>
-import NavBar from './NavBar.vue'
-import Transactions from './Transactions.vue'
+import NavBar from './commons/NavBar.vue'
+import Transactions from './ExplorerTransactions.vue'
 
 export default {
 	name: 'ExchangesStats',

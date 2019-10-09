@@ -1,6 +1,6 @@
 <template>
-	<b-modal id="donateReward" title="Donate a reward" :okDisabled="!validExchange && !isForAny" @ok="handleOk">
-		<b-container fluid >
+	<b-modal id="donateReward" title="Donate a reward" @close="link=false" :hide-footer="!!link" :okDisabled="!validExchange && !isForAny" @ok="handleOk">
+		<b-container v-if="!link" fluid  >
 			<b-row >
 				<label for="input-with-list">Select the exchange for which your reward will apply</label>
 				<b-form-input list="input-list"  :state="validExchange" v-model="exchange" id="input-with-list"  :disabled="isForAny"></b-form-input>
@@ -29,6 +29,19 @@
 				<div v-if="validExchange || isForAny" ><p>Donate <byteAmount :amount="Math.round(nb_reward*amount*1000000)"/> for operation on {{isForAny ? "any exchange" : exchange}}</p></div>
 			</b-row >
 		</b-container>
+		<b-container v-else fluid >
+			<b-row class="pt-3">
+				By clicking the link below, your Obyte wallet will open and ready to send a transaction for donating a reward.
+			</b-row >
+		<b-row class="pt-3">
+			<span class="text-break">
+				<a :href="link">{{link}}</a>
+			</span>
+			</b-row >
+			<b-row class="py-3">
+				Your donation will be taken into account after a few minutes when the transaction is confirmed.
+			</b-row >
+		</b-container>
 
 	</b-modal>
 </template>
@@ -46,7 +59,8 @@ export default {
 				isForAny: false,
 				amount: 0.1,
 				exchange: "",
-				nb_reward:1
+				nb_reward:1,
+				link: false
 		}
 	},
 	props: [],
@@ -66,8 +80,8 @@ export default {
 		}
 	},
 		methods:{
-			handleOk(){
-				const base64url = require('base64url');
+			handleOk(bvModalEvt){
+  bvModalEvt.preventDefault()	;			const base64url = require('base64url');
 				const data = {
 						number_of_rewards: this.nb_reward,
 						reward_amount: this.amount * 1000000000
@@ -76,9 +90,9 @@ export default {
 					data.exchange = this.exchange;
 				const json_string = JSON.stringify(data);
 				const base64data = base64url(json_string);
-				const href = (conf.testnet ? "byteball-tn" :"byteball")+":"+conf.aa_address+"?amount="
+				this.link = (conf.testnet ? "byteball-tn" :"byteball")+":"+conf.aa_address+"?amount="
 					+(Math.round(this.nb_reward * this.amount * 1000000000))+"&base64data="+base64data;
-				window.open(href, '_blank');
+		
 			}
 		}
 }

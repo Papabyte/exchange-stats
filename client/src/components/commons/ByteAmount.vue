@@ -1,5 +1,5 @@
 <template>
-	<span><span v-if="label"> {{label}}</span>{{amount/1000000000}} GB</span>
+	<span><span v-if="label"> {{label}}</span>{{(amount/1000000000).toPrecision(6)}} GB</span>
 </template>
 
 <script>

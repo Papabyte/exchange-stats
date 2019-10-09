@@ -1,4 +1,5 @@
 const db = require('ocore/db.js');
+const aa_handler = require("./aa_handler.js");
 
 const ITEMS_PER_PAGE = 100;
 
@@ -58,8 +59,17 @@ async function getTransactionsFromInternalIds(arrIds, handle){
 			assocTxsFromWallet[row.tx_id].height = row.block_height;
 			assocTxsFromWallet[row.tx_id].time = row.time;
 		}
-			assocTxsFromWallet[row.tx_id].from = {id: row.from_id, amount: row.amount_from} ;
-			assocTxsFromWallet[row.tx_id].to.push( {address: row.address, id: row.to_id, amount: row.amount_to}) ;
+
+		assocTxsFromWallet[row.tx_id].from = {
+			id: row.from_id,
+			amount: row.amount_from,
+			exchange: aa_handler.getCurrentExchangeByWalletId(row.from_id) 
+		} ;
+		assocTxsFromWallet[row.tx_id].to.push({
+			address: row.address, id: row.to_id,
+			amount: row.amount_to, 
+			exchange: aa_handler.getCurrentExchangeByWalletId(row.to_id)
+		}) ;
 	});
 	return handle(assocTxsFromWallet);
 }

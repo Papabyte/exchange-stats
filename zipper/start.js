@@ -10,7 +10,7 @@ const client = new Client({
 mainLoop()
 
 async function mainLoop(){
-	var nextBlock = await saveBlocksOndiskAndGetNextHash("00000000000000000472e4d1c7a6c2dee2738119d0c3edfb97b5264edae09621");
+	var nextBlock = await saveBlocksOndiskAndGetNextHash("000000000000000002537dcadc89fc4be3118c86162df7606700335bf03f6e6b");
 	while(1){
 		nextBlock = await saveBlocksOndiskAndGetNextHash(nextBlock);
 	}

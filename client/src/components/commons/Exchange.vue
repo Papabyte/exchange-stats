@@ -1,6 +1,7 @@
 <template>
 	<div v-if="noUrl">
 		{{id}}
+
 	</div>
 	<div v-else>
 		<span v-if="label"> {{label}} </span>
