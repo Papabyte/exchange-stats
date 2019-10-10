@@ -19,9 +19,7 @@ function processNewRanking(){
 			unlock();
 			return setTimeout(processNewRanking, 1000); //wait that aa handler set assocWalletIdsByExchange
 		}
-			console.log("assocWalletIdsByExchange");
-			console.log(assocWalletIdsByExchange);
-
+	
 		for (var key in exchanges){
 			var exchange = exchanges[key];
 			var total_24h_deposits=null;
@@ -61,6 +59,7 @@ function processNewRanking(){
 				nb_deposit_addresses,
 				nb_withdrawal_addresses
 			]);
+
 		}
 		unlock();
 	});
