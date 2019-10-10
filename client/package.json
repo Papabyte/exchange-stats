@@ -43,7 +43,9 @@
       "plugin:vue/essential"
     ],
     "rules": {},
-    "parserOptions": {}
+    "parserOptions": {
+			"parser": "babel-eslint"
+		}
   },
   "postcss": {
     "plugins": {
