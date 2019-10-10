@@ -39,7 +39,7 @@
 									Explore wallet
 								</b-button>
 							</b-link>
-							<b-button variant="primary" size="sm"  v-on:click="clicked_exchange=data.item.exchange_id" v-b-modal.editWallet>Add wallet</b-button>
+							<b-button variant="primary" size="sm"  v-on:click="clicked_exchange=data.item.exchange_id;$bvModal.show('editWallet')">Add wallet</b-button>
 						</template>
 					</b-table>
 				</b-row>
