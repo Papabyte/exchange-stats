@@ -48,9 +48,6 @@ export default {
 		}
 
 	},
-	mounted(){
-		this.$emit('init');
-	},
 	computed:{
 		getTitle:function(){
 			return "View proofs";

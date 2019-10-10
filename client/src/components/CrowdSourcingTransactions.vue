@@ -53,7 +53,7 @@
 			return {
 				isTestnet : conf.testnet,
 				isSpinnerActive: true,
-				currentPage:0,
+				currentPage:1,
 				totalRows:0,
 				sortBy: 'age',
 				sortDesc: false,

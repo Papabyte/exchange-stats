@@ -64,18 +64,19 @@ export default {
 			stakeAmount: 0,
 			link: false,
 			url_1: null,
-			url_2: null
+			url_2: null,
+			operation_item:{}
+			
 		}
-	},
-	mounted(){
-		this.$emit('init');
 	},
 	watch:{
 		prop_operation_item:function(){
-			console.log("watched");
-			console.log(this.prop_operation_item.staked_on_outcome);
-						console.log(conf.challenge_coef);
-			this.reversalStakeGb = (conf.challenge_coef*this.prop_operation_item.staked_on_outcome+10000)/1000000000;
+			if(!this.prop_operation_item)
+				return;
+
+			this.operation_item = this.prop_operation_item;
+
+			this.reversalStakeGb = (conf.challenge_coef*this.operation_item.staked_on_outcome+10000)/1000000000;
 			this.stakeAmountGb = this.reversalStakeGb;
 
 			this.reset();
@@ -85,21 +86,23 @@ export default {
 	},
 	computed:{
 		getTitle:function(){
-			if (!this.prop_operation_item)
-			return "";
-			if (this.prop_operation_item.isRemovingOperation)
-				return ("Contest removing of wallet "+ this.prop_operation_item.wallet_id + " from exchange " + this.prop_operation_item.exchange);
+			if (this.operation_item.isRemovingOperation)
+				return ("Contest removing of wallet "+ this.operation_item.wallet_id + " from exchange " + this.operation_item.exchange);
 			else
-				return ("Contest adding of wallet "+ this.prop_operation_item.wallet_id + " to exchange " + this.prop_operation_item.exchange);
+				return ("Contest adding of wallet "+ this.operation_item.wallet_id + " to exchange " + this.operation_item.exchange);
 		},
 		amountLeftToReverse: function(){
-				return ((this.reversalStakeGb - this.stakeAmountGb) * 1000000000).toPrecision(6) || 0;
+			return ((this.reversalStakeGb - this.stakeAmountGb) * 1000000000).toPrecision(6) || 0;
 		},
 		newTotalOppositeStake: function(){
-			return this.stakeAmountGb*1000000000 + (this.prop_operation_item.total_staked - this.prop_operation_item.staked_on_outcome);
+			if (!this.operation_item.total_staked)
+				return 0;
+			return this.stakeAmountGb*1000000000 + (this.operation_item.total_staked - this.operation_item.staked_on_outcome);
 		},
 		newTotalStake: function(){
-			return this.prop_operation_item.total_staked + this.stakeAmountGb*1000000000;
+			if (!this.operation_item)
+				return 0;
+			return this.operation_item.total_staked + this.stakeAmountGb*1000000000;
 		},
 		potentialGainAmount: function(){
 			return this.stakeAmountGb*1000000000 / this.newTotalOppositeStake *  this.newTotalStake - this.stakeAmountGb*1000000000;

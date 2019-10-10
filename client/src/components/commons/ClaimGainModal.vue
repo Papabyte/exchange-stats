@@ -4,8 +4,8 @@
 			<b-row>
 				Select the address.
 			</b-row>
-			<b-row class="pt-3" >
-				<div v-for="(address,index) in this.prop_operation_item.claimAddresses" :key="index">
+			<b-row v-if="this.operation_item.claimAddresses" class="pt-3" >
+				<div v-for="(address,index) in this.operation_item.claimAddresses" :key="index">
 					<b-button variant="primary"  class="mb-2" size="m"  @click="claim(address)">{{address}}</b-button>
 				</div>
 			</b-row >
@@ -37,11 +37,13 @@ export default {
 		return {
 			text_error: null,
 			items: [],
-			link: false
+			link: false,
+			operation_item: {}
 		}
 	},
 	watch:{
 		prop_operation_item:function(){
+			this.operation_item = this.prop_operation_item;
 			this.listAddresses();
 		}
 
@@ -49,14 +51,8 @@ export default {
 	},
 	computed:{
 		getTitle:function(){
-			if (!this.prop_operation_item)
-				return "";
-			else
 				return "Claim a gain";
 		}
-	},
-	mounted(){
-		this.$emit('init');
 	},
 	methods:{
 		listAddresses(){
@@ -66,7 +62,7 @@ export default {
 				const base64url = require('base64url');
 				const data = {
 						withdraw:1,
-						operation_id: this.prop_operation_item.key,
+						operation_id: this.operation_item.key,
 						address: address
 				};
 

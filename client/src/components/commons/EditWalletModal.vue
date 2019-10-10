@@ -144,8 +144,6 @@ export default {
 			this.objExchanges[row.id] = row.name;
 			});
 		});
-		this.$emit('init');
-
 	},
 	methods:{
 		update_url_1(value){

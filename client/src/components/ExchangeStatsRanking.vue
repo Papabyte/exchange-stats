@@ -1,7 +1,7 @@
 <template>
 	<b-container fluid>
 		<b-row >
-		<EditWalletModal @init="isEditModalInitialized=true;" :prop_exchange="clicked_exchange"/>
+		<EditWalletModal :prop_exchange="clicked_exchange"/>
 			<b-col offset-lg="1" lg="10" cols="12" class="py-3">
 				<b-row >
 					<b-col cols="12" class="py-3">
@@ -12,14 +12,14 @@
 					<b-pagination
 					v-model="currentPage"
 					:total-rows="totalRows"
-					per-page="30"
+					:per-page="perPage"
 					align="fill"
 					size="l"
 					class="pl-4 my-0"
 					></b-pagination> 
 					<b-table 
 					:current-page="currentPage"
-					per-page="30"
+					:per-page="perPage"
 					:items="items"
 					:fields="fields"
 					:sort-by.sync="sortBy"
@@ -39,7 +39,7 @@
 									Explore wallet
 								</b-button>
 							</b-link>
-							<b-button variant="primary" v-else-if="isEditModalInitialized" size="sm"  v-on:click="clicked_exchange=data.item.exchange_id" v-b-modal.editWallet>Add wallet</b-button>
+							<b-button variant="primary" size="sm"  v-on:click="clicked_exchange=data.item.exchange_id" v-b-modal.editWallet>Add wallet</b-button>
 						</template>
 					</b-table>
 				</b-row>
@@ -60,10 +60,10 @@ import EditWalletModal from './commons/EditWalletModal.vue';
 		},
 		data() {
 			return {
-				isEditModalInitialized: false,
 				clicked_exchange: null,
-				currentPage:0,
+				currentPage:1,
 				totalRows:0,
+				perPage: 30,
 				sortBy: 'total_btc_wallet',
 				sortDesc: true,
 				fields: [

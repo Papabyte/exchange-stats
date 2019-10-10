@@ -25,36 +25,32 @@ export default {
 	props: ['prop_operation_item'],
 	data(){
 		return {
-			link: false
+			link: false,
+			operation_item: {}
 		}
 	},
 	watch:{
 		prop_operation_item:function(){
+			this.operation_item = this.prop_operation_item;
 			this.createLink();
 		}
 	},
 	computed:{
 		getTitle:function(){
-			if (!this.prop_operation_item)
-				return "";
-			else
-				return "Claim a gain";
+			return "Commit an operation";
 		}
-	},
-	mounted(){
-		this.$emit('init');
 	},
 	methods:{
 		createLink(address){
 				const base64url = require('base64url');
 				const data = {
-						exchange: this.prop_operation_item.exchange,
+						exchange: this.operation_item.exchange,
 						commit: 1
 				};
-				if (this.prop_operation_item.initial_outcome == "in")
-					data.add_wallet_id= this.prop_operation_item.wallet_id;
+				if (this.operation_item.initial_outcome == "in")
+					data.add_wallet_id= this.operation_item.wallet_id;
 				else
-					data.remove_wallet_id= this.prop_operation_item.wallet_id;
+					data.remove_wallet_id= this.operation_item.wallet_id;
 
 				const json_string = JSON.stringify(data);
 				const base64data = base64url(json_string);

@@ -1,9 +1,9 @@
 <template>
 	<b-container fluid>
-		<ContestOperationModal @init="isContestModalInitialized=true;" :prop_operation_item="clicked_item"/>
-		<ClaimGainModal @init="isClaimModalInitialized=true;" :prop_operation_item="clicked_item"/>
-		<ViewUrlProofsModal @init="isViewProofModalInitialized=true;" :prop_operation_item="clicked_item"/>
-		<CommitOperationModal @init="isCommitModalInitialized=true;" :prop_operation_item="clicked_item"/>
+		<ContestOperationModal :prop_operation_item="clicked_item"/>
+		<ClaimGainModal  :prop_operation_item="clicked_item"/>
+		<ViewUrlProofsModal :prop_operation_item="clicked_item"/>
+		<CommitOperationModal :prop_operation_item="clicked_item"/>
 	<b-row class="main-col">
 		<b-pagination
 			v-model="currentPage"
@@ -37,27 +37,27 @@
 				<template v-slot:cell(action)="data">
 				<b-button 
 					variant="primary" 
-					v-if="data.item.status == 'onreview' && !data.item.is_commitable && isContestModalInitialized" 
+					v-if="data.item.status == 'onreview' && !data.item.is_commitable " 
 					v-on:click="clicked_item=data.item" 
 					class="mr-2" 
 					size="s" 
 					v-b-modal.contestOperation>contest</b-button>
 				<b-button 
 					variant="primary" 
-					v-if="data.item.status == 'onreview' && data.item.is_commitable && isCommitModalInitialized"
+					v-if="data.item.status == 'onreview' && data.item.is_commitable"
 					v-on:click="clicked_item=data.item"
 					class="mr-2" 
 					size="s"
 					v-b-modal.commitOperation>commit</b-button>
 				<b-button 
 					variant="primary"
-					v-if="data.item.status == 'onreview' && isViewProofModalInitialized"
+					v-if="data.item.status == 'onreview'"
 					v-on:click="clicked_item=data.item"
 					class="mr-2" size="s"
 					v-b-modal.viewUrlProofs>view proofs</b-button>
 				<b-button 
 					variant="primary" 
-					v-if="data.item.status == 'committed' && data.item.claimAddresses.length>0 && isClaimModalInitialized" 
+					v-if="data.item.status == 'committed' && data.item.claimAddresses.length>0" 
 					v-on:click="clicked_item=data.item"  
 					class="mr-2" size="s" 
 					v-b-modal.claimGain>claim a gain</b-button>
@@ -90,14 +90,10 @@ import WalletId from './commons/WalletId.vue';
 		},
 		data() {
 			return {
-				isCommitModalInitialized: false,
-				isViewProofModalInitialized: false,
-				isContestModalInitialized: false,
-				isClaimModalInitialized: false,
 				clicked_item: null,
 				pools : null,
 				isSpinnerActive: true,
-					currentPage:0,
+				currentPage:1,
 				totalRows:0,
 				sortBy: 'age',
 				sortDesc: false,

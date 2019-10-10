@@ -71,8 +71,6 @@ export default {
 			this.objExchanges[row.id] = row.name;
 			});
 		});
-	this.$emit('init');
-
 	},
 	computed: {
 		validExchange() {
