@@ -38,29 +38,26 @@
 				<b-button 
 					variant="primary" 
 					v-if="data.item.status == 'onreview' && !data.item.is_commitable " 
-					v-on:click="clicked_item=data.item" 
+					v-on:click="clicked_item=data.item;$bvModal.show('contestOperation');" 
 					class="mr-2" 
-					size="s" 
-					v-b-modal.contestOperation>contest</b-button>
+					size="s">contest</b-button>
 				<b-button 
 					variant="primary" 
 					v-if="data.item.status == 'onreview' && data.item.is_commitable"
-					v-on:click="clicked_item=data.item"
+					v-on:click="clicked_item=data.item;$bvModal.show('commitOperation');"
 					class="mr-2" 
-					size="s"
-					v-b-modal.commitOperation>commit</b-button>
+					size="s">commit</b-button>
 				<b-button 
 					variant="primary"
 					v-if="data.item.status == 'onreview'"
-					v-on:click="clicked_item=data.item"
-					class="mr-2" size="s"
-					v-b-modal.viewUrlProofs>view proofs</b-button>
+					v-on:click="clicked_item=data.item;$bvModal.show('viewUrlProofs');"
+					class="mr-2" 
+					size="s">view proofs</b-button>
 				<b-button 
 					variant="primary" 
 					v-if="data.item.status == 'committed' && data.item.claimAddresses.length>0" 
-					v-on:click="clicked_item=data.item"  
-					class="mr-2" size="s" 
-					v-b-modal.claimGain>claim a gain</b-button>
+					v-on:click="clicked_item=data.item;$bvModal.show('claimGain');"  
+					class="mr-2" size="s" >claim a gain</b-button>
 				</template>
 			</b-table>
 		</b-row>

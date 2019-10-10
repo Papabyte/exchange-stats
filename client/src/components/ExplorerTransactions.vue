@@ -28,14 +28,14 @@
 						<div v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
 							<b-col >
 								<b-link :to="'/explorer/'+wallet">{{wallet}}</b-link>
-								<b-button variant="primary" @click="isRemoving=true;walletIdToEdit=wallet;" class="ml-2" size="sm" v-b-modal.editWallet>remove wallet {{wallet}}</b-button>
+								<b-button variant="primary" @click="isRemoving=true;walletIdToEdit=wallet;$bvModal.show('editWallet');" class="ml-2" size="sm">remove wallet {{wallet}}</b-button>
 							</b-col>
 						</div>
 					</b-row >
 				</b-row>
 
 				<b-row v-if="wallet_id&&!walletOwner">
-					<b-button variant="primary" size="sm" @click="isRemoving=false;" v-b-modal.editWallet>add to an exchange</b-button>
+					<b-button variant="primary" size="sm" @click="isRemoving=false;$bvModal.show('editWallet');">add to an exchange</b-button>
 				</b-row>
 				
 				<b-row v-if="count_total">
