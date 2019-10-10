@@ -1,5 +1,5 @@
 <template>
-	<b-modal id="claimGain" :title="getTitle" @close="link=false" :hide-footer="true" >
+	<b-modal id="claimGain" :title="getTitle" :hide-footer="true" >
 		<b-container v-if="!link" fluid >
 			<b-row>
 				Select the address.
@@ -54,6 +54,9 @@ export default {
 			else
 				return "Claim a gain";
 		}
+	},
+	created(){
+		this.$emit('init');
 	},
 	methods:{
 		listAddresses(){

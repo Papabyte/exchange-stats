@@ -1,6 +1,6 @@
 <template>
 	<b-container fluid>
-			<DonateRewardModal />
+			<DonateRewardModal @init="isDonateModalInitialized=true;" />
 		<b-row class="main-col">
 			<b-col  cols="12">
 				<b-row>
@@ -35,7 +35,7 @@
 					</b-col>
 							</b-row>	
 			<b-row>	<b-col  offset="4" cols="4">
-								<b-button variant="primary"  class="mb-2" size="m"  v-b-modal.donateReward>Donate a reward</b-button>
+								<b-button v-if="isDonateModalInitialized" variant="primary"  class="mb-2" size="m"  v-b-modal.donateReward>Donate a reward</b-button>
 								</b-col>
 		</b-row>
 			</b-col>
@@ -55,6 +55,7 @@ import DonateRewardModal from './commons/DonateRewardModal.vue';
 		},
 		data() {
 			return {
+				isDonateModalInitialized: false,
 				pools : null,
 				isSpinnerActive: true,
 					currentPage:0,

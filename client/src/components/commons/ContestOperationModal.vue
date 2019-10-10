@@ -67,6 +67,9 @@ export default {
 			url_2: null
 		}
 	},
+	created(){
+		this.$emit('init');
+	},
 	watch:{
 		prop_operation_item:function(){
 			console.log("watched");

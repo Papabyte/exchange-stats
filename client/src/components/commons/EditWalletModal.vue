@@ -134,6 +134,9 @@ export default {
 		}
 
 	},
+	created(){
+		this.$emit('init');
+	},
 	mounted(){
 		if (this.prop_wallet_id)
 			this.wallet = this.prop_wallet_id;

@@ -79,9 +79,13 @@ export default {
 			return !!this.objExchanges[this.exchange]
 		}
 	},
+	created(){
+		this.$emit('init');
+	},
 		methods:{
 			handleOk(bvModalEvt){
-  bvModalEvt.preventDefault()	;			const base64url = require('base64url');
+				bvModalEvt.preventDefault()	;
+				const base64url = require('base64url');
 				const data = {
 						number_of_rewards: this.nb_reward,
 						reward_amount: this.amount * 1000000000

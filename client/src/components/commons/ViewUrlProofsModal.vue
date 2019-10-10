@@ -45,10 +45,11 @@ export default {
 	watch:{
 		prop_operation_item:function(){
 				this.proofsByOutcome = this.prop_operation_item.url_proofs_by_outcome || {};
-
 		}
 
-
+	},
+	created(){
+		this.$emit('init');
 	},
 	computed:{
 		getTitle:function(){

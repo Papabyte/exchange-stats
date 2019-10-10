@@ -1,5 +1,5 @@
 <template>
-	<b-modal id="commitOperation" :title="getTitle" @close="link=false" :hide-footer="true" >
+	<b-modal id="commitOperation" :title="getTitle"  :hide-footer="true" >
 		<b-container fluid >
 			<b-row class="pt-3">
 				By clicking the link below, your Obyte wallet will open and ready to send a transaction for committing operation.
@@ -40,6 +40,9 @@ export default {
 			else
 				return "Claim a gain";
 		}
+	},
+	created(){
+		this.$emit('init');
 	},
 	methods:{
 		createLink(address){

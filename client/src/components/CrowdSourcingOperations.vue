@@ -1,9 +1,9 @@
 <template>
 	<b-container fluid>
-		<ContestOperationModal :prop_operation_item="clicked_item"/>
-		<ClaimGainModal :prop_operation_item="clicked_item"/>
-		<ViewUrlProofsModal :prop_operation_item="clicked_item"/>
-		<CommitOperationModal :prop_operation_item="clicked_item"/>
+		<ContestOperationModal @init="isContestModalInitialized=true;" :prop_operation_item="clicked_item"/>
+		<ClaimGainModal @init="isClaimModalInitialized=true;" :prop_operation_item="clicked_item"/>
+		<ViewUrlProofsModal @init="isViewProofModalInitialized=true;" :prop_operation_item="clicked_item"/>
+		<CommitOperationModal @init="isCommitModalInitialized=true;" :prop_operation_item="clicked_item"/>
 	<b-row class="main-col">
 		<b-pagination
 			v-model="currentPage"
@@ -24,7 +24,8 @@
 			sort-icon-left
 		>	
 				<template v-slot:cell(operation)="data">
-					Add wallet <WalletId :id="data.item.wallet_id"/> to <Exchange :id="data.item.exchange"/>?
+					<span v-if="data.item.initial_outcome=='in'"> Add wallet <WalletId :id="data.item.wallet_id"/> to <Exchange :id="data.item.exchange"/>?</span>
+					<span v-else>Remove wallet <WalletId :id="data.item.wallet_id"/> from <Exchange :id="data.item.exchange"/>?</span>
 				</template>
 
 				<template v-slot:cell(staked_on_outcome)="data">
@@ -36,27 +37,27 @@
 				<template v-slot:cell(action)="data">
 				<b-button 
 					variant="primary" 
-					v-if="data.item.status == 'onreview' && !data.item.is_commitable" 
+					v-if="data.item.status == 'onreview' && !data.item.is_commitable && isContestModalInitialized" 
 					v-on:click="clicked_item=data.item" 
 					class="mr-2" 
 					size="s" 
 					v-b-modal.contestOperation>contest</b-button>
 				<b-button 
 					variant="primary" 
-					v-if="data.item.status == 'onreview' && data.item.is_commitable"
+					v-if="data.item.status == 'onreview' && data.item.is_commitable && isCommitModalInitialized"
 					v-on:click="clicked_item=data.item"
 					class="mr-2" 
 					size="s"
 					v-b-modal.commitOperation>commit</b-button>
 				<b-button 
 					variant="primary"
-					v-if="data.item.status == 'onreview'"
+					v-if="data.item.status == 'onreview' && isViewProofModalInitialized"
 					v-on:click="clicked_item=data.item"
 					class="mr-2" size="s"
 					v-b-modal.viewUrlProofs>view proofs</b-button>
 				<b-button 
 					variant="primary" 
-					v-if="data.item.status == 'committed' && data.item.claimAddresses.length>0" 
+					v-if="data.item.status == 'committed' && data.item.claimAddresses.length>0 && isClaimModalInitialized" 
 					v-on:click="clicked_item=data.item"  
 					class="mr-2" size="s" 
 					v-b-modal.claimGain>claim a gain</b-button>
@@ -89,6 +90,10 @@ import WalletId from './commons/WalletId.vue';
 		},
 		data() {
 			return {
+				isCommitModalInitialized: false,
+				isViewProofModalInitialized: false,
+				isContestModalInitialized: false,
+				isClaimModalInitialized: false,
 				clicked_item: null,
 				pools : null,
 				isSpinnerActive: true,
@@ -113,16 +118,15 @@ import WalletId from './commons/WalletId.vue';
 		created(){
 				this.items = [];
 				this.axios.get('/api/operations').then((response) => {
+					console.log(JSON.stringify(	response.data));
 					response.data.forEach((row)=>{
 						const item = {};
 						//if (row.status == "onreview"){
 							item.status = row.status ;
 							if (row.initial_outcome == "in"){
-								item.operation = "Add wallet " + row.wallet_id + " to exchange " + row.wallet_id +"?";
 								item.outcome_yes_or_no = row.outcome == "in" ? "yes" : "no";
 							}
 							else {
-								item.operation = "Remove wallet " + row.wallet_id + " from exchange " + row.wallet_id +"?";
 								item.outcome_yes_or_no = row.outcome == "out" ? "yes" : "no";
 							}
 							item.outcome= row.outcome;
