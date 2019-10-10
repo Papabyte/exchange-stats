@@ -1,7 +1,7 @@
 <template>
 	<b-container fluid>
 		<b-row >
-		<EditWalletModal @click="isEditModalInitialized=true;" :prop_exchange="clicked_exchange"/>
+		<EditWalletModal @init="isEditModalInitialized=true;" :prop_exchange="clicked_exchange"/>
 			<b-col offset-lg="1" lg="10" cols="12" class="py-3">
 				<b-row >
 					<b-col cols="12" class="py-3">

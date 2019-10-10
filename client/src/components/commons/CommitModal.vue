@@ -41,7 +41,7 @@ export default {
 				return "Claim a gain";
 		}
 	},
-	created(){
+	mounted(){
 		this.$emit('init');
 	},
 	methods:{

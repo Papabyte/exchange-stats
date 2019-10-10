@@ -67,7 +67,7 @@ export default {
 			url_2: null
 		}
 	},
-	created(){
+	mounted(){
 		this.$emit('init');
 	},
 	watch:{

@@ -71,6 +71,8 @@ export default {
 			this.objExchanges[row.id] = row.name;
 			});
 		});
+	this.$emit('init');
+
 	},
 	computed: {
 		validExchange() {
@@ -79,26 +81,23 @@ export default {
 			return !!this.objExchanges[this.exchange]
 		}
 	},
-	created(){
-		this.$emit('init');
-	},
-		methods:{
-			handleOk(bvModalEvt){
-				bvModalEvt.preventDefault()	;
-				const base64url = require('base64url');
-				const data = {
-						number_of_rewards: this.nb_reward,
-						reward_amount: this.amount * 1000000000
-				};
-				if (!this.isForAny)
-					data.exchange = this.exchange;
-				const json_string = JSON.stringify(data);
-				const base64data = base64url(json_string);
-				this.link = (conf.testnet ? "byteball-tn" :"byteball")+":"+conf.aa_address+"?amount="
-					+(Math.round(this.nb_reward * this.amount * 1000000000))+"&base64data="+base64data;
-		
-			}
+	methods:{
+		handleOk(bvModalEvt){
+			bvModalEvt.preventDefault()	;
+			const base64url = require('base64url');
+			const data = {
+					number_of_rewards: this.nb_reward,
+					reward_amount: this.amount * 1000000000
+			};
+			if (!this.isForAny)
+				data.exchange = this.exchange;
+			const json_string = JSON.stringify(data);
+			const base64data = base64url(json_string);
+			this.link = (conf.testnet ? "byteball-tn" :"byteball")+":"+conf.aa_address+"?amount="
+				+(Math.round(this.nb_reward * this.amount * 1000000000))+"&base64data="+base64data;
+	
 		}
+	}
 }
 </script>
 

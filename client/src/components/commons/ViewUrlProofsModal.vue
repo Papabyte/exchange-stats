@@ -48,7 +48,7 @@ export default {
 		}
 
 	},
-	created(){
+	mounted(){
 		this.$emit('init');
 	},
 	computed:{
