@@ -12,7 +12,7 @@ export default new Router({
 			name: 'exchangeStats',
 			path: '/',
 			component: lazyLoading('components/ExchangesStats'),
-			default: true
+			default: true,
 		},
 		{
 			name: 'exchangesStats',

@@ -3,10 +3,9 @@
 		<ContestOperationModal :prop_operation_item="clicked_item"/>
 		<ClaimGainModal :prop_operation_item="clicked_item"/>
 		<ViewUrlProofsModal :prop_operation_item="clicked_item"/>
-
-
-		<b-row class="main-col">
-	<b-pagination
+		<CommitOperationModal :prop_operation_item="clicked_item"/>
+	<b-row class="main-col">
+		<b-pagination
 			v-model="currentPage"
 			:total-rows="totalRows"
 			per-page="30"
@@ -14,7 +13,7 @@
 			size="l"
 			class="pl-4 my-0"
 			></b-pagination> 
-			<b-table 
+		<b-table 
 			:current-page="currentPage"
 			per-page="30"
 			:items="items"
@@ -23,9 +22,9 @@
 			:sort-desc.sync="sortDesc"
 			responsive
 			sort-icon-left
-			>	
+		>	
 				<template v-slot:cell(operation)="data">
-					Add wallet {{data.item.wallet_id}} to {{data.item.exchange}}?
+					Add wallet <WalletId :id="data.item.wallet_id"/> to <Exchange :id="data.item.exchange"/>?
 				</template>
 
 				<template v-slot:cell(staked_on_outcome)="data">
@@ -35,10 +34,32 @@
 					<ByteAmount :amount="data.item.total_staked" />
 				</template>
 				<template v-slot:cell(action)="data">
-				<b-button v-if="data.item.status == 'onreview' && !data.item.is_commitable" v-on:click="clicked_item=data.item" class="mr-2" size="s" v-b-modal.contestOperation>contest</b-button>
-				<b-button v-if="data.item.status == 'onreview' && data.item.is_commitable" v-on:click="commit(data.item)" class="mr-2" size="s">commit</b-button>
-				<b-button v-if="data.item.status == 'onreview'" v-on:click="clicked_item=data.item" class="mr-2" size="s" v-b-modal.viewUrlProofs>view proofs</b-button>
-				<b-button v-if="data.item.status == 'committed'" v-on:click="clicked_item=data.item"  class="mr-2" size="s" v-b-modal.claimGain>claim a gain</b-button>
+				<b-button 
+					variant="primary" 
+					v-if="data.item.status == 'onreview' && !data.item.is_commitable" 
+					v-on:click="clicked_item=data.item" 
+					class="mr-2" 
+					size="s" 
+					v-b-modal.contestOperation>contest</b-button>
+				<b-button 
+					variant="primary" 
+					v-if="data.item.status == 'onreview' && data.item.is_commitable"
+					v-on:click="clicked_item=data.item"
+					class="mr-2" 
+					size="s"
+					v-b-modal.commitOperation>commit</b-button>
+				<b-button 
+					variant="primary"
+					v-if="data.item.status == 'onreview'"
+					v-on:click="clicked_item=data.item"
+					class="mr-2" size="s"
+					v-b-modal.viewUrlProofs>view proofs</b-button>
+				<b-button 
+					variant="primary" 
+					v-if="data.item.status == 'committed' && data.item.claimAddresses.length>0" 
+					v-on:click="clicked_item=data.item"  
+					class="mr-2" size="s" 
+					v-b-modal.claimGain>claim a gain</b-button>
 				</template>
 			</b-table>
 		</b-row>
@@ -50,14 +71,21 @@ const conf = require("../conf.js");
 import ByteAmount from './commons/ByteAmount.vue';
 import ContestOperationModal from './commons/ContestOperationModal.vue';
 import ClaimGainModal from './commons/ClaimGainModal.vue';
+import CommitOperationModal from './commons/CommitModal.vue';
 import ViewUrlProofsModal from './commons/ViewUrlProofsModal.vue';
+import Exchange from './commons/Exchange.vue';
+import WalletId from './commons/WalletId.vue';
+
 
 	export default {
 		components: {
 			ByteAmount,
 			ContestOperationModal,
 			ClaimGainModal,
-			ViewUrlProofsModal
+			ViewUrlProofsModal,
+			Exchange,
+			WalletId,
+			CommitOperationModal
 		},
 		data() {
 			return {
@@ -71,7 +99,7 @@ import ViewUrlProofsModal from './commons/ViewUrlProofsModal.vue';
 				fields: [
 					{ key: 'status', sortable: true },
 					{ key: 'operation', sortable: true },
-					{ key: 'outcome_yes_or_no', sortable: true },
+					{ key: 'outcome_yes_or_no',label:'Outcome', sortable: true },
 
 					{ key: 'staked_on_outcome', sortable: true },
 					{ key: 'total_staked', sortable: true },
@@ -84,10 +112,7 @@ import ViewUrlProofsModal from './commons/ViewUrlProofsModal.vue';
 		},
 		created(){
 				this.items = [];
-									console.log('/api/operations');
-
 				this.axios.get('/api/operations').then((response) => {
-					console.log("operations " +JSON.stringify(response.data));
 					response.data.forEach((row)=>{
 						const item = {};
 						//if (row.status == "onreview"){
@@ -108,12 +133,21 @@ import ViewUrlProofsModal from './commons/ViewUrlProofsModal.vue';
 							item.wallet_id = row.wallet_id;
 							item.exchange = row.exchange;
 							item.key = row.key;
-							item.staked_by_address=row.staked_by_address;
 							item.url_proofs_by_outcome = row.url_proofs_by_outcome;
 							if ((new Date().getTime() / 1000 - row.countdown_start) > conf.challenge_period_length){
 								item.is_commitable = true;
 							}
-					//	}
+
+							if (item.status == "committed"){
+								item.claimAddresses = [];
+								const assocStakedByAdress =	row.staked_by_address;
+								const outcome = row.outcome
+								for (var key in assocStakedByAdress){
+									if (assocStakedByAdress[key][outcome])
+										item.claimAddresses.push(key);
+								}
+							}
+
 						this.items.push(item);
 						
 					})

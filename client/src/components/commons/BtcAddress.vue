@@ -2,7 +2,7 @@
 <div>
 	
 <div class="d-inline">
- <span v-if="label">{{label}}</span><span class="address">{{address}}</span>
+ <span v-if="label">{{label}}</span><span class="address text-break">{{address}}</span>
 </div>
 	<div class="d-inline">
 		<b-link target="_blank" :href="'https://blockstream.info/address/'+address">
@@ -29,6 +29,8 @@ export default {
 	}
 
 .address {
-	color: purple;
+		color: gray;
+	font-weight: 600;
+
 }
 </style>

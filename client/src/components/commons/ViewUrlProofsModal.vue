@@ -9,7 +9,7 @@
 						Proofs for adding wallet to exchange.
 					</b-row >
 					<b-row v-for="(url,index) in proofsByOutcome.in" :key="index">
-						<b-link href="url">{{url}}</b-link>
+						<b-link :href="url" target="_blank">{{url}}</b-link>
 					</b-row>
 				</b-col>
 			</b-row>
@@ -19,7 +19,7 @@
 						Proofs for removing wallet from exchange.
 					</b-row >
 					<b-row v-for="(url,index) in proofsByOutcome.out" :key="index">
-						<b-link href="url">{{url}}</b-link>
+						<b-link :href="url" target="_blank">{{url}}</b-link>
 					</b-row>
 				</b-col>
 			</b-row>

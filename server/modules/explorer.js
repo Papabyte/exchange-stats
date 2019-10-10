@@ -1,5 +1,6 @@
 const db = require('ocore/db.js');
 const aa_handler = require("./aa_handler.js");
+const stats = require("./stats.js");
 
 const ITEMS_PER_PAGE = 100;
 
@@ -16,9 +17,9 @@ console.error(idRows);
 	idRows = idRows.splice(ITEMS_PER_PAGE * page, ITEMS_PER_PAGE * (page +1)).map(function(row){
 		return row.id;
 	});
-	
+	var total_on_wallets = await stats.getTotalOnWallets(arrIds);
 	getTransactionsFromInternalIds(idRows, function(assocTxsFromWallet){
-		return handle({count_total: count_total, txs: assocTxsFromWallet});
+		return handle({total_on_wallets: total_on_wallets,count_total: count_total, txs: assocTxsFromWallet});
 	});
 }
 

@@ -1,6 +1,5 @@
 <template>
 	<b-container fluid>
-			<DonateRewardModal />
 		<b-row class="main-col">
 			<b-col  cols="12">
 				<b-row>
@@ -27,17 +26,16 @@
 							responsive
 								sort-icon-left
 						>	
-	
-					<template v-slot:cell(reward_amount)="data">
-						<ByteAmount :amount="data.item.reward_amount" />
-					</template>
+						<template v-slot:cell(unit)="data">
+								<b-link class="text-break" target="_blank" :href="(isTestnet ? 'https://testnetexplorer.obyte.org/#' : 'https://explorer.obyte.org/#')+data.item.unit">
+								{{data.item.unit}}
+								</b-link>
+						</template>
+
 				</b-table>
 					</b-col>
 							</b-row>	
-			<b-row>	<b-col  offset="4" cols="4">
-								<b-button variant="primary"  class="mb-2" size="m"  v-b-modal.donateReward>Donate a reward</b-button>
-								</b-col>
-		</b-row>
+
 			</b-col>
 				</b-row>	
 	</b-container>
@@ -45,33 +43,31 @@
 
 <script>
 
-import ByteAmount from './commons/ByteAmount.vue';
-import DonateRewardModal from './commons/DonateRewardModal.vue';
+	const conf = require("../conf.js");
 
 	export default {
 		components: {
-			ByteAmount,
-			DonateRewardModal
+			
 		},
 		data() {
 			return {
-				pools : null,
+				isTestnet : conf.testnet,
 				isSpinnerActive: true,
-					currentPage:0,
+				currentPage:0,
 				totalRows:0,
 				sortBy: 'age',
 				sortDesc: false,
 				fields: [
-					{ key: 'number_rewards', label:" Number of rewards", sortable: true ,},
-					{ key: 'reward_amount', sortable: true },
-					{ key: 'exchange', sortable: true }
+					{ key: 'type', sortable: true ,},
+					{ key: 'unit', sortable: true },
+					{ key: 'is_stable', sortable: true }
 				],
 				items: [
 				]
 			}
 		},
 		created(){
-				this.axios.get('/api/pools').then((response) => {
+				this.axios.get('/api/aa_transactions').then((response) => {
 					console.log(response.data);
 					this.items = response.data;
 					this.isSpinnerActive= false

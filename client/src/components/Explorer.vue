@@ -63,6 +63,8 @@ export default {
 	},
 	created(){
 		this.getExchanges();
+		document.title = 'Wallet explorer';
+
 	},
 	methods:{ 
 		onSubmit(){

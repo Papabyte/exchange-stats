@@ -2,21 +2,23 @@ const Client = require('bitcoin-core');
 const fs = require('fs');
 const zlib = require('zlib');
 
+//connect to local bitcoin full node
 const client = new Client({ 
 	username: 'extern', 
   password: 'p9gonL7ao9H7Vnb1IV9n', 
   port: 8000 
 });
+
 mainLoop()
 
 async function mainLoop(){
-	var nextBlock = await saveBlocksOndiskAndGetNextHash("000000000000000002537dcadc89fc4be3118c86162df7606700335bf03f6e6b");
+	var nextBlock = await saveBlockOndiskAndGetNextHash("000000000000000002537dcadc89fc4be3118c86162df7606700335bf03f6e6b");
 	while(1){
-		nextBlock = await saveBlocksOndiskAndGetNextHash(nextBlock);
+		nextBlock = await saveBlockOndiskAndGetNextHash(nextBlock);
 	}
 }
 
-function saveBlocksOndiskAndGetNextHash(block_hash){
+function saveBlockOndiskAndGetNextHash(block_hash){
 
 	return new Promise(async function(resolve){
 		try {
@@ -59,21 +61,7 @@ function saveBlocksOndiskAndGetNextHash(block_hash){
 			})
 		} catch(error) { 
 			console.log(error);
-			saveBlocksOndiskAndGetNextHash(block_hash).then(resolve);
+			saveBlockOndiskAndGetNextHash-(block_hash).then(resolve);
 		}
 	});
 }
-
-
-/*
-client.getBlock('0000000000000000000e7294c83f5351e9c781ad3c318a3fb8c765c9b27588be').then(async (block) => {
-	
-	var txs = 	block.tx;
-
-	for (var i=0; i<txs.length; i++){
-
-			var result = await 	client.getTx(txs[i])
-					console.error(result);
-	}
-	
-});*/

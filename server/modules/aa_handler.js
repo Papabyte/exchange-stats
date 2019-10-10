@@ -39,14 +39,7 @@ function refresh(){
 
 		indexOperations(objStateVars);
 		indexRewardPools(objStateVars);
-		console.error("currentPools");
-		console.error(JSON.stringify(currentPools));
-		console.error("currentOperations");
-		console.error(JSON.stringify(currentOperations));
-		console.error("assocCurrentPoolsByExchange");
-		console.error(JSON.stringify(assocCurrentPoolsByExchange));
-		console.error("assocCurrentOperationsByExchange");
-		console.error(JSON.stringify(assocCurrentOperationsByExchange));
+
 	});
 
 }
@@ -101,10 +94,10 @@ function indexOperations(objStateVars){
 
 		if(!assocWalletIdsByExchange[exchange])
 			assocWalletIdsByExchange[exchange] = [];
-		if (objStateVars[pairKey + "_committed_outcome"] == "in")
+		if (objStateVars[pairKey + "_committed_outcome"] == "in") {
 			assocWalletIdsByExchange[exchange].push(wallet_id);
-
-		assocExchangeByWalletId[wallet_id] = exchange;
+			assocExchangeByWalletId[wallet_id] = exchange;
+		}
 		const outcome = objStateVars[key + "_outcome"]
 		operation.outcome = outcome;
 		operation.committed_outcome = objStateVars[pairKey + "_committed_outcome"];
@@ -256,6 +249,31 @@ function getBestPoolForExchange(exchange){
 	}
 	return bestPool;
 }
+
+function getLastTransactionsToAA(handle){
+
+	db.query("SELECT is_stable,payload,units.unit,timestamp FROM units INNER JOIN outputs USING(unit) INNER JOIN messages USING(unit) WHERE outputs.address=? ORDER BY main_chain_index ASC",[conf.aa_address],
+	function(rows){
+		var results = [];
+		rows.forEach(function(row){
+			if (!row.payload)
+				return null;
+			const payload = JSON.parse(row.payload);
+			if	(payload.withdraw)
+				return results.push({type:"withdrawal", unit: row.unit,timestamp: row.timestamp, is_stable: row.is_stable});
+			if	(payload.commit)
+				return results.push({type:"commit", unit: row.unit,timestamp: row.timestamp, is_stable: row.is_stable});
+			if	(payload.add_wallet_id)
+				return results.push({type:"add", unit: row.unit,timestamp: row.timestamp, is_stable: row.is_stable});
+			if	(payload.remove_wallet_id)
+				return results.push({type:"remove", unit: row.unit,timestamp: row.timestamp, is_stable: row.is_stable});
+			if	(payload.reward_amount)
+				return results.push({type:"donate", unit: row.unit,timestamp: row.timestamp, is_stable: row.is_stable});
+		});
+		return handle(results);
+	});
+}
+
  
 
  exports.getCurrentPools = getCurrentPools;
@@ -263,3 +281,4 @@ function getBestPoolForExchange(exchange){
  exports.getCurrentOperationsForExchange = getCurrentOperationsForExchange;
  exports.getBestPoolForExchange = getBestPoolForExchange;
  exports.getCurrentExchangeByWalletId = getCurrentExchangeByWalletId;
+ exports.getLastTransactionsToAA = getLastTransactionsToAA;

@@ -15,7 +15,7 @@
 			</b-row >
 			<b-row v-if="amountLeftToReverse>0">
 			<div class="pt-3">
-					<ByteAmount :amount="amountLeftToReverse" /> still to stake to reverse outcome.
+					<ByteAmount :amount="amountLeftToReverse" /> left to stake to reverse outcome.
 			</div>
 			</b-row >
 			<b-row>
@@ -44,10 +44,12 @@
 <script>
 const conf = require("../../conf.js");
 import ByteAmount from './ByteAmount.vue';
+import UrlInputs from './UrlInputs.vue';
 
 export default {	
 	components: {
-		ByteAmount
+		ByteAmount,
+		UrlInputs
 	},
 	props: ['prop_operation_item'],
 	data(){
@@ -122,10 +124,12 @@ export default {
 				bvModalEvt.preventDefault()	;
 				const base64url = require('base64url');
 				const data = {
-						exchange: this.prop_operation_item.exchange,
-						url_1: this.url_1,
-						url_2: this.url_2
+						exchange: this.prop_operation_item.exchange
 				};
+				if (this.url_1)
+					data.url_1 = this.url_1;
+				if (this.url_2)
+					data.url_2 = this.url_2;
 
 				if (this.prop_operation_item.isRemovingOperation)
 					data.add_wallet_id = this.prop_operation_item.wallet_id;

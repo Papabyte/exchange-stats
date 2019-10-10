@@ -1,13 +1,13 @@
 <template>
-	<div v-if="noUrl">
+	<span v-if="noUrl">
 		{{id}}
-	</div>
-	<div v-else>
+	</span>
+	<span v-else>
 		<span v-if="label"> {{label}} </span>
-			<b-link :to="'/explorer/'+id">
+		<span class="wallet-link"><b-link :to="'/explorer/'+id">
 	{{id}}
-	</b-link>
-	</div>
+	</b-link></span>
+	</span>
 </template>
 
 <script>
@@ -18,5 +18,8 @@ export default {
 </script>
 
 <style lang='scss'>
-
+.wallet-link a{
+	color: blue;
+	font-weight: 600;
+}
 </style>

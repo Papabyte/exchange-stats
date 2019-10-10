@@ -1,6 +1,6 @@
 <template>
  <div>
-  <b-navbar type="dark" variant="info">
+  <b-navbar type="dark" variant="dark">
 		<b-navbar-nav>
 		<b-nav-item to="/stats" :class="{active: selected_item=='0'}">Exchanges Stats</b-nav-item>
 		<b-nav-item to="/explorer" :class="{active: selected_item=='1'}">Wallet explorer</b-nav-item>

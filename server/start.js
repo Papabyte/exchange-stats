@@ -36,8 +36,9 @@ require('./modules/sqlite_tables.js').create().then(function(){
 		explorer.getRedirections([id], function(redirected_ids){
 			console.error("redirected_ids");
 			console.error(redirected_ids);
+			
 			explorer.getTransactionsFromWallets(redirected_ids, 0, function(assocTxsFromWallet){
-				return response.send({txs: assocTxsFromWallet, redirected_id: redirected_ids[0]});
+				return response.send({txs: assocTxsFromWallet, redirected_id: redirected_ids[0], exchange: aa_handler.getCurrentExchangeByWalletId(id)});
 			});
 		})
 	});
@@ -112,6 +113,14 @@ require('./modules/sqlite_tables.js').create().then(function(){
 		console.log('/api/operations');
 		return response.send(aa_handler.getCurrentOperations());
 	});
+
+	app.get('/api/aa_transactions', function(request, response){
+		aa_handler.getLastTransactionsToAA(function(transactions){
+			return response.send(transactions);
+		});
+	});
+
+
 
 	app.get('/api/getredirection/:id', function(request, response){
 		const id = Number(request.params.id);

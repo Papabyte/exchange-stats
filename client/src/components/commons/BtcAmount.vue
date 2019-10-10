@@ -40,11 +40,15 @@ export default {
 .negative{
 	color: red;
 	font-size: 20px;
+		font-weight: 600;
+
 }
 
 .positive{
 	color: green;
 	font-size: 20px;
+		font-weight: 600;
+
 
 }
 

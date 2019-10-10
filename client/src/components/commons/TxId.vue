@@ -29,6 +29,8 @@ export default {
 	}
 
 .tx_id {
-	color: purple;
+	color: gray;
+	font-weight: 600;
+
 }
 </style>

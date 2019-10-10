@@ -30,16 +30,16 @@
 						<template v-slot:cell(total_btc_wallet)="data">
 							<BtcAmount v-if="data.item.total_btc_wallet" :amount="data.item.total_btc_wallet"/>
 						</template>
-						<template v-slot:cell(cmc_volume)="data">
-							<BtcAmount :amount="data.item.cmc_volume"/>
+						<template v-slot:cell(reported_volume)="data">
+							<BtcAmount :amount="data.item.reported_volume"/>
 						</template>
 						<template v-slot:cell(action)="data">
 							<b-link v-if="data.item.total_btc_wallet"  :to="'/explorer/'+ data.item.exchange_id">
-								<b-button size="sm"  class="mr-2">
+								<b-button variant="primary" size="sm"  class="mr-2">
 									Explore wallet
 								</b-button>
 							</b-link>
-							<b-button v-else size="sm"  v-on:click="clicked_exchange=data.item.exchange_id" v-b-modal.editWallet>Add wallet</b-button>
+							<b-button variant="primary" v-else size="sm"  v-on:click="clicked_exchange=data.item.exchange_id" v-b-modal.editWallet>Add wallet</b-button>
 						</template>
 					</b-table>
 				</b-row>
@@ -63,19 +63,17 @@ import EditWalletModal from './commons/EditWalletModal.vue';
 				clicked_exchange: null,
 				currentPage:0,
 				totalRows:0,
-				sortBy: 'age',
-				sortDesc: false,
+				sortBy: 'total_btc_wallet',
+				sortDesc: true,
 				fields: [
 					{ key: 'name', sortable: true ,},
-					{ key: 'cmc_volume', sortable: true },
-					{ key: 'nb_users', sortable: true },
+					{ key: 'reported_volume', sortable: true },
+					{ key: 'nb_withdrawal_addresses', sortable: true },
+					{ key: 'nb_deposit_addresses', sortable: true },
 					{ key: 'total_btc_wallet', sortable: true },
 					{ key: 'last_day_deposits', sortable: true },
 					{ key: 'last_day_withdrawals', sortable: true },
-					{ key: 'delivered_by_traded', sortable: true, label:'Delivered by traded ratio' },
-					{ key: 'MAU', sortable: true },
 					{ key: 'action'}
-
 				],
 				items: [
 				]

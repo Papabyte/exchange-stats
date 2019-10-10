@@ -54,13 +54,13 @@ exports.create = function(){
 	await db.query("CREATE TABLE IF NOT EXISTS last_exchanges_ranking (\n\
 		exchange_id VARCHAR(60) PRIMARY KEY, \n\
 		name VARCHAR(60),\n\
-		cmc_volume INTEGER,\n\
-		nb_users INTEGER,\n\
+		reported_volume INTEGER,\n\
+		nb_deposit_addresses INTEGER,\n\
+		nb_withdrawal_addresses INTEGER,\n\
 		total_btc_wallet INTEGER,\n\
 		last_day_deposits INTEGER,\n\
 		last_day_withdrawals INTEGER,\n\
-		delivered_by_traded,\n\
-		mau \n\
+		delivered_by_traded\n\
 		)");
 		console.error("all tables created");
 		resolve();

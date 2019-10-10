@@ -16,6 +16,9 @@ export default {
 	components: {
 		NavBar,
 		RankingTable
+	},
+	created(){
+		document.title = 'Exchange onchain statistics';
 	}
 }
 </script>

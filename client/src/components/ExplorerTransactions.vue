@@ -1,41 +1,54 @@
 <template>
 	<b-container fluid>
-		<EditWalletModal :prop_exchange="exchange" :prop_wallet_id="wallet_id"  :remove="!wallet_id"/>
+		<EditWalletModal :prop_exchange="exchange" :prop_wallet_id="walletIdToEdit"  :isRemoving="isRemoving"/>
+
 		<b-row v-if="title">
 			<b-col offset-lg="1" lg="10" cols="12" class="py-3">
 			<h3 class="text-center">{{title}}</h3>
 			</b-col>
 		</b-row >
+
 		<b-col offset-lg="1" lg="10" cols="12" class="py-3">
-			<b-row class="text-center" v-if="!isSpinnerActive&&failoverText">
-				{{failoverText}}
-			</b-row>
-				<b-row v-if="exchangeWallets && !isSpinnerActive">
-				 Wallets for this exchange:
+			<div v-if="!isSpinnerActive">
+				<b-row class="text-center" v-if="failoverText">
+					{{failoverText}}
+				</b-row>
+
+				<b-row class="text-center" v-if="walletOwner">
+					<span class="px-2">Belongs to exchange</span> <Exchange :id="walletOwner"/>
+				</b-row>
+
+				<b-row class="text-center" v-if="total_on_wallets">
+					<span class="px-2">Total on wallets: </span> <BtcAmount :amount="total_on_wallets"/>
+				</b-row>
+
+				<b-row v-if="exchangeWallets">
+					Wallets for this exchange:
 					<b-row class="pl-3" align-h="start">
 						<div v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
 							<b-col >
 								<b-link :to="'/explorer/'+wallet">{{wallet}}</b-link>
-							<b-button size="sm" v-b-modal.editWallet>remove wallet</b-button>
-
+								<b-button variant="primary" @click="isRemoving=true;walletIdToEdit=wallet;" class="ml-2" size="sm" v-b-modal.editWallet>remove wallet {{wallet}}</b-button>
 							</b-col>
 						</div>
 					</b-row >
 				</b-row>
 
-				<b-row v-if="wallet_id">
-							<b-button size="sm"  v-b-modal.editWallet>add to exchange</b-button>
-
+				<b-row v-if="wallet_id&&!walletOwner">
+					<b-button variant="primary" size="sm" @click="isRemoving=false;" v-b-modal.editWallet>add to an exchange</b-button>
 				</b-row>
-			<b-row v-if="count_total  && !isSpinnerActive">
-			{{count_total}} transaction{{count_total > 1 ? 's' : ''}} found.
-			</b-row>
-			<b-row v-if="isSpinnerActive">
+				
+				<b-row v-if="count_total">
+				{{count_total}} transaction{{count_total > 1 ? 's' : ''}} found.
+				</b-row>
+			</div>
+			<b-row v-else>
 				<div class="text-center w-100">
 					<b-spinner label="Spinning"></b-spinner>
 				</div>
 			</b-row>
 		</b-col>
+
 		<b-row v-if="!isSpinnerActive && transactions">
 			<b-col offset-lg="1" lg="10" cols="12" class="py-3 main-col">
 				<b-row  class="text-center">
@@ -44,7 +57,6 @@
 				</div>
 				</b-row>
 			</b-col>
-
 		</b-row>
 
 	</b-container>
@@ -54,11 +66,15 @@
 import Transaction from './ExplorerTransaction.vue'
 import validate from 'bitcoin-address-validation';
 import EditWalletModal from './commons/EditWalletModal.vue';
+import Exchange from './commons/Exchange.vue';
+import BtcAmount from './commons/BtcAmount.vue';
 
 export default {
 	components: {
 		Transaction,
-		EditWalletModal
+		EditWalletModal,
+		Exchange,
+		BtcAmount
 	},
 	props: ['request_input'],
 	data() {
@@ -69,11 +85,14 @@ export default {
 			exchange :null,
 			wallet_id: null,
 			exchangeWallets: null,
-			clicked_wallet: null,
 			title: null,
 			isSpinnerActive: true,
 			failoverText: null,
-			redirected_ids: []
+			redirected_ids: [],
+			isRemoving: null,
+			walletOwner: null,
+			walletIdToEdit: null,
+			total_on_wallets: null
 			}
 	},
 	created() {
@@ -97,19 +116,26 @@ export default {
 			this.failoverText =null;
 			this.redirected_ids = [];
 			this.wallet_id = null;
+			this.walletOwner = null;
+			this.walletIdToEdit = null;
+			this.total_on_wallets = null;
+
 			if (Number(this.request_input)) { // it's a wallet id
 				this.title = "Transactions for wallet " + this.request_input;
 				this.axios.get('/api/wallet/' + this.request_input).then((response) => {
 				this.title = "Transactions for wallet " + response.data.redirected_id;
+				console.log(JSON.stringify(response.data));
 				if (response.data.txs){
 					this.transactions = response.data.txs.txs;
 					this.count_total = response.data.txs.count_total;
 					this.redirected_ids = [response.data.redirected_id];
-					this.wallet_id = response.data.redirected_id;
-
+					this.total_on_wallets = response.data.txs.total_on_wallets;
 				} else {
 					this.failoverText = "No transaction found for wallet " + this.request_input;
 				}
+					this.wallet_id = response.data.redirected_id;
+					this.walletIdToEdit = this.wallet_id;
+					this.walletOwner = response.data.exchange;
 					this.isSpinnerActive = false;
 				});
 			} else if (isTxId(this.request_input)) { // it's a tx id
@@ -133,9 +159,12 @@ export default {
 						this.count_total = response.data.txs.count_total;
 						this.redirected_ids = [response.data.redirected_id];
 						this.wallet_id = response.data.redirected_id;
+						this.walletIdToEdit = this.wallet_id;
+						this.total_on_wallets = response.data.txs.total_on_wallets;
 				} else {
 					this.failoverText = "No wallet known for address " + this.request_input  + ".";
 				}
+					this.walletOwner = response.data.exchange;
 					this.isSpinnerActive = false;
 				});
 
@@ -148,6 +177,7 @@ export default {
 						this.exchangeWallets = response.data.wallet_ids;
 						this.redirected_ids = response.data.redirected_ids;
 						this.exchange = this.request_input;
+						this.total_on_wallets = response.data.txs.total_on_wallets;
 					} else if (!response.data.wallet_ids.length == 0){
 						this.failoverText = "No wallet known for exchange " + response.data.name + ".";
 					} else {

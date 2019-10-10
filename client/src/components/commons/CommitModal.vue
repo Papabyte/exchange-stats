@@ -1,18 +1,8 @@
 <template>
-	<b-modal id="claimGain" :title="getTitle" @close="link=false" :hide-footer="true" >
-		<b-container v-if="!link" fluid >
-			<b-row>
-				Select the address.
-			</b-row>
-			<b-row class="pt-3" >
-				<div v-for="(address,index) in this.prop_operation_item.claimAddresses" :key="index">
-					<b-button variant="primary"  class="mb-2" size="m"  @click="claim(address)">{{address}}</b-button>
-				</div>
-			</b-row >
-		</b-container>
-		<b-container v-else fluid >
+	<b-modal id="commitOperation" :title="getTitle" @close="link=false" :hide-footer="true" >
+		<b-container fluid >
 			<b-row class="pt-3">
-				By clicking the link below, your Obyte wallet will open and ready to send a transaction for claiming your gain.
+				By clicking the link below, your Obyte wallet will open and ready to send a transaction for committing operation.
 			</b-row >
 		<b-row class="pt-3">
 			<span class="text-break">
@@ -35,17 +25,13 @@ export default {
 	props: ['prop_operation_item'],
 	data(){
 		return {
-			text_error: null,
-			items: [],
 			link: false
 		}
 	},
 	watch:{
 		prop_operation_item:function(){
-			this.listAddresses();
+			this.createLink();
 		}
-
-
 	},
 	computed:{
 		getTitle:function(){
@@ -56,23 +42,22 @@ export default {
 		}
 	},
 	methods:{
-		listAddresses(){
-
-		},
-		claim(address){
+		createLink(address){
 				const base64url = require('base64url');
 				const data = {
-						withdraw:1,
-						operation_id: this.prop_operation_item.key,
-						address: address
+						exchange: this.prop_operation_item.exchange,
+						commit: 1
 				};
+				if (this.prop_operation_item.initial_outcome == "in")
+					data.add_wallet_id= this.prop_operation_item.wallet_id;
+				else
+					data.remove_wallet_id= this.prop_operation_item.wallet_id;
 
 				const json_string = JSON.stringify(data);
 				const base64data = base64url(json_string);
 				this.link = (conf.testnet ? "byteball-tn" :"byteball")+":"+conf.aa_address+"?amount=10000&base64data="+base64data;
-				window.open(href, '_blank');
+			}
 		}
-	}
 }
 </script>
 
