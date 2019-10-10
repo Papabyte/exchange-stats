@@ -1,13 +1,13 @@
 const express = require('express')
 //const ocore = require('./node_modules/ocore/');
 const validationUtils = require("ocore/validation_utils.js");
-const aa_handler = require("./modules/aa_handler.js");
 const conf = require('ocore/conf.js');
 
 const validate = require('bitcoin-address-validation');
 
 require('./modules/sqlite_tables.js').create().then(function(){
-
+	
+	const aa_handler = require("./modules/aa_handler.js");
 	const indexer = require('./modules/indexer.js');
 	const explorer = require('./modules/explorer.js');
 	const exchanges = require('./modules/exchanges.js');
