@@ -1,6 +1,6 @@
 <template>
 	<div class="main">
-		<NavBar selected_item='1' />
+		<nav-bar selected_item='1' />
 		<b-container fluid >
 			<b-row v-if="!url_input">
 				<b-col cols="12" class="py-3">
@@ -33,7 +33,7 @@
 				</b-col>
 			</b-row>
 			<b-row v-else  >
-				<Transactions :request_input="url_input" />
+				<transactions :request_input="url_input" />
 			</b-row>
 		</b-container>
 	</div>
@@ -44,11 +44,15 @@ import NavBar from './commons/NavBar.vue'
 import Transactions from './ExplorerTransactions.vue'
 
 export default {
-	name: 'ExchangesStats',
-	props: ['url_input'],
 	components: {
 		NavBar,
 		Transactions
+	},
+	props: {
+		url_input: {
+			type: String,
+			required: false
+		}
 	},
 	data() {
 		return {
@@ -64,7 +68,6 @@ export default {
 	created(){
 		this.getExchanges();
 		document.title = 'Wallet explorer';
-
 	},
 	methods:{ 
 		onSubmit(){
@@ -72,12 +75,11 @@ export default {
 		},
 		getExchanges(){
 			if (!this.url_input){
-					this.axios.get('/api/exchanges').then((response) => {
-						console.log(response.data);
-						this.arrExchanges = response.data.sort(function(a,b){
-							return a.name.toUpperCase() > b.name.toUpperCase();
-						});
+				this.axios.get('/api/exchanges').then((response) => {
+					this.arrExchanges = response.data.sort(function(a,b){
+						return a.name.toUpperCase() > b.name.toUpperCase();
 					});
+				});
 			}
 		}
 	}

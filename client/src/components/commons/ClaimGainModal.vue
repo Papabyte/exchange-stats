@@ -6,7 +6,7 @@
 			</b-row>
 			<b-row v-if="this.operation_item.claimAddresses" class="pt-3" >
 				<div v-for="(address,index) in this.operation_item.claimAddresses" :key="index">
-					<b-button variant="primary"  class="mb-2" size="m"  @click="claim(address)">{{address}}</b-button>
+					<b-button variant="primary" @click="claim(address)" class="mb-2" size="m" >{{address}}</b-button>
 				</div>
 			</b-row >
 		</b-container>
@@ -29,10 +29,15 @@
 <script>
 const conf = require("../../conf.js");
 export default {	
-	components: {
-		
+	props: {
+		operationItem: {
+			type: Object,
+			required: false,
+			default:  function () {
+				return {}
+			}
+		}
 	},
-	props: ['prop_operation_item'],
 	data(){
 		return {
 			text_error: null,
@@ -41,17 +46,15 @@ export default {
 			operation_item: {}
 		}
 	},
-	watch:{
-		prop_operation_item:function(){
-			this.operation_item = this.prop_operation_item;
-			this.listAddresses();
-		}
-
-
-	},
 	computed:{
 		getTitle:function(){
 				return "Claim a gain";
+		}
+	},
+	watch:{
+		operationItem:function(){
+			this.operation_item = this.operationItem;
+			this.listAddresses();
 		}
 	},
 	methods:{

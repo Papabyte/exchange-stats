@@ -63,14 +63,11 @@
 			}
 		},
 		created(){
-				this.axios.get('/api/aa_transactions').then((response) => {
-					console.log(response.data);
-					this.items = response.data;
-					this.totalRows = this.items.length;
-					this.isSpinnerActive= false
-				});
-
-
+			this.axios.get('/api/aa_transactions').then((response) => {
+				this.items = response.data;
+				this.totalRows = this.items.length;
+				this.isSpinnerActive= false
+			});
 		}
 	}
 </script>

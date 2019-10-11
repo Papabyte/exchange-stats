@@ -36,25 +36,29 @@ const conf = require("../../conf.js");
 export default {	
 	components: {
 	},
-	props: ['prop_operation_item'],
+	props: {
+		operationItem: {
+			type: Object,
+			required: false,
+			default:  function () {
+				return {}
+			}
+		}
+	},
 	data(){
 		return {
 			proofsByOutcome: {}
 		}
-	},
-	watch:{
-		prop_operation_item:function(){
-				this.proofsByOutcome = this.prop_operation_item.url_proofs_by_outcome || {};
-		}
-
 	},
 	computed:{
 		getTitle:function(){
 			return "View proofs";
 		}
 	},
-	methods:{
-	
+	watch:{
+		operationItem:function(){
+			this.proofsByOutcome = this.operationItem.url_proofs_by_outcome || {};
+		}
 	}
 }
 </script>

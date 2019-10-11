@@ -1,55 +1,56 @@
 <template>
 	<div>
-		<span v-if="label"> {{label}}</span><span v-bind:class="amountClass">{{(amount/100000000).toPrecision(6)}} BTC </span>
+		<span v-if="label"> {{label}}</span>
+		<span v-bind:class="amountClass">{{(amount/100000000).toPrecision(6)}} BTC </span>
 	</div>
 </template>
 
 <script>
-
 export default {
-	props: ['amount', 'label','isNegative','isPositive'],
-	  data(){ return {
-	
-
-  }},
-	computed:{
-
-		amountClass:function(){
-					return {
-					negative: this.isNegative,
-					positive: this.isPositive
-				};
+	props: {
+		amount: {
+			type: Number,
+			required: false,
+			default: 0
+		},
+		label: {
+			type: String,
+			required: false
+		},
+		isNegative: {
+			type: Boolean,
+			required: false,
+			default: false
+		},
+		isPositive: {
+			type: Boolean,
+			required: false,
+			default: false
 		}
-/*			if (this.isNegative){
-				console.log(this.amount + "negative")
-				return "negative";
-			}
-			if (this.isPositive){
-								console.log(this.amount + "positive")
-
-				return "positive";
-			}
-		}*/
-
+	},
+	computed:{
+		amountClass:function(){
+			return {
+				negative: this.isNegative,
+				positive: this.isPositive
+			};
+		}
 	}
 }
 </script>
 
-<style lang='scss'>
+<style scoped>
 
 .negative{
 	color: red;
 	font-size: 20px;
-		font-weight: 600;
-
+	font-weight: 600;
 }
 
 .positive{
 	color: green;
 	font-size: 20px;
-		font-weight: 600;
-
-
+	font-weight: 600;
 }
 
 </style>

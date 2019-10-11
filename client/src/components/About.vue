@@ -1,7 +1,7 @@
 <template>
 	<div>
-	<NavBar selected_item='3' />
-	About
+		<nav-bar selected_item='3' />
+		About
 	</div>
 </template>
 

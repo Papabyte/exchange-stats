@@ -12,26 +12,24 @@
 							size="l"
 							class="pl-4 my-0"
 							></b-pagination> 
-						</b-col>
+					</b-col>
 				</b-row>	
 			<b-row>
-					<b-col  cols="12">
-							<b-table 
-							:current-page="currentPage"
-							per-page="10"
-							:items="items"
-							:fields="fields"
-							:sort-by.sync="sortBy"
-							:sort-desc.sync="sortDesc"
-							responsive
-								sort-icon-left
-						>	
-	
-					<template v-slot:cell(reward_amount)="data">
-						<ByteAmount :amount="data.item.reward_amount" />
-					</template>
-				</b-table>
-					</b-col>
+				<b-col  cols="12">
+					<b-table 
+					:current-page="currentPage"
+					per-page="10"
+					:items="items"
+					:fields="fields"
+					:sort-by.sync="sortBy"
+					:sort-desc.sync="sortDesc"
+					responsive
+					sort-icon-left>	
+						<template v-slot:cell(reward_amount)="data">
+							<byte-amount :amount="Number(data.item.reward_amount)" />
+						</template>
+					</b-table>
+				</b-col>
 			</b-row>	
 			<b-row>
 				<b-col  offset="4" cols="4">
@@ -76,15 +74,10 @@ import DonateRewardModal from './commons/DonateRewardModal.vue';
 					this.totalRows = this.items.length;
 					this.isSpinnerActive= false
 				});
-
-
 		}
 	}
 </script>
 
 <style >
-
-.main-col{
-}
 
 </style>

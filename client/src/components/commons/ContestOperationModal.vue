@@ -1,7 +1,7 @@
 <template>
 	
 
-	<b-modal id="contestOperation" :title="getTitle" @close="link=false" :hide-footer="!!link" @ok="handleOk">
+	<b-modal id="contestOperation" :title="getTitle"  :hide-footer="!!link" @close="link=false" @ok="handleOk">
 		<b-container v-if="!link" fluid >
 				<b-row class="pt-3" >
 				<label for="range-1">Amount to stake</label>
@@ -10,12 +10,12 @@
 			<b-row>
 				<span v-if="text_error" class="pt-3">{{text_error}}</span>
 				<div class="pt-3">
-					Stake <ByteAmount :amount="stakeAmountGb*1000000000" />, gain <ByteAmount :amount="potentialGainAmount" /> if outcome is eventually reversed.
+					Stake <byte-amount :amount="stakeAmountGb*1000000000" />, gain <byte-amount :amount="potentialGainAmount" /> if outcome is eventually reversed.
 				</div>
 			</b-row >
 			<b-row v-if="amountLeftToReverse>0">
 			<div class="pt-3">
-					<ByteAmount :amount="amountLeftToReverse" /> left to stake to reverse outcome.
+					<byte-amount :amount="amountLeftToReverse" /> left to stake to reverse outcome.
 			</div>
 			</b-row >
 			<b-row>
@@ -51,7 +51,15 @@ export default {
 		ByteAmount,
 		UrlInputs
 	},
-	props: ['prop_operation_item'],
+	props: {
+		operationItem: {
+			type: Object,
+			required: false,
+			default:  function () {
+				return {}
+			}
+		}
+	},
 	data(){
 		return {
 			text_error: null,
@@ -68,21 +76,6 @@ export default {
 			operation_item:{}
 			
 		}
-	},
-	watch:{
-		prop_operation_item:function(){
-			if(!this.prop_operation_item)
-				return;
-
-			this.operation_item = this.prop_operation_item;
-
-			this.reversalStakeGb = (conf.challenge_coef*this.operation_item.staked_on_outcome+10000)/1000000000;
-			this.stakeAmountGb = this.reversalStakeGb;
-
-			this.reset();
-		}
-
-
 	},
 	computed:{
 		getTitle:function(){
@@ -108,6 +101,16 @@ export default {
 			return this.stakeAmountGb*1000000000 / this.newTotalOppositeStake *  this.newTotalStake - this.stakeAmountGb*1000000000;
 		}
 	},
+	watch:{
+		operationItem:function(){
+			if(!this.operationItem)
+				return;
+			this.operation_item = this.operationItem;
+			this.reversalStakeGb = (conf.challenge_coef*this.operation_item.staked_on_outcome+10000)/1000000000;
+			this.stakeAmountGb = this.reversalStakeGb;
+			this.reset();
+		}
+	},
 	methods:{
 		update_url_1(value){
 			this.url_1 = value;
@@ -123,24 +126,21 @@ export default {
 			this.rewardAmount = 0;
 
 		},
-		check(){
-
-		},
 		handleOk(bvModalEvt){
 				bvModalEvt.preventDefault()	;
 				const base64url = require('base64url');
 				const data = {
-						exchange: this.prop_operation_item.exchange
+						exchange: this.operationItem.exchange
 				};
 				if (this.url_1)
 					data.url_1 = this.url_1;
 				if (this.url_2)
 					data.url_2 = this.url_2;
 
-				if (this.prop_operation_item.isRemovingOperation)
-					data.add_wallet_id = this.prop_operation_item.wallet_id;
+				if (this.operationItem.isRemovingOperation)
+					data.add_wallet_id = this.operationItem.wallet_id;
 				else
-					data.remove_wallet_id = this.prop_operation_item.wallet_id;
+					data.remove_wallet_id = this.operationItem.wallet_id;
 				const json_string = JSON.stringify(data);
 				const base64data = base64url(json_string);
 				this.link = (conf.testnet ? "byteball-tn" :"byteball")+":"+conf.aa_address+"?amount="

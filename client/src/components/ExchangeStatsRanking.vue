@@ -1,7 +1,7 @@
 <template>
 	<b-container fluid>
 		<b-row >
-		<EditWalletModal :prop_exchange="clicked_exchange"/>
+		<edit-wallet-modal :propExchange="clicked_exchange"/>
 			<b-col offset-lg="1" lg="10" cols="12" class="py-3">
 				<b-row >
 					<b-col cols="12" class="py-3">
@@ -87,14 +87,11 @@ import EditWalletModal from './commons/EditWalletModal.vue';
 			}
 		},
 		created(){
-				this.axios.get('/api/ranking').then((response) => {
-					console.log(response.data);
-					this.totalRows = response.data.length;
-					this.items = response.data;
-					
-				});
-
-
+			this.axios.get('/api/ranking').then((response) => {
+				console.log(response.data);
+				this.totalRows = response.data.length;
+				this.items = response.data;
+			});
 		}
 	}
 </script>

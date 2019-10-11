@@ -6,10 +6,13 @@ const ITEMS_PER_PAGE = 100;
 
 async function getTransactionsFromWallets(arrIds, page, handle){
 	const idsSqlFilter = arrIds.join(",");
-	console.error(idsSqlFilter);
-	var idRows = await db.query("SELECT DISTINCT id from (SELECT id FROM transactions_to WHERE wallet_id IN("+ idsSqlFilter +") \n\
-		UNION SELECT id FROM transactions_from WHERE wallet_id IN("+ idsSqlFilter +"))s");
-console.error(idRows);
+
+	var [idRows, total_on_wallets] = await Promise.all([
+		db.query("SELECT DISTINCT id from (SELECT id FROM transactions_to WHERE wallet_id IN("+ idsSqlFilter +") \n\
+		UNION SELECT id FROM transactions_from WHERE wallet_id IN("+ idsSqlFilter +"))s ORDER BY id DESC"),
+		stats.getTotalOnWallets(arrIds)
+	]);
+
 	const count_total = idRows.length;
 	if (count_total == 0)
 		return handle(null);
@@ -17,7 +20,6 @@ console.error(idRows);
 	idRows = idRows.splice(ITEMS_PER_PAGE * page, ITEMS_PER_PAGE * (page +1)).map(function(row){
 		return row.id;
 	});
-	var total_on_wallets = await stats.getTotalOnWallets(arrIds);
 	getTransactionsFromInternalIds(idRows, function(assocTxsFromWallet){
 		return handle({total_on_wallets: total_on_wallets,count_total: count_total, txs: assocTxsFromWallet});
 	});

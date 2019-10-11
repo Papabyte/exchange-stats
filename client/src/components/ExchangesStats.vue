@@ -1,9 +1,8 @@
 <template>
 	<div class="main">
-	<NavBar selected_item='0' />
-	<RankingTable />
-
-</div>
+		<nav-bar selected_item='0' />
+		<ranking-table />
+	</div>
 </template>
 
 <script>

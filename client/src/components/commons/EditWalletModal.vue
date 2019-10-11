@@ -7,7 +7,7 @@
 		:title="getTitle"
 		@ok="handleOk">
 		<b-container v-if="!link" fluid >
-			<b-row v-if="!prop_exchange">
+			<b-row v-if="!propExchange">
 				<label for="input-with-list">Select the exchange to which you want to add wallet</label>
 				<b-form-input 
 					v-on:input="reset" 
@@ -48,7 +48,7 @@
 			<b-row >
 				<span v-if="text_error" class="pt-3">{{text_error}}</span>
 				<div v-if="rewardAmount>0" class="pt-3">
-					Stake <ByteAmount :amount="stakeAmount" />, gain <ByteAmount :amount="rewardAmount" /> if wallet {{wallet}} is successfully {{isRemoving ? "removed from" : "added to"}} exchange {{exchange}}
+					Stake <byte-amount :amount="stakeAmount" />, gain <byte-amount :amount="rewardAmount" /> if wallet {{wallet}} is successfully {{isRemoving ? "removed from" : "added to"}} exchange {{exchange}}
 				<UrlInputs v-on:url_1_update="update_url_1" v-on:url_2_update="update_url_2"/>
 				</div>
 			</b-row >
@@ -80,7 +80,23 @@ export default {
 		ByteAmount,
 		UrlInputs
 	},
-	props: ['isRemoving', 'prop_exchange', 'prop_wallet_id'],
+	props: {
+		prop_wallet_id: {
+			type: Number,
+			required: false,
+			default: null
+		},
+		propExchange: {
+			type: String,
+			required: false,
+			default: null
+		},
+		isRemoving: {
+			type: Boolean,
+			required: false,
+			default: false
+		}
+	},
 	data(){
 		return {
 			text_error: null,
@@ -98,25 +114,10 @@ export default {
 			objExchanges: {}
 		}
 	},
-	watch:{
-		prop_exchange:function(){
 
-			this.exchange = this.prop_exchange;
-			this.reset();
-
-		},
-		prop_wallet_id:function(){
-			this.wallet = this.prop_wallet_id;
-			if (this.prop_exchange)
-				this.check()
-			this.reset();
-		}
-
-
-	},
 	computed:{
 		getTitle:function(){
-			if (this.prop_exchange){
+			if (this.propExchange){
 			if (this.wallet && this.exchange)
 				return (this.isRemoving ? "Remove wallet "+ this.wallet + " from exchange " + this.exchange :  "Add wallet "+ this.wallet + " to exchange " + this.exchange)
 			else if (this.exchange)
@@ -132,7 +133,18 @@ export default {
 		validExchange() {
 			return !!this.objExchanges[this.exchange]
 		}
-
+	},
+		watch:{
+		propExchange:function(){
+			this.exchange = this.propExchange;
+			this.reset();
+		},
+		prop_wallet_id:function(){
+			this.wallet = this.prop_wallet_id;
+			if (this.propExchange)
+				this.check()
+			this.reset();
+		}
 	},
 	mounted(){
 		if (this.prop_wallet_id)

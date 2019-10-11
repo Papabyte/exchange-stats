@@ -1,8 +1,8 @@
 <template>
 	<div class="py-3">
-		<b-form-input :formatter="format" v-model="url_1" placeholder="Enter first proof url (optional)"></b-form-input>
+		<b-form-input placeholder="Enter first proof url (optional)" :formatter="format" v-model="url_1"></b-form-input>
 		<span v-if="text_error_1" class="pt-3">{{text_error_1}}</span>
-		<b-form-input :formatter="format" v-model="url_2" placeholder="Enter second proof url (optional)"></b-form-input>
+		<b-form-input placeholder="Enter second proof url (optional)" :formatter="format" v-model="url_2" ></b-form-input>
 		<span v-if="text_error_2" class="pt-3">{{text_error_2}}</span>
 	</div>
 </template>
@@ -22,7 +22,6 @@ export default {
 	},
 	watch:{
 		url_1: function(){
-			console.log("changed");
 			if (this.url_1.length >= 64){
 				this.text_error_1 = "Cannot be more than 64 characters, you should use an url shortener service."
 			} else {
