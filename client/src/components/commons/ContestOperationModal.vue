@@ -5,12 +5,12 @@
 		<b-container v-if="!link" fluid >
 				<b-row class="pt-3" >
 				<label for="range-1">Amount to stake</label>
-			<b-form-input id="range-1" v-model="stakeAmountGb" type="range" min="0.000001" :max="reversalStakeGb*1.01" :step="reversalStakeGb/100"></b-form-input>
+			<b-form-input id="range-1" v-model="stakeAmountGb" type="range" :number="true" min="0.001" :max="reversalStakeGb*1.01" :step="reversalStakeGb/100"></b-form-input>
 			</b-row >
 			<b-row>
 				<span v-if="text_error" class="pt-3">{{text_error}}</span>
 				<div class="pt-3">
-					Stake <byte-amount :amount="stakeAmountGb*1000000000" />, gain <byte-amount :amount="potentialGainAmount" /> if outcome is eventually reversed.
+					Stake <byte-amount :amount="stakeAmount" />, gain <byte-amount :amount="potentialGainAmount" /> if outcome is eventually reversed.
 				</div>
 			</b-row >
 			<b-row v-if="amountLeftToReverse>0">
@@ -21,6 +21,7 @@
 			<b-row>
 				<UrlInputs v-on:url_1_update="update_url_1" v-on:url_2_update="update_url_2"/>
 			</b-row >
+	
 		</b-container>
 		<b-container v-else fluid >
 			<b-row class="pt-3">
@@ -34,6 +35,8 @@
 			<b-row class="py-3">
 				It will be taken into account after a few minutes when the transaction is confirmed. Note that it could be canceled if meanwhile another user contested the operation. In this case, the AA would bounce the transaction to refund you.
 			</b-row >
+
+
 		</b-container>
 
 	</b-modal>
@@ -68,6 +71,7 @@ export default {
 			isSpinnerActive: false,
 			coeff: conf.coef_challenge,
 			reversalStakeGb:0,
+			reversalStake: 0,
 			stakeAmountGb: 0,
 			stakeAmount: 0,
 			link: false,
@@ -84,21 +88,18 @@ export default {
 			else
 				return ("Contest adding of wallet "+ this.operation_item.wallet_id + " to exchange " + this.operation_item.exchange);
 		},
+
 		amountLeftToReverse: function(){
-			return ((this.reversalStakeGb - this.stakeAmountGb) * 1000000000) || 0;
+			return ((this.reversalStakeGb - this.stakeAmount) );
 		},
-		newTotalOppositeStake: function(){
-			if (!this.operation_item.total_staked)
-				return 0;
-			return this.stakeAmountGb*1000000000 + (this.operation_item.total_staked - this.operation_item.staked_on_outcome);
+		newTotalOppositeStakeForReversal: function(){
+			return this.reversalStake + (this.operation_item.total_staked - this.operation_item.staked_on_outcome);
 		},
 		newTotalStake: function(){
-			if (!this.operation_item)
-				return 0;
-			return this.operation_item.total_staked + this.stakeAmountGb*1000000000;
+			return this.operation_item.total_staked + this.stakeAmount;
 		},
 		potentialGainAmount: function(){
-			return this.stakeAmountGb*1000000000 / this.newTotalOppositeStake *  this.newTotalStake - this.stakeAmountGb*1000000000;
+			return this.stakeAmount / this.newTotalOppositeStakeForReversal *  this.newTotalStake - this.stakeAmount;
 		}
 	},
 	watch:{
@@ -106,9 +107,13 @@ export default {
 			if(!this.operationItem)
 				return;
 			this.operation_item = this.operationItem;
-			this.reversalStakeGb = (conf.challenge_coef*this.operation_item.staked_on_outcome+10000)/1000000000;
+			this.reversalStake = (conf.challenge_coef*this.operation_item.staked_on_outcome+10000);
+			this.reversalStakeGb = this.reversalStake/1000000000;
 			this.stakeAmountGb = this.reversalStakeGb;
 			this.reset();
+		},
+		stakeAmountGb: function(){
+			this.stakeAmount = this.stakeAmountGb * 1000000000;
 		}
 	},
 	methods:{
