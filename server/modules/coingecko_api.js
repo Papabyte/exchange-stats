@@ -16,13 +16,14 @@ function getExchangeInfo(exchange_id, try_count){
 			function(error, response, body) {
 
 				if (error || response.statusCode !== 200){
-					return getExchangeInfo(exchange_id, try_count+1);
+					console.error("coingecko request error " + error);
+					return getExchangeInfo(exchange_id, try_count+1).then(resolve);
 				}
 				try {
 					var objInfo = JSON.parse(body);
 				} catch (e) {
-					console.error(e);
-					return getExchangeInfo(exchange_id, try_count+1);
+					console.error("coingecko parsing error " + e);
+					return getExchangeInfo(exchange_id, try_count+1).then(resolve);
 				}
 				return resolve(objInfo);
 			})

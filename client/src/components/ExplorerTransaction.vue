@@ -16,7 +16,7 @@
 				<div class="w-100 px-4">
 					<WalletId v-if="transaction.from && transaction.from.id" label="Wallet: " :id="transaction.from.id"/>
 					<span v-if="transaction.from.exchange"><Exchange label="Exchange: " :id="transaction.from.exchange"/></span>
-					<BtcAmount v-if="transaction.from && transaction.from.amount" label="Amount: " :amount="transaction.from.amount" :isNegative="about_ids.indexOf(transaction.from.id)>-1"/>
+					<btc-amount v-if="transaction.from && transaction.from.amount" label="Amount: " :amount="transaction.from.amount" :isNegative="about_ids.indexOf(transaction.from.id)>-1"/>
 				</div>
 			</b-col>
 			<b-col cols="2" class="text-center">
@@ -30,7 +30,7 @@
 					<span v-else>Wallet: unknown yet</span>
 					<span v-if="t_out.exchange"><Exchange label="Exchange: " :id="t_out.exchange"/></span>
 					<BtcAddress v-if="t_out.address" label="Address: " :address="t_out.address"/>
-					<BtcAmount label="Amount: " :amount="t_out.amount" :isPositive="about_ids.indexOf(t_out.id)>-1"/>
+					<btc-amount label="Amount: " :amount="t_out.amount" :isPositive="about_ids.indexOf(t_out.id)>-1"/>
 				</div>
 			</b-col>
 		</b-row >
@@ -60,7 +60,7 @@ export default {
 		}
 	},
 	created() {
-		console.log(this.about_ids);
+
 	}
 }
 </script>

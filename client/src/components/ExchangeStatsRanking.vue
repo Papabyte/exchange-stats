@@ -1,7 +1,7 @@
 <template>
 	<b-container fluid>
 		<b-row >
-		<EditWalletModal :prop_exchange="clicked_exchange"/>
+		<edit-wallet-modal :propExchange="clicked_exchange"/>
 			<b-col offset-lg="1" lg="10" cols="12" class="py-3">
 				<b-row >
 					<b-col cols="12" class="py-3">
@@ -27,6 +27,12 @@
 					responsive
 					sort-icon-left
 					>
+						<template v-slot:cell(last_day_deposits)="data">
+							<BtcAmount v-if="data.item.last_day_deposits" :amount="data.item.last_day_deposits"/>
+						</template>
+						<template v-slot:cell(last_day_withdrawals)="data">
+							<BtcAmount v-if="data.item.last_day_withdrawals" :amount="data.item.last_day_withdrawals"/>
+						</template>
 						<template v-slot:cell(total_btc_wallet)="data">
 							<BtcAmount v-if="data.item.total_btc_wallet" :amount="data.item.total_btc_wallet"/>
 						</template>
@@ -81,14 +87,11 @@ import EditWalletModal from './commons/EditWalletModal.vue';
 			}
 		},
 		created(){
-				this.axios.get('/api/ranking').then((response) => {
-					console.log(response.data);
-					this.totalRows = response.data.length;
-					this.items = response.data;
-					
-				});
-
-
+			this.axios.get('/api/ranking').then((response) => {
+				console.log(response.data);
+				this.totalRows = response.data.length;
+				this.items = response.data;
+			});
 		}
 	}
 </script>

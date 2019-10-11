@@ -19,9 +19,7 @@ function processNewRanking(){
 			unlock();
 			return setTimeout(processNewRanking, 1000); //wait that aa handler set assocWalletIdsByExchange
 		}
-			console.log("assocWalletIdsByExchange");
-			console.log(assocWalletIdsByExchange);
-
+	
 		for (var key in exchanges){
 			var exchange = exchanges[key];
 			var total_24h_deposits=null;
@@ -30,7 +28,7 @@ function processNewRanking(){
 			var nb_deposit_addresses=null;
 			var nb_withdrawal_addresses=null;
 
-			if (assocWalletIdsByExchange[key]){
+			if (assocWalletIdsByExchange[key] && assocWalletIdsByExchange[key].length > 0){
 				var arrWalletIds = assocWalletIdsByExchange[key];
 				var lastHeight = await indexer.getLastProcessedHeight();
 				total_24h_deposits = await stats.getTotalDepositedToWallets(arrWalletIds, lastHeight - 10 * 6 * 24 , lastHeight);
@@ -61,6 +59,7 @@ function processNewRanking(){
 				nb_deposit_addresses,
 				nb_withdrawal_addresses
 			]);
+
 		}
 		unlock();
 	});

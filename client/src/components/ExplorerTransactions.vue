@@ -1,6 +1,6 @@
 <template>
 	<b-container fluid>
-		<EditWalletModal :prop_exchange="exchange" :prop_wallet_id="walletIdToEdit"  :isRemoving="isRemoving"/>
+		<edit-wallet-modal :propExchange="exchange" :prop_wallet_id="walletIdToEdit"  :isRemoving="isRemoving"/>
 
 		<b-row v-if="title">
 			<b-col offset-lg="1" lg="10" cols="12" class="py-3">
@@ -19,7 +19,7 @@
 				</b-row>
 
 				<b-row class="text-center" v-if="total_on_wallets">
-					<span class="px-2">Total on wallets: </span> <BtcAmount :amount="total_on_wallets"/>
+					<span class="px-2">Total on wallets: </span> <btc-amount :amount="total_on_wallets"/>
 				</b-row>
 
 				<b-row v-if="exchangeWallets">
@@ -53,7 +53,7 @@
 			<b-col offset-lg="1" lg="10" cols="12" class="py-3 main-col">
 				<b-row  class="text-center">
 					<div  class="w-100" v-for="(transaction,key,index) in transactions" v-bind:key="key">
-					<Transaction :tx_id="key" :transaction="transaction" :no_border="index == (Object.keys(transactions).length-1)" :about_wallet_ids="redirected_ids"/>
+					<transaction :tx_id="key" :transaction="transaction" :no_border="index == (Object.keys(transactions).length-1)" :about_wallet_ids="redirected_ids"/>
 				</div>
 				</b-row>
 			</b-col>
@@ -95,16 +95,15 @@ export default {
 			total_on_wallets: null
 			}
 	},
-	created() {
-		this.getTransactions();
-	},
 	watch: {
 		$route(route) {
 			this.getTransactions();
 		}
 	},
+	created() {
+		this.getTransactions();
+	},
 	methods: {
-
 		getTransactions() {
 			this.isSpinnerActive = true;
 			this.transactions = null;
@@ -133,7 +132,7 @@ export default {
 				} else {
 					this.failoverText = "No transaction found for wallet " + this.request_input;
 				}
-					this.wallet_id = response.data.redirected_id;
+					this.wallet_id = Number(response.data.redirected_id);
 					this.walletIdToEdit = this.wallet_id;
 					this.walletOwner = response.data.exchange;
 					this.isSpinnerActive = false;
@@ -158,7 +157,7 @@ export default {
 						this.transactions = response.data.txs.txs;
 						this.count_total = response.data.txs.count_total;
 						this.redirected_ids = [response.data.redirected_id];
-						this.wallet_id = response.data.redirected_id;
+						this.wallet_id = Number(response.data.redirected_id);
 						this.walletIdToEdit = this.wallet_id;
 						this.total_on_wallets = response.data.txs.total_on_wallets;
 				} else {
@@ -168,7 +167,7 @@ export default {
 					this.isSpinnerActive = false;
 				});
 
-			}  else if (this.request_input) { // should be an exchange
+			} else if (this.request_input) { // should be an exchange
 				this.axios.get('/api/exchange/' + this.request_input).then((response) => {
 					this.title = "Transactions for exchange " + response.data.name;
 					if (response.data.txs){

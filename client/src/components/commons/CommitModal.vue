@@ -19,25 +19,30 @@
 <script>
 const conf = require("../../conf.js");
 export default {	
-	components: {
-		
+	props: {
+		operationItem: {
+			type: Object,
+			required: false,
+			default:  function () {
+				return {}
+			}
+		}
 	},
-	props: ['prop_operation_item'],
 	data(){
 		return {
 			link: false,
 			operation_item: {}
 		}
 	},
-	watch:{
-		prop_operation_item:function(){
-			this.operation_item = this.prop_operation_item;
-			this.createLink();
-		}
-	},
 	computed:{
 		getTitle:function(){
 			return "Commit an operation";
+		}
+	},
+	watch:{
+		operationItem:function(){
+			this.operation_item = this.operationItem;
+			this.createLink();
 		}
 	},
 	methods:{

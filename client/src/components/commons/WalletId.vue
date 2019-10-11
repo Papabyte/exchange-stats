@@ -5,7 +5,7 @@
 	<span v-else>
 		<span v-if="label"> {{label}} </span>
 		<span class="wallet-link"><b-link :to="'/explorer/'+id">
-	{{id}}
+			{{id}}
 	</b-link></span>
 	</span>
 </template>
@@ -13,7 +13,22 @@
 <script>
 
 export default {
-	props: ['label','id', 'noUrl']
+	props: {
+		label: {
+			type: String,
+			required: false,
+			default: null
+		},
+		id: {
+			type: Number,
+			required: true
+		},
+		noUrl: {
+			type: Boolean,
+			required: false,
+			default: false
+		}
+	}
 }
 </script>
 
