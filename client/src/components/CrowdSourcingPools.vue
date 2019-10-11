@@ -1,14 +1,13 @@
 <template>
-	<b-container fluid>
-			<DonateRewardModal />
 		<b-row class="main-col">
+			<DonateRewardModal />
 			<b-col  cols="12">
 				<b-row>
 					<b-col  cols="3">
 						<b-pagination
 							v-model="currentPage"
 							:total-rows="totalRows"
-							per-page="30"
+							per-page="10"
 							align="fill"
 							size="l"
 							class="pl-4 my-0"
@@ -19,7 +18,7 @@
 					<b-col  cols="12">
 							<b-table 
 							:current-page="currentPage"
-							per-page="30"
+							per-page="10"
 							:items="items"
 							:fields="fields"
 							:sort-by.sync="sortBy"
@@ -33,14 +32,14 @@
 					</template>
 				</b-table>
 					</b-col>
-							</b-row>	
-			<b-row>	<b-col  offset="4" cols="4">
-								<b-button variant="primary"  class="mb-2" size="m"  v-b-modal.donateReward>Donate a reward</b-button>
-								</b-col>
-		</b-row>
-			</b-col>
-				</b-row>	
-	</b-container>
+			</b-row>	
+			<b-row>
+				<b-col  offset="4" cols="4">
+					<b-button variant="primary"  class="mb-2" size="m"  v-b-modal.donateReward>Donate a reward</b-button>
+				</b-col>
+			</b-row>
+		</b-col>
+	</b-row>	
 </template>
 
 <script>
@@ -74,6 +73,7 @@ import DonateRewardModal from './commons/DonateRewardModal.vue';
 				this.axios.get('/api/pools').then((response) => {
 					console.log(response.data);
 					this.items = response.data;
+					this.totalRows = this.items.length;
 					this.isSpinnerActive= false
 				});
 

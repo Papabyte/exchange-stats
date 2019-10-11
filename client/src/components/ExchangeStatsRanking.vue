@@ -27,6 +27,12 @@
 					responsive
 					sort-icon-left
 					>
+						<template v-slot:cell(last_day_deposits)="data">
+							<BtcAmount v-if="data.item.last_day_deposits" :amount="data.item.last_day_deposits"/>
+						</template>
+						<template v-slot:cell(last_day_withdrawals)="data">
+							<BtcAmount v-if="data.item.last_day_withdrawals" :amount="data.item.last_day_withdrawals"/>
+						</template>
 						<template v-slot:cell(total_btc_wallet)="data">
 							<BtcAmount v-if="data.item.total_btc_wallet" :amount="data.item.total_btc_wallet"/>
 						</template>

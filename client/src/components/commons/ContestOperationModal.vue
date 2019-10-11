@@ -92,7 +92,7 @@ export default {
 				return ("Contest adding of wallet "+ this.operation_item.wallet_id + " to exchange " + this.operation_item.exchange);
 		},
 		amountLeftToReverse: function(){
-			return ((this.reversalStakeGb - this.stakeAmountGb) * 1000000000).toPrecision(6) || 0;
+			return ((this.reversalStakeGb - this.stakeAmountGb) * 1000000000) || 0;
 		},
 		newTotalOppositeStake: function(){
 			if (!this.operation_item.total_staked)

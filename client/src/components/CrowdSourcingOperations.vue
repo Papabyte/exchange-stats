@@ -1,21 +1,21 @@
 <template>
-	<b-container fluid>
+
+	<b-row class="main-col">
 		<ContestOperationModal :prop_operation_item="clicked_item"/>
 		<ClaimGainModal  :prop_operation_item="clicked_item"/>
 		<ViewUrlProofsModal :prop_operation_item="clicked_item"/>
 		<CommitOperationModal :prop_operation_item="clicked_item"/>
-	<b-row class="main-col">
 		<b-pagination
 			v-model="currentPage"
 			:total-rows="totalRows"
-			per-page="30"
+			per-page="10"
 			align="fill"
 			size="l"
 			class="pl-4 my-0"
 			></b-pagination> 
 		<b-table 
 			:current-page="currentPage"
-			per-page="30"
+			per-page="10"
 			:items="items"
 			:fields="fields"
 			:sort-by.sync="sortBy"
@@ -61,7 +61,6 @@
 				</template>
 			</b-table>
 		</b-row>
-	</b-container>
 </template>
 
 <script>
@@ -146,6 +145,7 @@ import WalletId from './commons/WalletId.vue';
 							}
 
 						this.items.push(item);
+						this.totalRows = this.items.length;
 						
 					})
 					this.isSpinnerActive= false

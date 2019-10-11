@@ -1,5 +1,4 @@
 <template>
-	<b-container fluid>
 		<b-row class="main-col">
 			<b-col  cols="12">
 				<b-row>
@@ -7,7 +6,7 @@
 						<b-pagination
 							v-model="currentPage"
 							:total-rows="totalRows"
-							per-page="30"
+							per-page="10"
 							align="fill"
 							size="l"
 							class="pl-4 my-0"
@@ -18,7 +17,7 @@
 					<b-col  cols="12">
 							<b-table 
 							:current-page="currentPage"
-							per-page="30"
+							per-page="10"
 							:items="items"
 							:fields="fields"
 							:sort-by.sync="sortBy"
@@ -26,19 +25,16 @@
 							responsive
 								sort-icon-left
 						>	
-						<template v-slot:cell(unit)="data">
-								<b-link class="text-break" target="_blank" :href="(isTestnet ? 'https://testnetexplorer.obyte.org/#' : 'https://explorer.obyte.org/#')+data.item.unit">
-								{{data.item.unit}}
-								</b-link>
-						</template>
-
-				</b-table>
+							<template v-slot:cell(unit)="data">
+									<b-link class="text-break" target="_blank" :href="(isTestnet ? 'https://testnetexplorer.obyte.org/#' : 'https://explorer.obyte.org/#')+data.item.unit">
+									{{data.item.unit}}
+									</b-link>
+							</template>
+						</b-table>
 					</b-col>
-							</b-row>	
-
+				</b-row>
 			</b-col>
-				</b-row>	
-	</b-container>
+		</b-row>	
 </template>
 
 <script>
@@ -70,6 +66,7 @@
 				this.axios.get('/api/aa_transactions').then((response) => {
 					console.log(response.data);
 					this.items = response.data;
+					this.totalRows = this.items.length;
 					this.isSpinnerActive= false
 				});
 
