@@ -118,7 +118,7 @@ import WalletId from './commons/WalletId.vue';
 					}
 					item.outcome= row.outcome;
 					item.isRemovingOperation = row.outcome == "out";
-					item.initial_outcome = Number(row.initial_outcome);
+					item.initial_outcome = row.initial_outcome;
 					item.staked_on_outcome = Number(row.staked_on_outcome);
 					item.total_staked = Number(row.total_staked);
 					item.wallet_id = Number(row.wallet_id);
