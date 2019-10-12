@@ -2,26 +2,25 @@ const db = require('ocore/db.js');
 const aa_handler = require("./aa_handler.js");
 const stats = require("./stats.js");
 
-const ITEMS_PER_PAGE = 100;
+const ITEMS_PER_PAGE = 50;
 
 async function getTransactionsFromWallets(arrIds, page, handle){
 	const idsSqlFilter = arrIds.join(",");
-
-	var [idRows, total_on_wallets] = await Promise.all([
+	var [idRows, total_on_wallets, transactions_count] = await Promise.all([
 		db.query("SELECT DISTINCT id from (SELECT id FROM transactions_to WHERE wallet_id IN("+ idsSqlFilter +") \n\
-		UNION SELECT id FROM transactions_from WHERE wallet_id IN("+ idsSqlFilter +"))s ORDER BY id DESC"),
-		stats.getTotalOnWallets(arrIds)
+		UNION SELECT id FROM transactions_from WHERE wallet_id IN("+ idsSqlFilter +"))s ORDER BY id DESC LIMIT ?,?",[page*ITEMS_PER_PAGE,ITEMS_PER_PAGE]),
+		stats.getTotalOnWallets(arrIds),
+		stats.getTotalTransactions(arrIds)
 	]);
 
-	const count_total = idRows.length;
-	if (count_total == 0)
+	if (transactions_count == 0)
 		return handle(null);
 
-	idRows = idRows.splice(ITEMS_PER_PAGE * page, ITEMS_PER_PAGE * (page +1)).map(function(row){
+	idRows = idRows.map(function(row){
 		return row.id;
 	});
 	getTransactionsFromInternalIds(idRows, function(assocTxsFromWallet){
-		return handle({total_on_wallets: total_on_wallets,count_total: count_total, txs: assocTxsFromWallet});
+		return handle({total_on_wallets: total_on_wallets,count_total: transactions_count, txs: assocTxsFromWallet});
 	});
 }
 

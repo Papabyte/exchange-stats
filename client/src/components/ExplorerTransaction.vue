@@ -1,6 +1,6 @@
 <template>
 	<div :class="{bordered: !no_border}" class="py-4">
-		<b-row>
+		<b-row class="transaction-headers mx-lg-4 mx-2">
 			<b-col  cols="6" >
 				<TxId label="Transaction: " :tx_id="tx_id"/>
 			</b-col>
@@ -14,7 +14,7 @@
 		<b-row>
 			<b-col  cols="5" class="py-3 text-left">
 				<div class="w-100 px-4">
-					<WalletId v-if="transaction.from && transaction.from.id" label="Wallet: " :id="transaction.from.id"/>
+					<wallet-id v-if="transaction.from && transaction.from.id" label="Wallet: " :id="transaction.from.id"/>
 					<span v-if="transaction.from.exchange"><Exchange label="Exchange: " :id="transaction.from.exchange"/></span>
 					<btc-amount v-if="transaction.from && transaction.from.amount" label="Amount: " :amount="transaction.from.amount" :isNegative="about_ids.indexOf(transaction.from.id)>-1"/>
 				</div>
@@ -26,10 +26,10 @@
 			</b-col>
 			<b-col  cols="5" class="py-3 text-left">
 				<div  v-for="(t_out,index) in transaction.to" :key="index" class="py-2">
-					<WalletId v-if="t_out.id" label="Wallet: " :id="t_out.id"/>
+					<wallet-id v-if="t_out.id" label="Wallet: " :id="t_out.id"/>
 					<span v-else>Wallet: unknown yet</span>
 					<span v-if="t_out.exchange"><Exchange label="Exchange: " :id="t_out.exchange"/></span>
-					<BtcAddress v-if="t_out.address" label="Address: " :address="t_out.address"/>
+					<btc-address v-if="t_out.address" label="Address: " :address="t_out.address"/>
 					<btc-amount label="Amount: " :amount="t_out.amount" :isPositive="about_ids.indexOf(t_out.id)>-1"/>
 				</div>
 			</b-col>
@@ -85,4 +85,8 @@ border-bottom-style: solid;
 	height: 100%;
 }
 
+.transaction-headers{
+	background-color: gainsboro
+
+}
 </style>

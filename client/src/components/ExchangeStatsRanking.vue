@@ -13,9 +13,8 @@
 					v-model="currentPage"
 					:total-rows="totalRows"
 					:per-page="perPage"
-					align="fill"
 					size="l"
-					class="pl-4 my-0"
+					class="p-4 my-0"
 					></b-pagination> 
 					<b-table 
 					:current-page="currentPage"

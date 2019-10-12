@@ -17,6 +17,7 @@ require('./modules/sqlite_tables.js').create().then(function(){
 	app.get('/api/wallet/:id/:page', function(request, response){
 		const id = Number(request.params.id);
 		const page = request.params.page ? Number(request.params.page) : 0;
+
 		if (!validationUtils.isNonnegativeInteger(id))
 			return response.status(400).send('Wrong wallet id');
 		if (!validationUtils.isNonnegativeInteger(page))
@@ -28,21 +29,6 @@ require('./modules/sqlite_tables.js').create().then(function(){
 			});
 		})
 	});
-
-	app.get('/api/wallet/:id', function(request, response){
-		const id = Number(request.params.id);
-		if (!validationUtils.isNonnegativeInteger(id))
-			return response.status(400).send('Wrong wallet id');
-		explorer.getRedirections([id], function(redirected_ids){
-			console.error("redirected_ids");
-			console.error(redirected_ids);
-			
-			explorer.getTransactionsFromWallets(redirected_ids, 0, function(assocTxsFromWallet){
-				return response.send({txs: assocTxsFromWallet, redirected_id: redirected_ids[0], exchange: aa_handler.getCurrentExchangeByWalletId(id)});
-			});
-		})
-	});
-
 
 	app.get('/api/address/:address', function(request, response){
 		const address = request.params.address;
@@ -60,17 +46,21 @@ require('./modules/sqlite_tables.js').create().then(function(){
 			return response.send(	exchanges.getExchangesList());
 	});
 
-	app.get('/api/exchange/:exchange', function(request, response){
+	app.get('/api/exchange/:exchange/:page', function(request, response){
 		const exchange = request.params.exchange;
+		const page = request.params.page ? Number(request.params.page) : 0;
+		if (!validationUtils.isNonnegativeInteger(page))
+			return response.status(400).send('Wrong page');
 		if(!validationUtils.isNonemptyString(exchange))
 			return response.status(400).send('Wrong exchange id');
 		const wallet_ids = exchanges.getExchangeWalletIds(exchange);
 		explorer.getRedirections(wallet_ids, function(redirected_ids){
-			explorer.getTransactionsFromWallets(redirected_ids, 0, function(assocTxsFromWallet){
+			explorer.getTransactionsFromWallets(redirected_ids, page, function(assocTxsFromWallet){
 				return response.send({txs: assocTxsFromWallet, wallet_ids: wallet_ids, redirected_ids: redirected_ids, name: exchanges.getExchangeName(exchange)});
 			});
 		})
 	});
+
 
 	app.get('/api/txid/:tx_id', function(request, response){
 		const tx_id = request.params.tx_id;

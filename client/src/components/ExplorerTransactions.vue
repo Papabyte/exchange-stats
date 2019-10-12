@@ -17,9 +17,8 @@
 				<b-row class="text-center" v-if="walletOwner">
 					<span class="px-2">Belongs to exchange</span> <Exchange :id="walletOwner"/>
 				</b-row>
-
-				<b-row class="text-center" v-if="total_on_wallets">
-					<span class="px-2">Total on wallets: </span> <btc-amount :amount="total_on_wallets"/>
+				<b-row v-if="wallet_id&&!walletOwner">
+					<b-button variant="primary" size="sm" @click="isRemoving=false;$bvModal.show('editWallet');">add to an exchange</b-button>
 				</b-row>
 
 				<b-row v-if="exchangeWallets">
@@ -27,17 +26,17 @@
 					<b-row class="pl-3" align-h="start">
 						<div v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
 							<b-col >
-								<b-link :to="'/explorer/'+wallet">{{wallet}}</b-link>
+								<wallet-id :id="wallet"/>
 								<b-button variant="primary" @click="isRemoving=true;walletIdToEdit=wallet;$bvModal.show('editWallet');" class="ml-2" size="sm">remove wallet {{wallet}}</b-button>
 							</b-col>
 						</div>
 					</b-row >
 				</b-row>
 
-				<b-row v-if="wallet_id&&!walletOwner">
-					<b-button variant="primary" size="sm" @click="isRemoving=false;$bvModal.show('editWallet');">add to an exchange</b-button>
+				<b-row class="text-center" v-if="total_on_wallets">
+					<span class="pr-1">Total on wallets: </span> <btc-amount :amount="total_on_wallets"/>
 				</b-row>
-				
+
 				<b-row v-if="count_total">
 				{{count_total}} transaction{{count_total > 1 ? 's' : ''}} found.
 				</b-row>
@@ -52,6 +51,14 @@
 		<b-row v-if="!isSpinnerActive && transactions">
 			<b-col offset-lg="1" lg="10" cols="12" class="py-3 main-col">
 				<b-row  class="text-center">
+		<b-pagination
+			v-model="currentPage"
+			:total-rows="count_total"
+			per-page="50"
+			@change="onPageChanged"
+			size="l"
+			class="pl-4 pt-2 my-0"
+			></b-pagination> 
 					<div  class="w-100" v-for="(transaction,key,index) in transactions" v-bind:key="key">
 					<transaction :tx_id="key" :transaction="transaction" :no_border="index == (Object.keys(transactions).length-1)" :about_wallet_ids="redirected_ids"/>
 				</div>
@@ -68,15 +75,27 @@ import validate from 'bitcoin-address-validation';
 import EditWalletModal from './commons/EditWalletModal.vue';
 import Exchange from './commons/Exchange.vue';
 import BtcAmount from './commons/BtcAmount.vue';
+import WalletId from './commons/WalletId.vue';
 
 export default {
-	components: {
-		Transaction,
-		EditWalletModal,
-		Exchange,
-		BtcAmount
+		components: {
+			Transaction,
+			EditWalletModal,
+			Exchange,
+			BtcAmount,
+			WalletId
+		},
+		props: {
+		request_input: {
+			type: String,
+			required: true
+		},
+		page: {
+			type: Number,
+			required: false,
+			default: 1
+		}
 	},
-	props: ['request_input'],
 	data() {
 		return {
 			transactions: null,
@@ -97,13 +116,20 @@ export default {
 	},
 	watch: {
 		$route(route) {
+			this.currentPage = this.page || 1;
 			this.getTransactions();
 		}
 	},
 	created() {
+		this.currentPage = this.page || 1;
 		this.getTransactions();
 	},
 	methods: {
+		onPageChanged(value){
+console.log("page changed " + value);
+			this.$router.push({ name: 'explorerInputPaged', params: { url_input: this.request_input, page: value } })
+
+		},
 		getTransactions() {
 			this.isSpinnerActive = true;
 			this.transactions = null;
@@ -121,7 +147,7 @@ export default {
 
 			if (Number(this.request_input)) { // it's a wallet id
 				this.title = "Transactions for wallet " + this.request_input;
-				this.axios.get('/api/wallet/' + this.request_input).then((response) => {
+				this.axios.get('/api/wallet/' + this.request_input+'/' + (this.currentPage-1)).then((response) => {
 				this.title = "Transactions for wallet " + response.data.redirected_id;
 				console.log(JSON.stringify(response.data));
 				if (response.data.txs){
@@ -152,6 +178,8 @@ export default {
 			} else if (validate(this.request_input)) { // it's a BTC address
 				this.title = "Looking for known wallet for " + this.request_input;
 				this.axios.get('/api/address/' + this.request_input).then((response) => {
+				this.$router.push({ name: 'explorerInputPaged', params: { url_input: response.data.redirected_id } })
+/*
 				this.title = "Transactions for wallet " + response.data.redirected_id;
 				if (response.data.txs){
 						this.transactions = response.data.txs.txs;
@@ -164,11 +192,11 @@ export default {
 					this.failoverText = "No wallet known for address " + this.request_input  + ".";
 				}
 					this.walletOwner = response.data.exchange;
-					this.isSpinnerActive = false;
+					this.isSpinnerActive = false;*/
 				});
 
 			} else if (this.request_input) { // should be an exchange
-				this.axios.get('/api/exchange/' + this.request_input).then((response) => {
+				this.axios.get('/api/exchange/' + this.request_input+'/' + (this.currentPage-1)).then((response) => {
 					this.title = "Transactions for exchange " + response.data.name;
 					if (response.data.txs){
 						this.transactions = response.data.txs.txs;

@@ -33,7 +33,7 @@
 				</b-col>
 			</b-row>
 			<b-row v-else  >
-				<transactions :request_input="url_input" />
+				<transactions :request_input="url_input" :page="Number(page)"/>
 			</b-row>
 		</b-container>
 	</div>
@@ -52,6 +52,11 @@ export default {
 		url_input: {
 			type: String,
 			required: false
+		},
+		page: {
+			type: String,
+			required: false,
+			default: "0"
 		}
 	},
 	data() {

@@ -20,6 +20,12 @@ export default new Router({
 			component: lazyLoading('components/ExchangesStats')
 		},
 		{
+			name: 'explorerInputPaged',
+			path: '/explorer/:url_input/:page',
+			component: lazyLoading('components/Explorer'),
+			props: true
+		},
+		{
 			name: 'explorerInput',
 			path: '/explorer/:url_input',
 			component: lazyLoading('components/Explorer'),

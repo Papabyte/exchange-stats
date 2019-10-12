@@ -35,6 +35,18 @@ function getTotalOnWallets(arrIds){
 	})
 }
 
+function getTotalTransactions(arrIds){
+	return new Promise(async function(resolve){
+		if (arrIds.length ===0)
+			return resolve(0);
+		const idsSqlFilter = arrIds.join(",");
+		const rows = await db.query("SELECT COUNT(DISTINCT id) AS count FROM (SELECT id FROM transactions_to WHERE wallet_id IN("+ idsSqlFilter +")\n\
+		UNION SELECT id FROM transactions_from WHERE wallet_id IN("+ idsSqlFilter +"))s");
+		console.log("getTotalTransactions");
+		console.log(rows);
+		return resolve(rows[0] && rows[0].count ? rows[0].count : 0);
+	});
+}
 
 function getTotalDepositAddresses(arrIds){
 	return new Promise(async function(resolve){
@@ -64,3 +76,4 @@ exports.getTotalWithdrawnFromWallets = getTotalWithdrawnFromWallets;
 exports.getTotalOnWallets = getTotalOnWallets;
 exports.getTotalDepositAddresses = getTotalDepositAddresses;
 exports.getTotalWithdrawalAddresses = getTotalWithdrawalAddresses;
+exports.getTotalTransactions = getTotalTransactions;

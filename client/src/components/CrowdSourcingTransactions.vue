@@ -9,7 +9,7 @@
 							per-page="10"
 							align="fill"
 							size="l"
-							class="pl-4 my-0"
+							class="p-4 my-0"
 							></b-pagination> 
 						</b-col>
 				</b-row>	

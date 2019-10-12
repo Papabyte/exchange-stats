@@ -107,7 +107,7 @@ export default {
 			if(!this.operationItem)
 				return;
 			this.operation_item = this.operationItem;
-			this.reversalStake = (conf.challenge_coef*this.operation_item.staked_on_outcome+10000);
+			this.reversalStake = (conf.challenge_coef*this.operation_item.staked_on_outcome+1001);
 			this.reversalStakeGb = this.reversalStake/1000000000;
 			this.stakeAmountGb = this.reversalStakeGb;
 			this.reset();
