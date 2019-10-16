@@ -1,3 +1,33 @@
 {
-  "welcomeMessageRanking": "These statistics are made from activity happening on-chain concerning exchanges. The exchange's wallets identification is crowdsourced by users, they interact with an Obyte autonomous agent and earn rewards for their contributions."
+  "rankingWelcomeMessage": "These statistics are made from activity happening on-chain concerning exchanges. The exchange's wallets identification is crowdsourced by users, they interact with an Obyte autonomous agent and earn rewards for their contributions.",
+	"editModalRemoveXFromX" : "Remove wallet {wallet} from exchange {exchange}",
+	"editModalAddXToX": "Add wallet {wallet} to exchange {exchange}",
+	"editModalRemoveFromX" : "Remove wallet from exchange {exchange}",
+	"editModalAddToX" :  "Add wallet to exchange {exchange}",
+	"editModalRemoveXFrom" : "Remove wallet {wallet} from exchange",
+	"editModalAddXTo" : "Add wallet {wallet} to exchange",
+	"editModalAlreadyBelongs": "{wallet} already belongs to exchange {exchange}",
+	"editModalDoesntBelong": "{wallet} doesn't belong to exchange {exchange}",
+	"editModalOperationOnGoing" : "An operation is already ongoing for wallet {wallet} and exchange {exchange}",
+	"editModalNoRewardAvailable" : "No reward available for operation on this exchange.",
+	"editModalSelectExchange" : "Select the exchange to which you want to add wallet",
+	"editModalGainIfRemoved" : "Stake {stake_amount}, gain {gain_amount} if wallet {wallet} is successfully removed from {exchange}",
+	"editModalGainIfAdded" : "Stake {stake_amount}, gain {gain_amount} if wallet {wallet} is successfully added to {exchange}",
+	"editModalLinkHeader" : "By clicking the link below, your Obyte wallet will open and ready to send a transaction for ordering the operation.",
+	"editModalLinkFooter" : "It will be taken into account after a few minutes when the transaction is confirmed. Note that it could be canceled if meanwhile another user ordered a similar operation. In this case, the AA would bounce the transaction to refund you.",
+	"claimModalLinkHeader" : "By clicking the link below, your Obyte wallet will open and ready to send a transaction for claiming your gain.",
+	"claimModalLinkFooter" : "It will be taken into account after a few minutes when the transaction is confirmed.",
+	"claimModalSelectAddress" : "Select the address.",
+	"commitModalLinkHeader" : "By clicking the link below, your Obyte wallet will open and ready to send a transaction for committing operation.",
+	"commitModalLinkFooter" :"It will be taken into account after a few minutes when the transaction is confirmed.",
+	"commitModalTitle": "Commit an operation",
+	"contestModalGainIfReversed" : "Stake {stake_amount}, gain {gain_amount} if outcome is eventually reversed",
+	"contestModalAmountLeft" : "{amount} left to reverse outcome",
+	"contestModalAmountToStake" : "Amount to stake",
+	"contestModalLinkHeader" : "By clicking the link below, your Obyte wallet will open and ready to send a transaction for contesting the operation.",
+	"contestModalLinkFooter" : "It will be taken into account after a few minutes when the transaction is confirmed. Note that it could be canceled if meanwhile another user contested the operation. In this case, the AA would bounce the transaction to refund you.",
+	"contestModalTitleRemoving" : "Contest removing of wallet {wallet} from exchange {exchange}",
+	"contestModalTitleAdding" : "Contest adding of wallet {wallet} to exchange {exchange}"
+
 }
+

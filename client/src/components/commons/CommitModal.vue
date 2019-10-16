@@ -2,7 +2,7 @@
 	<b-modal id="commitOperation" :title="getTitle"  :hide-footer="true" >
 		<b-container fluid >
 			<b-row class="pt-3">
-				By clicking the link below, your Obyte wallet will open and ready to send a transaction for committing operation.
+				{{$("commitModalLinkHeader")}}
 			</b-row >
 		<b-row class="pt-3">
 			<span class="text-break">
@@ -10,7 +10,7 @@
 			</span>
 			</b-row >
 			<b-row class="py-3">
-				It will be taken into account after a few minutes when the transaction is confirmed.
+				{{$("commitModalLinkFooter")}}
 			</b-row >
 		</b-container>
 	</b-modal>
@@ -36,7 +36,7 @@ export default {
 	},
 	computed:{
 		getTitle:function(){
-			return "Commit an operation";
+			return this.$t("commitModalTitle");
 		}
 	},
 	watch:{
@@ -56,7 +56,6 @@ export default {
 					data.add_wallet_id= this.operation_item.wallet_id;
 				else
 					data.remove_wallet_id= this.operation_item.wallet_id;
-
 				const json_string = JSON.stringify(data);
 				const base64data = base64url(json_string);
 				this.link = (conf.testnet ? "byteball-tn" :"byteball")+":"+conf.aa_address+"?amount=10000&base64data="+base64data;

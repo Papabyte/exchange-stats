@@ -2,7 +2,7 @@
 	<b-modal id="claimGain" :title="getTitle" :hide-footer="true" >
 		<b-container v-if="!link" fluid >
 			<b-row>
-				Select the address.
+				{{$t("claimModalSelectAddress")}}
 			</b-row>
 			<b-row v-if="this.operation_item.claimAddresses" class="pt-3" >
 				<div v-for="(address,index) in this.operation_item.claimAddresses" :key="index">
@@ -12,7 +12,7 @@
 		</b-container>
 		<b-container v-else fluid >
 			<b-row class="pt-3">
-				By clicking the link below, your Obyte wallet will open and ready to send a transaction for claiming your gain.
+				{{$t("claimModalLinkHeader")}}
 			</b-row >
 		<b-row class="pt-3">
 			<span class="text-break">
@@ -20,7 +20,7 @@
 			</span>
 			</b-row >
 			<b-row class="py-3">
-				It will be taken into account after a few minutes when the transaction is confirmed.
+				{{$t("claimModalLinkFooter")}}
 			</b-row >
 		</b-container>
 	</b-modal>

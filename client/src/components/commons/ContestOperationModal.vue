@@ -1,31 +1,42 @@
 <template>
-	
-
-	<b-modal id="contestOperation" :title="getTitle"  :hide-footer="!!link" @close="link=false" @ok="handleOk">
+	<b-modal id="contestOperation" :title="getTitle" :hide-footer="!!link" @close="link=false" @ok="handleOk">
 		<b-container v-if="!link" fluid >
-				<b-row class="pt-3" >
-				<label for="range-1">Amount to stake</label>
-			<b-form-input id="range-1" v-model="stakeAmountGb" type="range" :number="true" min="0.001" :max="reversalStakeGb*1.01" :step="reversalStakeGb/100"></b-form-input>
+			<b-row class="pt-3" >
+				<label for="range-1">{{$("contestModalAmountToStake")}}</label>
+				<b-form-input id="range-1" v-model="stakeAmountGb" type="range" :number="true" min="0.001" :max="reversalStakeGb" :step="reversalStakeGb/100"></b-form-input>
 			</b-row >
 			<b-row>
 				<span v-if="text_error" class="pt-3">{{text_error}}</span>
 				<div class="pt-3">
-					Stake <byte-amount :amount="stakeAmount" />, gain <byte-amount :amount="potentialGainAmount" /> if outcome is eventually reversed.
+					<i18n path="contestModalGainIfReversed" id="potential-gain">
+						<template #stake_amount>
+							<byte-amount :amount="stakeAmount" />
+						</template>
+						<template #gain_amount>
+							<byte-amount :amount="potentialGainAmount" /> 
+						</template>
+					</i18n>
 				</div>
 			</b-row >
 			<b-row v-if="amountLeftToReverse>0">
 			<div class="pt-3">
-					<byte-amount :amount="amountLeftToReverse" /> left to stake to reverse outcome.
+				<i18n path="contestModalAmountLeft" id="amount-left">
+					<template #amount>
+						<byte-amount :amount="amountLeftToReverse" /> l
+					</template>
+					<template #gain_amount>
+						<byte-amount :amount="potentialGainAmount" /> 
+					</template>
+				</i18n>
 			</div>
 			</b-row >
 			<b-row>
 				<UrlInputs v-on:url_1_update="update_url_1" v-on:url_2_update="update_url_2"/>
 			</b-row >
-	
 		</b-container>
 		<b-container v-else fluid >
 			<b-row class="pt-3">
-				By clicking the link below, your Obyte wallet will open and ready to send a transaction for contesting the operation.
+				{{$("contestModalLinkHeader")}}
 			</b-row >
 		<b-row class="pt-3">
 			<span class="text-break">
@@ -33,10 +44,8 @@
 			</span>
 			</b-row >
 			<b-row class="py-3">
-				It will be taken into account after a few minutes when the transaction is confirmed. Note that it could be canceled if meanwhile another user contested the operation. In this case, the AA would bounce the transaction to refund you.
+				{{$("contestModalLinkFooter")}}
 			</b-row >
-
-
 		</b-container>
 
 	</b-modal>
@@ -84,9 +93,9 @@ export default {
 	computed:{
 		getTitle:function(){
 			if (this.operation_item.isRemovingOperation)
-				return ("Contest removing of wallet "+ this.operation_item.wallet_id + " from exchange " + this.operation_item.exchange);
+				return this.$("contestModalTitleRemoving", {wallet: this.operation_item.wallet_id, exchange: this.operation_item.exchange});
 			else
-				return ("Contest adding of wallet "+ this.operation_item.wallet_id + " to exchange " + this.operation_item.exchange);
+				return this.$("contestModalTitleAdding", {wallet: this.operation_item.wallet_id, exchange: this.operation_item.exchange});
 		},
 
 		amountLeftToReverse: function(){
@@ -129,7 +138,6 @@ export default {
 			this.text_error = null;
 			this.bestPoolId = false;
 			this.rewardAmount = 0;
-
 		},
 		handleOk(bvModalEvt){
 				bvModalEvt.preventDefault()	;

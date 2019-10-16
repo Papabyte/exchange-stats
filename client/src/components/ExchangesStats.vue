@@ -5,7 +5,7 @@
 				<b-row>
 					<b-col offset-lg="1" lg="10" cols="12" class="py-3">
 						<b-alert v-if="welcomeMessageShow" @dismissed="$store.commit('setWasRankingWelcomeMessageClosed',true)" show dismissible>
-						{{$t('welcomeMessageRanking')}}
+						{{$t('rankingWelcomeMessage')}}
 						</b-alert>
 					</b-col>
 				</b-row >

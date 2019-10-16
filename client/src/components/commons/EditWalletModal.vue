@@ -8,7 +8,7 @@
 		@ok="handleOk">
 		<b-container v-if="!link" fluid >
 			<b-row v-if="!propExchange">
-				<label for="input-with-list">Select the exchange to which you want to add wallet</label>
+				<label for="input-with-list">{{$t("editModalSelectExchange")}}</label>
 				<b-form-input 
 					v-on:input="reset" 
 					:state="validExchange"
@@ -48,7 +48,34 @@
 			<b-row >
 				<span v-if="text_error" class="pt-3">{{text_error}}</span>
 				<div v-if="rewardAmount>0" class="pt-3">
-					Stake <byte-amount :amount="stakeAmount" />, gain <byte-amount :amount="rewardAmount" /> if wallet {{wallet}} is successfully {{isRemoving ? "removed from" : "added to"}} <exchange :id="exchange" noUrl />
+					<i18n v-if="isRemoving" path="editModalGainIfRemoved" id="potential-gain">
+						<template #stake_amount>
+							<byte-amount :amount="stakeAmount" />
+						</template>
+						<template #gain_amount>
+							<byte-amount :amount="rewardAmount" /> 
+						</template>
+						<template #wallet>
+							{{wallet}}
+						</template>
+						<template #exchange>
+							<exchange :id="exchange" noUrl />
+						</template>
+					</i18n>
+					<i18n v-else path="editModalGainIfAdded" id="potential-gain">
+						<template #stake_amount>
+							<byte-amount :amount="stakeAmount" />
+						</template>
+						<template #gain_amount>
+							<byte-amount :amount="rewardAmount" /> 
+						</template>
+						<template #wallet>
+							{{wallet}}
+						</template>
+						<template #exchange>
+							<exchange :id="exchange" noUrl />
+						</template>
+  			</i18n>
 				<UrlInputs v-on:url_1_update="update_url_1" v-on:url_2_update="update_url_2"/>
 				</div>
 			</b-row >
@@ -56,7 +83,7 @@
 		</b-container>
 		<b-container v-else fluid >
 			<b-row class="pt-3">
-				By clicking the link below, your Obyte wallet will open and ready to send a transaction for ordering the operation.
+				{{$t("editModalLinkHeader")}}
 			</b-row >
 			<b-row class="pt-3">
 				<span class="text-break">
@@ -64,7 +91,7 @@
 				</span>
 			</b-row >
 			<b-row class="py-3">
-				It will be taken into account after a few minutes when the transaction is confirmed. Note that it could be canceled if meanwhile another user ordered a similar operation. In this case, the AA would bounce the transaction to refund you.
+				{{$t("editModalLinkFooter")}}
 			</b-row >
 		</b-container>
 	</b-modal>
@@ -119,16 +146,21 @@ export default {
 	computed:{
 		getTitle:function(){
 			if (this.propExchange){
-			if (this.wallet && this.exchange)
-				return (this.isRemoving ? "Remove wallet "+ this.wallet + " from exchange " + this.exchange :  "Add wallet "+ this.wallet + " to exchange " + this.exchange)
-			else if (this.exchange)
-				return (this.isRemoving ? "Remove wallet from exchange ": "Add wallet to exchange" + " " + this.exchange);
-			else if (this.wallet)
-				return (this.isRemoving ? "Remove wallet "+ this.wallet + " from an exchange ":  "Add wallet "+ this.wallet + " to an exchange ");
-			}
-			 if (this.prop_wallet_id){
-				return "Add wallet " + this.wallet + " to exchange " + this.exchange;
-			 }
+				if (this.wallet && this.exchange){
+					return (this.isRemoving ? this.$t('editModalRemoveXFromX', {exchange: this.assocExchanges[this.exchange], wallet: this.wallet}): 
+					this.$t('editModalAddXToX', {exchange:this.assocExchanges[this.exchange], wallet: this.wallet}));
+				}
+				else if (this.exchange){
+					return (this.isRemoving ? this.$t('editModalRemoveFromX',{exchange:this.assocExchanges[this.exchange]}):
+					this.$t('editModalAddToX',{exchange:this.assocExchanges[this.exchange]}));
+				}
+				else if (this.wallet){
+					return (this.isRemoving ? this.$t('editModalRemoveXFrom', {wallet: this.wallet}): 
+					this.$t('editModalAddXTo', {wallet: this.wallet}));
+				}
+			} else if (this.prop_wallet_id){
+					return this.$t('editModalAddXToX', {exchange:this.assocExchanges[this.exchange], wallet: this.wallet});
+			 } else
 			 return "";
 		},
 		validExchange() {
@@ -180,11 +212,8 @@ export default {
 			this.wallet = Math.round(this.wallet);
 
 			this.axios.get('/api/getredirection/'+this.wallet).then((response) => {
-				console.log(response.data);
 				this.wallet = response.data.redirected_id;
-
 				this.axios.get('/api/operations/'+this.exchange).then((response) => {
-					console.log(JSON.stringify(response.data));
 					const operations = response.data;
 					var bFound = false;
 					for (var i=0; i< operations.length; i++){
@@ -192,47 +221,40 @@ export default {
 							continue;
 						bFound = true;
 						if (operations[i].committed_outcome == "in" && !this.isRemoving){
-							this.text_error = this.wallet + " already belongs to " + this.exchange;
+							this.text_error = this.$t("editModalAlreadyBelongs", {wallet: this.wallet, exchange: this.exchange});
 							break;
 						}
 						if ((!operations[i].committed_outcome || operations[i].committed_outcome == "out") && this.isRemoving){
-							this.text_error = this.wallet + " doesn't belong to " + this.exchange;
+							this.text_error = this.$t("editModalDoesntBelong", {wallet: this.wallet, exchange: this.exchange});
 							break;
 						}
 						if (operations[i].status == "onreview")
-							this.text_error = "An operation is already ongoing for wallet " + this.wallet + " and exchange " + this.exchange;
+							this.text_error = this.$t("editModalOperationOnGoing", {wallet: this.wallet, exchange: this.exchange});
 					}
 
 						if(!bFound && this.isRemoving)
-							this.text_error = this.wallet + " doesn't belong to " + this.exchange;
+							this.text_error = this.$t("editModalDoesntBelong", {wallet: this.wallet, exchange: this.exchange});
 
 						if (!this.text_error) {
 							this.getBestPool()
-
-				//	this.wallet = response.data.redirected_id;
-
 						} else {
-									this.isSpinnerActive = false;
-
+							this.isSpinnerActive = false;
 						}
 
 				});
 			});
 		},
 		getBestPool(){
-
-				this.axios.get('/api/pool/'+this.exchange).then((response) => {
-						console.log(JSON.stringify(response.data));
-					if (response.data.pool_id){
-						this.bestPoolId = response.data.pool_id;
-						this.rewardAmount = response.data.reward_amount;
-						this.isOkDisabled = false;
-					} else {
-						this.text_error ="No reward available for operation on this exchange."
-					}
-						this.isSpinnerActive = false;
-
-				});
+			this.axios.get('/api/pool/'+this.exchange).then((response) => {
+				if (response.data.pool_id){
+					this.bestPoolId = response.data.pool_id;
+					this.rewardAmount = response.data.reward_amount;
+					this.isOkDisabled = false;
+				} else {
+					this.text_error = this.$t("editModalNoRewardAvailable");
+				}
+					this.isSpinnerActive = false;
+			});
 		},
 		handleOk(bvModalEvt){
 				bvModalEvt.preventDefault();
