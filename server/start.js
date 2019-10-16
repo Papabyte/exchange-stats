@@ -25,7 +25,7 @@ require('./modules/sqlite_tables.js').create().then(function(){
 
 		explorer.getRedirections([id], function(redirected_ids){
 			explorer.getTransactionsFromWallets(redirected_ids, page, function(assocTxsFromWallet){
-				return response.send({txs: assocTxsFromWallet, redirected_id: redirected_ids[0]});
+				return response.send({txs: assocTxsFromWallet, redirected_id: redirected_ids[0], exchange: aa_handler.getCurrentExchangeByWalletId(id)});
 			});
 		})
 	});

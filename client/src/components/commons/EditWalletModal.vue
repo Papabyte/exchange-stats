@@ -18,7 +18,7 @@
 					></b-form-input>
 				<b-form-datalist 
 					id="input-list"
-					:options="objExchanges"></b-form-datalist>
+					:options="assocExchanges"></b-form-datalist>
 				<b-button 
 					variant="primary"
 					v-if="validExchange"
@@ -48,7 +48,7 @@
 			<b-row >
 				<span v-if="text_error" class="pt-3">{{text_error}}</span>
 				<div v-if="rewardAmount>0" class="pt-3">
-					Stake <byte-amount :amount="stakeAmount" />, gain <byte-amount :amount="rewardAmount" /> if wallet {{wallet}} is successfully {{isRemoving ? "removed from" : "added to"}} exchange {{exchange}}
+					Stake <byte-amount :amount="stakeAmount" />, gain <byte-amount :amount="rewardAmount" /> if wallet {{wallet}} is successfully {{isRemoving ? "removed from" : "added to"}} <exchange :id="exchange" noUrl />
 				<UrlInputs v-on:url_1_update="update_url_1" v-on:url_2_update="update_url_2"/>
 				</div>
 			</b-row >
@@ -73,12 +73,14 @@
 <script>
 const conf = require("../../conf.js");
 import ByteAmount from './ByteAmount.vue';
+import Exchange from './Exchange.vue';
 import UrlInputs from './UrlInputs.vue';
 
 export default {	
 	components: {
 		ByteAmount,
-		UrlInputs
+		UrlInputs,
+		Exchange
 	},
 	props: {
 		prop_wallet_id: {
@@ -110,9 +112,8 @@ export default {
 			stakeAmount: conf.challenge_min_stake,
 			link: false,
 			url_1: null,
-			url_2: null,
-			objExchanges: {}
-		}
+			url_2: null
+			}
 	},
 
 	computed:{
@@ -131,7 +132,10 @@ export default {
 			 return "";
 		},
 		validExchange() {
-			return !!this.objExchanges[this.exchange]
+			return !!this.assocExchanges[this.exchange]
+		},
+		assocExchanges() {
+			return this.$store.state.exchangesById;
 		}
 	},
 		watch:{
@@ -149,13 +153,6 @@ export default {
 	mounted(){
 		if (this.prop_wallet_id)
 			this.wallet = this.prop_wallet_id;
-
-		this.axios.get('/api/exchanges').then((response) => {
-			console.log(response.data);
-		response.data.forEach((row)=>{
-			this.objExchanges[row.id] = row.name;
-			});
-		});
 	},
 	methods:{
 		update_url_1(value){

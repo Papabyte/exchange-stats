@@ -61,31 +61,24 @@ export default {
 	},
 	data() {
 		return {
-			user_input: "",
-			arrExchanges: null
+			user_input: ""
+		}
+	},
+	computed:{
+		arrExchanges: function(){
+			return this.$store.state.exchanges;
 		}
 	},
 	watch: {
 		$route(route) {
-			this.getExchanges();
 		}
 	},
 	created(){
-		this.getExchanges();
 		document.title = 'Wallet explorer';
 	},
 	methods:{ 
 		onSubmit(){
 			this.$router.push({ name: 'explorerInput', params: { url_input: this.user_input } })
-		},
-		getExchanges(){
-			if (!this.url_input){
-				this.axios.get('/api/exchanges').then((response) => {
-					this.arrExchanges = response.data.sort(function(a,b){
-						return a.name.toUpperCase() > b.name.toUpperCase();
-					});
-				});
-			}
 		}
 	}
 }

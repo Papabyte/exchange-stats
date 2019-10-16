@@ -1,11 +1,11 @@
 <template>
 	<span v-if="noUrl">
-		{{id}}
+		{{exchangeName}}
 	</span>
 	<span v-else>
 		<span v-if="label"> {{label}} </span>
 		<span class="exchange-link"><b-link :to="'/explorer/'+id" >
-	{{id}}
+	{{exchangeName}}
 	</b-link></span>
 	</span>
 </template>
@@ -27,6 +27,13 @@ export default {
 			type: Boolean,
 			required: false,
 			default: false
+		}
+	},
+	computed:{
+
+		exchangeName: function(){
+			return this.$store.state.exchangesById[this.id] ? this.$store.state.exchangesById[this.id] : this.id;
+
 		}
 	}
 }

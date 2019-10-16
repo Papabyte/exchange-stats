@@ -4,7 +4,7 @@
 			<b-container fluid>
 				<b-row>
 					<b-col offset-lg="1" lg="10" cols="12" class="py-3">
-						<b-alert show dismissible>
+						<b-alert v-if="welcomeMessageShow" @dismissed="$store.commit('setWasRankingWelcomeMessageClosed',true)" show dismissible>
 						{{$t('welcomeMessageRanking')}}
 						</b-alert>
 					</b-col>
@@ -24,6 +24,11 @@ export default {
 	components: {
 		NavBar,
 		RankingTable
+	},
+	computed:{
+		welcomeMessageShow(){
+			return !this.$store.state.wasRankingWelcomeMessageClosed;
+		}
 	},
 	created(){
 		document.title = 'Exchange onchain statistics';

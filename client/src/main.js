@@ -12,6 +12,7 @@ import feather from 'vue-icon'
 
 import "@/assets/global.css"
 import i18n from './i18n'
+import store from './store'
 
 Vue.use(feather, 'v-icon');
 
@@ -24,5 +25,6 @@ new Vue({
     el: '#app',
     router,
     i18n,
+    store,
     render: h => h(App)
 })

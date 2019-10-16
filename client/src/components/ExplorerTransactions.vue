@@ -15,7 +15,7 @@
 				</b-row>
 
 				<b-row class="text-center" v-if="walletOwner">
-					<span class="px-2">Belongs to exchange</span> <Exchange :id="walletOwner"/>
+					<span class="pr-2">Belongs to exchange: </span> <Exchange :id="walletOwner"/>
 				</b-row>
 				<b-row v-if="wallet_id&&!walletOwner">
 					<b-button variant="primary" size="sm" @click="isRemoving=false;$bvModal.show('editWallet');">add to an exchange</b-button>
@@ -38,7 +38,7 @@
 				</b-row>
 
 				<b-row v-if="count_total">
-				{{count_total}} transaction{{count_total > 1 ? 's' : ''}} found.
+				Total transactions: {{count_total}}
 				</b-row>
 			</div>
 			<b-row v-else>
@@ -126,9 +126,7 @@ export default {
 	},
 	methods: {
 		onPageChanged(value){
-console.log("page changed " + value);
 			this.$router.push({ name: 'explorerInputPaged', params: { url_input: this.request_input, page: value } })
-
 		},
 		getTransactions() {
 			this.isSpinnerActive = true;
