@@ -11,6 +11,7 @@ import VueAxios from 'vue-axios'
 import feather from 'vue-icon'
 
 import "@/assets/global.css"
+import i18n from './i18n'
 
 Vue.use(feather, 'v-icon');
 
@@ -20,7 +21,8 @@ Vue.use(BootstrapVue);
 Vue.config.productionTip = false;
 
 new Vue({
-	el: '#app',
-	router,
-	render: h => h(App)
+    el: '#app',
+    router,
+    i18n,
+    render: h => h(App)
 })
