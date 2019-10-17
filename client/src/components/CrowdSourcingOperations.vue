@@ -22,11 +22,27 @@
 			:sort-desc.sync="sortDesc"
 			responsive
 			sort-icon-left>	
-				<template v-slot:cell(operation)="data">
-					<span v-if="data.item.initial_outcome=='in'"> Add wallet <WalletId :id="data.item.wallet_id"/> to <Exchange :id="data.item.exchange"/>?</span>
-					<span v-else>Remove wallet <WalletId :id="data.item.wallet_id"/> from <Exchange :id="data.item.exchange"/>?</span>
+				<template v-slot:cell(operation)="data">			
+					<i18n v-if="data.item.initial_outcome=='in'" tag="span" path="crowdSourcingOperationsAddXToX" id="action">
+						<template #wallet>
+							<wallet-id :id="data.item.wallet_id"/>
+						</template>
+						<template #exchange>
+							<exchange :id="data.item.exchange"/>
+						</template>
+					</i18n>
+					<i18n v-else tag="span" path="crowdSourcingOperationsRemoveXFromX" id="action">
+						<template #wallet>
+							<wallet-id :id="data.item.wallet_id"/>
+						</template>
+						<template #exchange>
+							<exchange :id="data.item.exchange"/>
+						</template>
+					</i18n>
 				</template>
-
+				<template v-slot:cell(outcome)="data">
+					{{data.item.outcome == "yes" ? $t("crowdSourcingOperationsYes") : $t("crowdSourcingOperationsNo")}}/>
+				</template>
 				<template v-slot:cell(staked_on_outcome)="data">
 					<byte-amount :amount="data.item.staked_on_outcome" />
 				</template>
@@ -39,24 +55,24 @@
 					v-if="data.item.status == 'onreview' && !data.item.is_commitable " 
 					v-on:click="clicked_item=data.item;$bvModal.show('contestOperation');" 
 					class="mr-2" 
-					size="s">contest</b-button>
+					size="s">{{$t("crowdSourcingOperationsButtonContest")}}</b-button>
 				<b-button 
 					variant="primary" 
 					v-if="data.item.status == 'onreview' && data.item.is_commitable"
 					v-on:click="clicked_item=data.item;$bvModal.show('commitOperation');"
 					class="mr-2" 
-					size="s">commit</b-button>
+					size="s">{{$t("crowdSourcingOperationsButtonCommit")}}</b-button>
 				<b-button 
 					variant="primary"
 					v-if="data.item.status == 'onreview'"
 					v-on:click="clicked_item=data.item;$bvModal.show('viewUrlProofs');"
 					class="mr-2" 
-					size="s">view proofs</b-button>
+					size="s">{{$t("crowdSourcingOperationsButtonViewProofs")}}</b-button>
 				<b-button 
 					variant="primary" 
 					v-if="data.item.status == 'committed' && data.item.claimAddresses.length>0" 
 					v-on:click="clicked_item=data.item;$bvModal.show('claimGain');"  
-					class="mr-2" size="s" >claim a gain</b-button>
+					class="mr-2" size="s" >{{$t("crowdSourcingOperationsButtonClaim")}}</b-button>
 				</template>
 			</b-table>
 		</b-row>
@@ -93,12 +109,12 @@ import WalletId from './commons/WalletId.vue';
 				sortBy: 'age',
 				sortDesc: false,
 				fields: [
-					{ key: 'status', sortable: true },
-					{ key: 'operation', sortable: true },
-					{ key: 'outcome_yes_or_no',label:'Outcome', sortable: true },
-					{ key: 'staked_on_outcome', sortable: true },
-					{ key: 'total_staked', sortable: true },
-					{ key: 'action' }
+					{ key: 'status', sortable: true, label: this.$t('crowdSourcingOperationsTableColStatus')},
+					{ key: 'operation', sortable: true, label: this.$t('crowdSourcingOperationsTableColOperation')},
+					{ key: 'outcome_yes_or_no', sortable: true, label: this.$t('crowdSourcingOperationsTableColOutcome')},
+					{ key: 'staked_on_outcome', sortable: true, label: this.$t('crowdSourcingOperationsTableColStakedOnOutcome')},
+					{ key: 'total_staked', sortable: true, label: this.$t('crowdSourcingOperationsTableColTotalStaked')},
+					{ key: 'action', label: this.$t('crowdSourcingOperationsTableColAction') }
 				],
 				items: [
 				]

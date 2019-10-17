@@ -4,7 +4,7 @@
 		<b-container fluid >
 			<b-row v-if="!url_input">
 				<b-col cols="12" class="py-3">
-					<h3 class="text-center">Wallet explorer</h3>
+					<h3 class="text-center">{{$t("explorerTitle")}}</h3>
 				</b-col>
 			</b-row >
 			<b-row v-if="!url_input" >
@@ -19,11 +19,11 @@
 							placeholder="Enter BTC address, transaction id or wallet id."
 							class="mx-2 flex-fill"
 							></b-form-input>
-							<button type="submit" class="btn btn-primary">Go</button>
+							<button type="submit" class="btn btn-primary">{{$t("explorerButtonGo")}}</button>
 						</b-form>
 					</div>
 				<div v-if="arrExchanges" class="pt-4">
-					Or browse by exchange:
+					{{$t("explorerOrBrowseExchanges")}}
 					<b-row class="py-4" align-h="start">
 						<div v-for="(exchange,index) in arrExchanges" v-bind:key="index">
 							<b-col >	<b-link :to="'/explorer/'+exchange.id">{{exchange.name}}</b-link></b-col>
@@ -74,7 +74,11 @@ export default {
 		}
 	},
 	created(){
-		document.title = 'Wallet explorer';
+		document.title = this.$t("explorerPageTitle");
+				document
+			.getElementsByTagName('meta')
+			.namedItem('description')
+			.setAttribute('content', this.$("explorerMetaDescription"));
 	},
 	methods:{ 
 		onSubmit(){

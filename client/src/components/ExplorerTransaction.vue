@@ -14,9 +14,9 @@
 		<b-row>
 			<b-col  cols="5" class="py-3 text-left">
 				<div class="w-100 px-4">
-					<wallet-id v-if="transaction.from && transaction.from.id" label="Wallet: " :id="transaction.from.id"/>
-					<span v-if="transaction.from.exchange"><Exchange label="Exchange: " :id="transaction.from.exchange"/></span>
-					<btc-amount v-if="transaction.from && transaction.from.amount" label="Amount: " :amount="transaction.from.amount" :isNegative="about_ids.indexOf(transaction.from.id)>-1"/>
+					<wallet-id v-if="transaction.from && transaction.from.id" :label="$t('explorerTransactionLabelWallet')" :id="transaction.from.id"/>
+					<span v-if="transaction.from.exchange"><Exchange :label="$t('explorerTransactionLabelExchange')" :id="transaction.from.exchange"/></span>
+					<btc-amount v-if="transaction.from && transaction.from.amount" :label="$t('explorerTransactionLabelAmount')" :amount="transaction.from.amount" :isNegative="about_ids.indexOf(transaction.from.id)>-1"/>
 				</div>
 			</b-col>
 			<b-col cols="2" class="text-center">
@@ -27,10 +27,10 @@
 			<b-col  cols="5" class="py-3 text-left">
 				<div  v-for="(t_out,index) in transaction.to" :key="index" class="py-2">
 					<wallet-id v-if="t_out.id" label="Wallet: " :id="t_out.id"/>
-					<span v-else>Wallet: unknown yet</span>
-					<span v-if="t_out.exchange"><Exchange label="Exchange: " :id="t_out.exchange"/></span>
-					<btc-address v-if="t_out.address" label="Address: " :address="t_out.address"/>
-					<btc-amount label="Amount: " :amount="t_out.amount" :isPositive="about_ids.indexOf(t_out.id)>-1"/>
+					<span v-else>{{$t("explorerTransactionUnknownWallet")}}</span>
+					<span v-if="t_out.exchange"><Exchange :label="$t('explorerTransactionLabelExchange')" :id="t_out.exchange"/></span>
+					<btc-address v-if="t_out.address" :label="$t('explorerTransactionLabelAddress')" :address="t_out.address"/>
+					<btc-amount :label="$t('explorerTransactionLabelAmount')" :amount="t_out.amount" :isPositive="about_ids.indexOf(t_out.id)>-1"/>
 				</div>
 			</b-col>
 		</b-row >

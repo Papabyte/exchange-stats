@@ -5,7 +5,7 @@
 			<b-col offset-lg="1" lg="10" cols="12" class="py-3">
 				<b-row >
 					<b-col cols="12" class="py-3">
-						<h3 class="text-center">On-chain activity ranking</h3>
+						<h3 class="text-center">{{$t('rankingTitle')}}</h3>
 					</b-col >
 				</b-row >
 				<b-row class="main-col">
@@ -72,14 +72,14 @@ import EditWalletModal from './commons/EditWalletModal.vue';
 				sortBy: 'total_btc_wallet',
 				sortDesc: true,
 				fields: [
-					{ key: 'name', sortable: true ,},
-					{ key: 'reported_volume', sortable: true },
-					{ key: 'nb_withdrawal_addresses', sortable: true },
-					{ key: 'nb_deposit_addresses', sortable: true },
-					{ key: 'total_btc_wallet', sortable: true },
-					{ key: 'last_day_deposits', sortable: true },
-					{ key: 'last_day_withdrawals', sortable: true },
-					{ key: 'action'}
+					{ key: 'name', sortable: true, label: this.$t('rankingTableColName')},
+					{ key: 'reported_volume', sortable: true, label: this.$t('rankingTableColReportedVolume')},
+					{ key: 'nb_withdrawal_addresses', sortable: true, label: this.$t('rankingTableColNbWithdrawalAddresses')},
+					{ key: 'nb_deposit_addresses', sortable: true, label: this.$t('rankingTableColNbDepositAddresses')},
+					{ key: 'total_btc_wallet', sortable: true, label: this.$t('rankingTableColTotalBtcWallet')},
+					{ key: 'last_day_deposits', sortable: true, label: this.$t('rankingTableColLastDayDeposits')},
+					{ key: 'last_day_withdrawals', sortable: true, label: this.$t('rankingTableColLastDayWithdrawals') },
+					{ key: 'action', label: this.$t('rankingTableColAction')}
 				],
 				items: [
 				]
@@ -87,7 +87,6 @@ import EditWalletModal from './commons/EditWalletModal.vue';
 		},
 		created(){
 			this.axios.get('/api/ranking').then((response) => {
-				console.log(response.data);
 				this.totalRows = response.data.length;
 				this.items = response.data;
 			});

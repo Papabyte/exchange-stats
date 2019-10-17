@@ -33,7 +33,7 @@
 			</b-row>	
 			<b-row>
 				<b-col  offset="4" cols="4">
-					<b-button variant="primary"  class="mb-2" size="m"  v-b-modal.donateReward>Donate a reward</b-button>
+					<b-button variant="primary"  class="mb-2" size="m"  v-b-modal.donateReward>{{$t("crowdSourcingPoolsButtonDonate")}}</b-button>
 				</b-col>
 			</b-row>
 		</b-col>
@@ -59,9 +59,9 @@ import DonateRewardModal from './commons/DonateRewardModal.vue';
 				sortBy: 'age',
 				sortDesc: false,
 				fields: [
-					{ key: 'number_rewards', label:" Number of rewards", sortable: true ,},
-					{ key: 'reward_amount', sortable: true },
-					{ key: 'exchange', sortable: true }
+					{ key: 'number_rewards', sortable: true, label: this.$t("crowdSourcingPoolsNbOfRewards")},
+					{ key: 'reward_amount', sortable: true, label: this.$t("crowdSourcingPoolsRewardAmount")},
+					{ key: 'exchange', sortable: true, label: this.$t("crowdSourcingPoolsExchange")}
 				],
 				items: [
 				]
@@ -69,7 +69,6 @@ import DonateRewardModal from './commons/DonateRewardModal.vue';
 		},
 		created(){
 				this.axios.get('/api/pools').then((response) => {
-					console.log(response.data);
 					this.items = response.data;
 					this.totalRows = this.items.length;
 					this.isSpinnerActive= false

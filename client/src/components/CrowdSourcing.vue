@@ -4,7 +4,7 @@
 		<b-container fluid >
 			<b-row >
 				<b-col offset-lg="2" lg="8"  cols="12" class="py-3">
-					<h3 class="text-center">Current operations</h3>
+					<h3 class="text-center">{{$t("crowdSourcingCurrentOperations")}}</h3>
 						<current-operations />
 				</b-col>
 			</b-row >
@@ -12,11 +12,11 @@
 				<b-col offset-lg="2" lg="8"  cols="12" class="py-3">
 					<b-row >
 						<b-col lg="6"  cols="12" class="pr-lg-5 py-3">
-							<h3 class="text-center">Current rewards</h3>
+							<h3 class="text-center">{{$t("crowdSourcingCurrentRewards")}}</h3>
 								<current-pools />
 						</b-col>
 						<b-col lg="6"  cols="12" class="pl-lg-5 ml-auto py-3">
-							<h3 class="text-center">Last transactions to AA</h3>
+							<h3 class="text-center">{{$t("crowdSourcingLastTransactions")}}</h3>
 							<last-transactions />
 						</b-col>
 					</b-row >
@@ -40,7 +40,11 @@ export default {
 		LastTransactions
 	},
 	created(){
-		document.title = 'Crowdsourcing';
+		document.title = this.$("crowdSourcingPageTitle");
+		document
+			.getElementsByTagName('meta')
+			.namedItem('description')
+			.setAttribute('content', this.$("crowdSourcingMetaDescription"))
 	}
 }
 </script>

@@ -15,30 +15,30 @@
 				</b-row>
 
 				<b-row class="text-center" v-if="walletOwner">
-					<span class="pr-2">Belongs to exchange: </span> <Exchange :id="walletOwner"/>
+					<span class="pr-2">{{$("explorerTransactionsBelongsTo")}}</span> <Exchange :id="walletOwner"/>
 				</b-row>
 				<b-row v-if="wallet_id&&!walletOwner">
-					<b-button variant="primary" size="sm" @click="isRemoving=false;$bvModal.show('editWallet');">add to an exchange</b-button>
+					<b-button variant="primary" size="sm" @click="isRemoving=false;$bvModal.show('editWallet');">{{$("explorerTransactionsButtonAddToExchange")}}</b-button>
 				</b-row>
 
 				<b-row v-if="exchangeWallets">
-					Wallets for this exchange:
+					{{$("explorerTransactionsWalletsForExchange")}}
 					<b-row class="pl-3" align-h="start">
 						<div v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
 							<b-col >
 								<wallet-id :id="wallet"/>
-								<b-button variant="primary" @click="isRemoving=true;walletIdToEdit=wallet;$bvModal.show('editWallet');" class="ml-2" size="sm">remove wallet {{wallet}}</b-button>
+								<b-button variant="primary" @click="isRemoving=true;walletIdToEdit=wallet;$bvModal.show('editWallet');" class="ml-2" size="sm">{{$t("explorerTransactionsRemoveWallet", {wallet: wallet})}}</b-button>
 							</b-col>
 						</div>
 					</b-row >
 				</b-row>
 
 				<b-row class="text-center" v-if="total_on_wallets">
-					<span class="pr-1">Total on wallets: </span> <btc-amount :amount="total_on_wallets"/>
+					<span class="pr-1">{{$t("explorerTransactionsTotalOnWallet")}}</span> <btc-amount :amount="total_on_wallets"/>
 				</b-row>
 
 				<b-row v-if="count_total">
-				Total transactions: {{count_total}}
+				{{$t("explorerTransactionsTotalTransactions")}}{{count_total}}
 				</b-row>
 			</div>
 			<b-row v-else>
@@ -144,17 +144,16 @@ export default {
 			this.total_on_wallets = null;
 
 			if (Number(this.request_input)) { // it's a wallet id
-				this.title = "Transactions for wallet " + this.request_input;
+				this.title = this.$t("explorerTransactionsTransactionsForWallet") + this.request_input;
 				this.axios.get('/api/wallet/' + this.request_input+'/' + (this.currentPage-1)).then((response) => {
-				this.title = "Transactions for wallet " + response.data.redirected_id;
-				console.log(JSON.stringify(response.data));
+				this.title = this.$t("explorerTransactionsTransactionsForWallet") + response.data.redirected_id;
 				if (response.data.txs){
 					this.transactions = response.data.txs.txs;
 					this.count_total = response.data.txs.count_total;
 					this.redirected_ids = [response.data.redirected_id];
 					this.total_on_wallets = response.data.txs.total_on_wallets;
 				} else {
-					this.failoverText = "No transaction found for wallet " + this.request_input;
+					this.failoverText = this.$t("explorerTransactionsNoTransactionsFound") + this.request_input;
 				}
 					this.wallet_id = Number(response.data.redirected_id);
 					this.walletIdToEdit = this.wallet_id;
@@ -169,33 +168,19 @@ export default {
 						this.count_total = null;
 						this.isSpinnerActive = false;
 					} else {
-						this.failoverText = "Transaction " + this.request_input + " not found.";
+						this.failoverText = this.$t("explorerTransactionsTransactionsNotFound", {transaction:  this.request_input});
 					}
 				});
 
 			} else if (validate(this.request_input)) { // it's a BTC address
-				this.title = "Looking for known wallet for " + this.request_input;
+				this.title = this.$t("explorerTransactionsLookingForWallet", {address: this.request_input});
 				this.axios.get('/api/address/' + this.request_input).then((response) => {
-				this.$router.push({ name: 'explorerInputPaged', params: { url_input: response.data.redirected_id } })
-/*
-				this.title = "Transactions for wallet " + response.data.redirected_id;
-				if (response.data.txs){
-						this.transactions = response.data.txs.txs;
-						this.count_total = response.data.txs.count_total;
-						this.redirected_ids = [response.data.redirected_id];
-						this.wallet_id = Number(response.data.redirected_id);
-						this.walletIdToEdit = this.wallet_id;
-						this.total_on_wallets = response.data.txs.total_on_wallets;
-				} else {
-					this.failoverText = "No wallet known for address " + this.request_input  + ".";
-				}
-					this.walletOwner = response.data.exchange;
-					this.isSpinnerActive = false;*/
+					this.$router.push({ name: 'explorerInputPaged', params: { url_input: response.data.redirected_id}})
 				});
 
 			} else if (this.request_input) { // should be an exchange
 				this.axios.get('/api/exchange/' + this.request_input+'/' + (this.currentPage-1)).then((response) => {
-					this.title = "Transactions for exchange " + response.data.name;
+					this.title = this.$t("explorerTransactionsTransactionsForExchange", {exchange:  response.data.name});
 					if (response.data.txs){
 						this.transactions = response.data.txs.txs;
 						this.count_total = response.data.txs.count_total;
@@ -204,9 +189,9 @@ export default {
 						this.exchange = this.request_input;
 						this.total_on_wallets = response.data.txs.total_on_wallets;
 					} else if (!response.data.wallet_ids.length == 0){
-						this.failoverText = "No wallet known for exchange " + response.data.name + ".";
+						this.failoverText = this.$t("explorerTransactionsNoWalletKnown", {exchange:  response.data.name});
 					} else {
-						this.failoverText = "No transaction found for exchange " + response.data.name + ".";
+						this.failoverText = this.$t("explorerTransactionsNoTransactionFound", {exchange:  response.data.name});
 					}
 					this.exchangeName =  response.data.name;
 					this.isSpinnerActive = false;

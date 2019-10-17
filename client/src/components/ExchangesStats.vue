@@ -31,7 +31,11 @@ export default {
 		}
 	},
 	created(){
-		document.title = 'Exchange onchain statistics';
+		document.title = this.$t('rankingPageTitle');
+				document
+			.getElementsByTagName('meta')
+			.namedItem('description')
+			.setAttribute('content', this.$("rankingMetaDescription"))
 	}
 }
 </script>

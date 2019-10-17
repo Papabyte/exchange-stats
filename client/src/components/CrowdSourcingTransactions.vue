@@ -1,6 +1,6 @@
 <template>
 		<b-row class="main-col">
-			<b-col  cols="12">
+			<b-col cols="12">
 				<b-row>
 					<b-col  cols="3">
 						<b-pagination

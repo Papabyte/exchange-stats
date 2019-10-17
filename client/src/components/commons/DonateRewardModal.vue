@@ -2,7 +2,7 @@
 	<b-modal id="donateReward" title="Donate a reward"  :hide-footer="!!link" :okDisabled="!validExchange && !isForAny" @close="link=false" @ok="handleOk">
 		<b-container v-if="!link" fluid  >
 			<b-row >
-				<label for="input-with-list">Select the exchange for which your reward will apply</label>
+				<label for="input-with-list">{{$t("donateModalSelectExchange")}}</label>
 				<b-form-input id="input-with-list" list="input-list"  :state="validExchange" :disabled="isForAny" v-model="exchange"></b-form-input>
 				<b-form-datalist id="input-list" :options="objExchanges"  ></b-form-datalist>
 			</b-row >
@@ -12,26 +12,40 @@
 				v-model="isForAny"
 				name="checkbox-1"
 				>
-				Donate for any exchange
+				{{$t("donateModalDonateForAny")}}
 				</b-form-checkbox>
 			</b-row >
 			<b-row class="pt-3" >
-				<label for="range-1">Individual reward amount</label>
+				<label for="range-1">{{$t("donateModalIndividualRewardAmount")}}</label>
 			<b-form-input id="range-1" v-model="amount" type="range" min="0.01" max="10" step="0.01"></b-form-input>
 				<byte-amount :amount="amount*1000000000"/>
 			</b-row >
 			<b-row class="pt-3" >
-				<label for="range-2">Number of rewards</label>
+				<label for="range-2">{{$t("donateModalNumberOfRewards")}}</label>
 				<b-form-input id="range-2"  type="range" min="1" max="10" step="1" v-model="nb_reward"></b-form-input>
 				{{nb_reward}}
 			</b-row >
 			<b-row class="pt-3" >
-				<div v-if="validExchange || isForAny" ><p>Donate <byte-amount :amount="Math.round(nb_reward*amount*1000000)"/> for operation on {{isForAny ? "any exchange" : exchange}}</p></div>
+				<div v-if="validExchange || isForAny" >
+					<i18n v-if="!isForAny" path="donateModalDonateAmountFor" tag="label" id="donate-amount">
+						<template #amount>
+							<byte-amount :amount="Math.round(nb_reward*amount*1000000)"/> 
+						</template>
+						<template #exchange>
+							<exchange :id="exchange" /> 
+						</template>
+					</i18n>
+					<i18n v-else path="donateModalDonateAmountForAny" tag="label" id="donate-amount">
+						<template #amount>
+							<byte-amount :amount="Math.round(nb_reward*amount*1000000)"/> 
+						</template>
+					</i18n>	
+				</div>
 			</b-row >
 		</b-container>
 		<b-container v-else fluid >
 			<b-row class="pt-3">
-				By clicking the link below, your Obyte wallet will open and ready to send a transaction for donating a reward.
+				{{$t("donateModalLinkHeader")}}
 			</b-row >
 		<b-row class="pt-3">
 			<span class="text-break">
@@ -39,10 +53,9 @@
 			</span>
 			</b-row >
 			<b-row class="py-3">
-				Your donation will be taken into account after a few minutes when the transaction is confirmed.
+				{{$t("donateModalLinkFooter")}}
 			</b-row >
 		</b-container>
-
 	</b-modal>
 </template>
 

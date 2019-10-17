@@ -1,12 +1,12 @@
 <template>
 	
 
-	<b-modal id="viewUrlProofs" :title="getTitle" hide-footer>
+	<b-modal id="viewUrlProofs" :title="$t('urlProofModalTitle')" hide-footer>
 		<b-container  >
 			<b-row v-if="proofsByOutcome.in && proofsByOutcome.in.length>0" class="pt-3" >
 				<b-col cols="12">
 					<b-row>
-						Proofs for adding wallet to exchange.
+						{{$t("urlProofModalProofForAdding")}}
 					</b-row >
 					<b-row v-for="(url,index) in proofsByOutcome.in" :key="index">
 						<b-link :href="url" target="_blank">{{url}}</b-link>
@@ -16,7 +16,7 @@
 			<b-row v-if="proofsByOutcome.out && proofsByOutcome.out.length>0" class="pt-3" >
 				<b-col cols="12">
 					<b-row>
-						Proofs for removing wallet from exchange.
+						{{$t("urlProofModalProofForRemoving")}}
 					</b-row >
 					<b-row v-for="(url,index) in proofsByOutcome.out" :key="index">
 						<b-link :href="url" target="_blank">{{url}}</b-link>
@@ -48,11 +48,6 @@ export default {
 	data(){
 		return {
 			proofsByOutcome: {}
-		}
-	},
-	computed:{
-		getTitle:function(){
-			return "View proofs";
 		}
 	},
 	watch:{
