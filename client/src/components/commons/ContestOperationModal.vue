@@ -2,7 +2,7 @@
 	<b-modal id="contestOperation" :title="getTitle" :hide-footer="!!link" @close="link=false" @ok="handleOk">
 		<b-container v-if="!link" fluid >
 			<b-row class="pt-3" >
-				<label for="range-1">{{$("contestModalAmountToStake")}}</label>
+				<label for="range-1">{{$t("contestModalAmountToStake")}}</label>
 				<b-form-input id="range-1" v-model="stakeAmountGb" type="range" :number="true" min="0.001" :max="reversalStakeGb" :step="reversalStakeGb/100"></b-form-input>
 			</b-row >
 			<b-row>
@@ -36,7 +36,7 @@
 		</b-container>
 		<b-container v-else fluid >
 			<b-row class="pt-3">
-				{{$("contestModalLinkHeader")}}
+				{{$t("contestModalLinkHeader")}}
 			</b-row >
 		<b-row class="pt-3">
 			<span class="text-break">
@@ -44,7 +44,7 @@
 			</span>
 			</b-row >
 			<b-row class="py-3">
-				{{$("contestModalLinkFooter")}}
+				{{$t("contestModalLinkFooter")}}
 			</b-row >
 		</b-container>
 
@@ -93,9 +93,9 @@ export default {
 	computed:{
 		getTitle:function(){
 			if (this.operation_item.isRemovingOperation)
-				return this.$("contestModalTitleRemoving", {wallet: this.operation_item.wallet_id, exchange: this.operation_item.exchange});
+				return this.$t("contestModalTitleRemoving", {wallet: this.operation_item.wallet_id, exchange: this.operation_item.exchange});
 			else
-				return this.$("contestModalTitleAdding", {wallet: this.operation_item.wallet_id, exchange: this.operation_item.exchange});
+				return this.$t("contestModalTitleAdding", {wallet: this.operation_item.wallet_id, exchange: this.operation_item.exchange});
 		},
 
 		amountLeftToReverse: function(){

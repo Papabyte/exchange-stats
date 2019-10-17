@@ -2,6 +2,13 @@
 	<div>
 	<nav-bar selected_item='2'/>
 		<b-container fluid >
+				<b-row>
+					<b-col offset-lg="2" lg="8" cols="12" class="py-3">
+						<b-alert v-if="welcomeMessageShow" @dismissed="$store.commit('setWasCrowdSourcingWelcomeMessageClosed',true)" show dismissible>
+						{{$t('crowdSourcingWelcomeMessage')}}
+						</b-alert>
+					</b-col>
+				</b-row >
 			<b-row >
 				<b-col offset-lg="2" lg="8"  cols="12" class="py-3">
 					<h3 class="text-center">{{$t("crowdSourcingCurrentOperations")}}</h3>
@@ -39,12 +46,17 @@ export default {
 		CurrentOperations,
 		LastTransactions
 	},
+	computed:{
+		welcomeMessageShow(){
+			return !this.$store.state.wasCrowdSourcingWelcomeMessageClosed;
+		}
+	},
 	created(){
-		document.title = this.$("crowdSourcingPageTitle");
+		document.title = this.$t("crowdSourcingPageTitle");
 		document
 			.getElementsByTagName('meta')
 			.namedItem('description')
-			.setAttribute('content', this.$("crowdSourcingMetaDescription"))
+			.setAttribute('content', this.$t("crowdSourcingMetaDescription"))
 	}
 }
 </script>

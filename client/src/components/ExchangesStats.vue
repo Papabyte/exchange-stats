@@ -35,7 +35,7 @@ export default {
 				document
 			.getElementsByTagName('meta')
 			.namedItem('description')
-			.setAttribute('content', this.$("rankingMetaDescription"))
+			.setAttribute('content', this.$t("rankingMetaDescription"))
 	}
 }
 </script>

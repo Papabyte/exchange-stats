@@ -2,6 +2,11 @@
 	<div class="main">
 		<nav-bar selected_item='1' />
 		<b-container fluid >
+					<b-col  offset-lg="3" lg="6" cols="12"  class="py-3">
+						<b-alert v-if="welcomeMessageShow" @dismissed="$store.commit('setWasExplorerWelcomeMessageClosed',true)" show dismissible>
+						{{$t('explorerWelcomeMessage')}}
+						</b-alert>
+					</b-col>
 			<b-row v-if="!url_input">
 				<b-col cols="12" class="py-3">
 					<h3 class="text-center">{{$t("explorerTitle")}}</h3>
@@ -67,6 +72,9 @@ export default {
 	computed:{
 		arrExchanges: function(){
 			return this.$store.state.exchanges;
+		},
+		welcomeMessageShow(){
+			return !this.$store.state.wasExplorerWelcomeMessageClosed;
 		}
 	},
 	watch: {
@@ -78,7 +86,7 @@ export default {
 				document
 			.getElementsByTagName('meta')
 			.namedItem('description')
-			.setAttribute('content', this.$("explorerMetaDescription"));
+			.setAttribute('content', this.$t("explorerMetaDescription"));
 	},
 	methods:{ 
 		onSubmit(){

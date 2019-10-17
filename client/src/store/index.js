@@ -8,7 +8,9 @@ export default new Vuex.Store({
 	state: {
 		exchanges: [],
 		exchangesById: {},
-		wasRankingWelcomeMessageClosed: false
+		wasRankingWelcomeMessageClosed: false,
+		wasExplorerWelcomeMessageClosed: false,
+		wasCrowdSourcingWelcomeMessageClosed: false
 	},
 	mutations: {
 		setExchanges(state, data) {
@@ -19,7 +21,14 @@ export default new Vuex.Store({
 		},
 		setWasRankingWelcomeMessageClosed(state, data) {
 			state.wasRankingWelcomeMessageClosed = data;
-		}
+		},
+		setWasExplorerWelcomeMessageClosed(state, data) {
+			state.wasExplorerWelcomeMessageClosed = data;
+		},
+		setWasCrowdSourcingWelcomeMessageClosed(state, data) {
+			state.wasCrowdSourcingWelcomeMessageClosed = data;
+		},
+
 	},
 	actions: {
 		getExchanges(context){

@@ -2,7 +2,7 @@
 	<b-modal id="commitOperation" :title="getTitle"  :hide-footer="true" >
 		<b-container fluid >
 			<b-row class="pt-3">
-				{{$("commitModalLinkHeader")}}
+				{{$t("commitModalLinkHeader")}}
 			</b-row >
 		<b-row class="pt-3">
 			<span class="text-break">
@@ -10,7 +10,7 @@
 			</span>
 			</b-row >
 			<b-row class="py-3">
-				{{$("commitModalLinkFooter")}}
+				{{$t("commitModalLinkFooter")}}
 			</b-row >
 		</b-container>
 	</b-modal>

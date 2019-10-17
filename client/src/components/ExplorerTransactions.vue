@@ -15,14 +15,14 @@
 				</b-row>
 
 				<b-row class="text-center" v-if="walletOwner">
-					<span class="pr-2">{{$("explorerTransactionsBelongsTo")}}</span> <Exchange :id="walletOwner"/>
+					<span class="pr-2">{{$t("explorerTransactionsBelongsTo")}}</span> <Exchange :id="walletOwner"/>
 				</b-row>
 				<b-row v-if="wallet_id&&!walletOwner">
-					<b-button variant="primary" size="sm" @click="isRemoving=false;$bvModal.show('editWallet');">{{$("explorerTransactionsButtonAddToExchange")}}</b-button>
+					<b-button variant="primary" size="sm" @click="isRemoving=false;$bvModal.show('editWallet');">{{$t("explorerTransactionsButtonAddToExchange")}}</b-button>
 				</b-row>
 
 				<b-row v-if="exchangeWallets">
-					{{$("explorerTransactionsWalletsForExchange")}}
+					{{$t("explorerTransactionsWalletsForExchange")}}
 					<b-row class="pl-3" align-h="start">
 						<div v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
 							<b-col >

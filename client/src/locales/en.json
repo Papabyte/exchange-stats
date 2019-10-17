@@ -102,6 +102,8 @@
 	"explorerTransactionsLookingForWallet" : "Looking for known wallet for {address}",
 	"explorerTransactionsTransactionsForExchange" : "Transaction for exchange {exchange}",
 	"explorerTransactionsNoWalletKnown" : "No wallet known for exchange {exchange}.",
-	"explorerTransactionsNoTransactionFound" : "No transaction found for exchange {exchange}."
+	"explorerTransactionsNoTransactionFound" : "No transaction found for exchange {exchange}.",
+	"explorerWelcomeMessage" : "Here you can explore BTC blockchain with transactions sorted by wallets or exchanges.",
+	"crowdSourcingWelcomeMessage" : "Help us to identify wallets used by exchanges and earn gain through counterstake protocol."
 }
 
