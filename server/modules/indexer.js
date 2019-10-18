@@ -234,7 +234,7 @@ function mergeWallets(objInputs, block_height, block_time, tx_index){
 					var wallet_ids_to_update_string =  wallet_ids_to_update.join(",");
 					conn.addQuery(arrQueries, "UPDATE btc_wallets SET addr_count=addr_count+(SELECT SUM(addr_count) FROM btc_wallets WHERE id IN("+wallet_ids_to_update_string+")) WHERE id=?",[rows[0].id]);
 					if (block_height >= activeRedirectionFromHeight) {
-						conn.addQuery(arrQueries, "UPDATE btc_wallets SET addr_count=0,redirection=? WHERE id IN("+wallet_ids_to_update_string+")",[rows[0].id]);
+						conn.addQuery(arrQueries, "UPDATE btc_wallets SET addr_count=0,redirection=? WHERE id IN("+wallet_ids_to_update_string+") OR redirection IN("+wallet_ids_to_update_string+")",[rows[0].id]);
 					} else {
 						conn.addQuery(arrQueries, "UPDATE btc_wallets SET addr_count=0 WHERE id IN("+wallet_ids_to_update_string+")");
 					}

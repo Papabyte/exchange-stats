@@ -77,10 +77,10 @@ async function getTransactionsFromInternalIds(arrIds, handle){
 }
 
 
-async function getRedirections(arrIds, handle){
+async function redirections(arrIds, handle){
 	if (arrIds.length == 0)
 		return handle([]);
-		console.log("getRedirections");
+		console.log("redirections");
 		console.log(arrIds);
 	const idsSqlFilter = arrIds.join(",");
 	const rows = await db.query("SELECT DISTINCT(redirection_id) FROM (SELECT \n\
@@ -95,6 +95,6 @@ async function getRedirections(arrIds, handle){
 	}
 }
 exports.getTransactionsFromWallets = getTransactionsFromWallets;
-exports.getRedirections = getRedirections;
+exports.redirections = redirections;
 exports.getTransactionFromTxId = getTransactionFromTxId;
 exports.getWalletIdFromAddress = getWalletIdFromAddress;

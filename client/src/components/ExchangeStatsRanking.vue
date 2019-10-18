@@ -1,7 +1,7 @@
 <template>
 	<b-container fluid>
 		<b-row >
-		<edit-wallet-modal :propExchange="clicked_exchange"/>
+		<edit-wallet-modal :propExchange="clicked_exchange" :isRemoving="isRemoving"/>
 			<b-col offset-lg="1" lg="10" cols="12" class="py-3">
 				<b-row >
 					<b-col cols="12" class="py-3">
@@ -39,12 +39,22 @@
 							<BtcAmount :amount="data.item.reported_volume"/>
 						</template>
 						<template v-slot:cell(action)="data">
-							<b-link v-if="data.item.total_btc_wallet"  :to="'/explorer/'+ data.item.exchange_id">
-								<b-button variant="primary" size="sm"  class="mr-2">
+
+
+						<b-button-group class="mr-2">
+								<b-link v-if="data.item.total_btc_wallet"  :to="'/explorer/'+ data.item.exchange_id">
+								<b-button  variant="primary" size="m" >
 									Explore wallet
 								</b-button>
 							</b-link>
-							<b-button v-else variant="primary" size="sm"  v-on:click="clicked_exchange=data.item.exchange_id;$bvModal.show('editWallet');">Add wallet</b-button>
+								<b-dropdown right text="edit" variant="primary" size="m" >
+			
+									<b-dropdown-item  v-on:click="isRemoving=false;clicked_exchange=data.item.exchange_id;$bvModal.show('editWallet');">Add wallet</b-dropdown-item>
+									<b-dropdown-item v-if="data.item.total_btc_wallet" v-on:click="isRemoving=true;clicked_exchange=data.item.exchange_id;$bvModal.show('editWallet');">Remove wallet</b-dropdown-item>
+								</b-dropdown>
+		
+							</b-button-group>
+
 						</template>
 					</b-table>
 				</b-row>
@@ -65,6 +75,7 @@ import EditWalletModal from './commons/EditWalletModal.vue';
 		},
 		data() {
 			return {
+				isRemoving: false,
 				clicked_exchange: null,
 				currentPage:1,
 				totalRows:0,

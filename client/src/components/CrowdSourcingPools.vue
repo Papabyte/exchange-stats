@@ -56,6 +56,7 @@ import DonateRewardModal from './commons/DonateRewardModal.vue';
 				isSpinnerActive: true,
 				currentPage:1,
 				totalRows:0,
+				timerId: null,
 				sortBy: 'age',
 				sortDesc: false,
 				fields: [
@@ -68,11 +69,21 @@ import DonateRewardModal from './commons/DonateRewardModal.vue';
 			}
 		},
 		created(){
+			this.getData();
+			this.timerId = setInterval(this.getData, 60000);
+		},
+		beforeDestroy(){
+			clearInterval(this.timerId);
+		},
+		methods:{
+			getData(){
 				this.axios.get('/api/pools').then((response) => {
 					this.items = response.data;
 					this.totalRows = this.items.length;
 					this.isSpinnerActive= false
 				});
+
+			}
 		}
 	}
 </script>

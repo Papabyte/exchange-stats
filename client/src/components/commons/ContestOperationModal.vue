@@ -158,7 +158,6 @@ export default {
 				const base64data = base64url(json_string);
 				this.link = (conf.testnet ? "byteball-tn" :"byteball")+":"+conf.aa_address+"?amount="
 					+Math.round(this.stakeAmountGb*1000000000)+"&base64data="+base64data;
-				window.open(href, '_blank');
 		}
 	}
 }

@@ -108,6 +108,7 @@ import WalletId from './commons/WalletId.vue';
 				totalRows:0,
 				sortBy: 'age',
 				sortDesc: false,
+				timerId: null,
 				fields: [
 					{ key: 'status', sortable: true, label: this.$t('crowdSourcingOperationsTableColStatus')},
 					{ key: 'operation', sortable: true, label: this.$t('crowdSourcingOperationsTableColOperation')},
@@ -121,44 +122,57 @@ import WalletId from './commons/WalletId.vue';
 			}
 		},
 		created(){
-			this.items = [];
-			this.axios.get('/api/operations').then((response) => {
-				response.data.forEach((row)=>{
-					const item = {};
-					item.status = row.status ;
-					if (row.initial_outcome == "in"){
-						item.outcome_yes_or_no = row.outcome == "in" ? "yes" : "no";
-					}
-					else {
-						item.outcome_yes_or_no = row.outcome == "out" ? "yes" : "no";
-					}
-					item.outcome= row.outcome;
-					item.isRemovingOperation = row.outcome == "out";
-					item.initial_outcome = row.initial_outcome;
-					item.staked_on_outcome = Number(row.staked_on_outcome);
-					item.total_staked = Number(row.total_staked);
-					item.wallet_id = Number(row.wallet_id);
-					item.exchange = row.exchange;
-					item.key = row.key;
-					item.url_proofs_by_outcome = row.url_proofs_by_outcome;
-					if ((new Date().getTime() / 1000 - row.countdown_start) > conf.challenge_period_length){
-						item.is_commitable = true;
-					}
+			this.getData();
+			this.timerId = setInterval(this.getData, 60000);
+		
+		},
+		beforeDestroy(){
+			console.log("will destroy timer for operations");
+				clearInterval(this.timerId);
+		},
+		methods:{
+			getData(){
+				this.axios.get('/api/operations').then((response) => {
+							this.items = [];
+							response.data.forEach((row)=>{
+								const item = {};
+								item.status = row.status ;
+								if (row.initial_outcome == "in"){
+									item.outcome_yes_or_no = row.outcome == "in" ? "yes" : "no";
+								}
+								else {
+									item.outcome_yes_or_no = row.outcome == "out" ? "yes" : "no";
+								}
+								item.outcome= row.outcome;
+								item.isRemovingOperation = row.outcome == "out";
+								item.initial_outcome = row.initial_outcome;
+								item.staked_on_outcome = Number(row.staked_on_outcome);
+								item.total_staked = Number(row.total_staked);
+								item.wallet_id = Number(row.wallet_id);
+								item.exchange = row.exchange;
+								item.key = row.key;
+								item.url_proofs_by_outcome = row.url_proofs_by_outcome;
+								if ((new Date().getTime() / 1000 - row.countdown_start) > conf.challenge_period_length){
+									item.is_commitable = true;
+								}
 
-					if (item.status == "committed"){
-						item.claimAddresses = [];
-						const assocStakedByAdress =	row.staked_by_address;
-						const outcome = row.outcome
-						for (var key in assocStakedByAdress){
-							if (assocStakedByAdress[key][outcome])
-								item.claimAddresses.push(key);
-						}
-					}
-					this.items.push(item);
-					this.totalRows = this.items.length;
-				})
-				this.isSpinnerActive= false
-			});
+								if (item.status == "committed"){
+									item.claimAddresses = [];
+									const assocStakedByAdress =	row.staked_by_address;
+									const outcome = row.outcome
+									for (var key in assocStakedByAdress){
+										if (assocStakedByAdress[key][outcome])
+											item.claimAddresses.push(key);
+									}
+								}
+								this.items.push(item);
+								this.totalRows = this.items.length;
+							})
+							this.isSpinnerActive= false
+						});
+
+			}
+
 		}
 	}
 </script>

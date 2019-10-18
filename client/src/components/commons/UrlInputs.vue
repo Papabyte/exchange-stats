@@ -2,7 +2,7 @@
 	<div class="py-3">
 		<b-form-input :placeholder="$t('urlInputsFirstHolder')" :formatter="format" v-model="url_1"></b-form-input>
 		<span v-if="text_error_1" class="pt-3">{{text_error_1}}</span>
-		<b-form-input :placeholder="$t('urlInputsSecondtHolder')"  :formatter="format" v-model="url_2" ></b-form-input>
+		<b-form-input :placeholder="$t('urlInputsSecondHolder')"  :formatter="format" v-model="url_2" ></b-form-input>
 		<span v-if="text_error_2" class="pt-3">{{text_error_2}}</span>
 	</div>
 </template>

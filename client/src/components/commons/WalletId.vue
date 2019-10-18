@@ -4,7 +4,7 @@
 	</span>
 	<span v-else>
 		<span v-if="label"> {{label}} </span>
-		<span class="wallet-link"><b-link :to="'/explorer/'+id">
+		<span class="wallet-link"><b-link :target="target" :to="'/explorer/'+id">
 			{{id}}
 	</b-link></span>
 	</span>
@@ -27,7 +27,19 @@ export default {
 			type: Boolean,
 			required: false,
 			default: false
+		},
+		newTab:{
+			type: Boolean,
+			required: false,
+			default: false
 		}
+	},
+	computed:{
+		target: function(){
+
+			return this.newTab ? "_blank" : ""
+		}
+
 	}
 }
 </script>

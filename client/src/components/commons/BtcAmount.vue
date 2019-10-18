@@ -32,7 +32,8 @@ export default {
 		amountClass:function(){
 			return {
 				negative: this.isNegative,
-				positive: this.isPositive
+				positive: this.isPositive,
+				default: !this.isNegative && !this.isPositive
 			};
 		}
 	}
@@ -53,4 +54,8 @@ export default {
 	font-weight: 600;
 }
 
+.default{
+	font-size: 16px;
+	font-weight: 500;
+}
 </style>
