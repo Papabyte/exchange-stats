@@ -201,9 +201,12 @@ export default {
 		},
 		wallet: function(){
 			this.isCheckButtonActive = validate(this.wallet) || this.isWalletId(this.wallet);
+		},
+		isRemoving: function(){
+
 		}
 	},
-	mounted(){
+	created(){
 		if (this.prop_wallet_id)
 			this.wallet = this.prop_wallet_id;
 	},
@@ -219,7 +222,7 @@ export default {
 		},
 		reset(){
 			this.isSpinnerActive = false;
-			this.isCheckButtonActive = true;
+			this.isCheckButtonActive = false;
 			this.text_error = null;
 			this.isOkDisabled = true;
 			this.bestPoolId = false;
@@ -243,12 +246,11 @@ this.check();
 			this.isSpinnerActive = true;
 			this.isCheckButtonActive = false;
 
-/*			if (){
-				return this.text_error = "Invalid wallet id or BTC address";//this.$t("editModalAlreadyBelongs", {wallet: this.wallet, exchange: this.exchange});
-			}*/
-
 			this.axios.get('/api/redirection/'+this.wallet).then((response) => {
 				this.wallet = response.data.redirected_id;
+				if (!this.wallet)
+					this.text_error = this.$t("editModalWalletNotFound");
+
 				this.axios.get('/api/operations/'+this.exchange).then((response) => {
 					const operations = response.data;
 					var bFound = false;

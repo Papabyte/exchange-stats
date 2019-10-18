@@ -15,6 +15,7 @@
 	"editModalHolderEnterIdOrAddress" : "Enter a wallet id or one of its address",
 	"editModalLinkHeader" : "By clicking the link below, your Obyte wallet will open and ready to send a transaction for ordering the operation.",
 	"editModalLinkFooter" : "It will be taken into account after a few minutes when the transaction is confirmed. Note that it could be canceled if meanwhile another user ordered a similar operation. In this case, the AA would bounce the transaction to refund you.",
+	"editModalWalletNotFound" : "Wallet not found",
 	"claimModalLinkHeader" : "By clicking the link below, your Obyte wallet will open and ready to send a transaction for claiming your gain.",
 	"claimModalLinkFooter" : "It will be taken into account after a few minutes when the transaction is confirmed.",
 	"claimModalSelectAddress" : "Select the address.",

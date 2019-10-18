@@ -87,7 +87,7 @@ import CommitOperationModal from './commons/CommitModal.vue';
 import ViewUrlProofsModal from './commons/ViewUrlProofsModal.vue';
 import Exchange from './commons/Exchange.vue';
 import WalletId from './commons/WalletId.vue';
-
+import moment from 'moment/src/moment'
 
 	export default {
 		components: {
@@ -106,8 +106,8 @@ import WalletId from './commons/WalletId.vue';
 				isSpinnerActive: true,
 				currentPage:1,
 				totalRows:0,
-				sortBy: 'age',
-				sortDesc: false,
+				sortBy: 'countdown_start',
+				sortDesc: true,
 				timerId: null,
 				fields: [
 					{ key: 'status', sortable: true, label: this.$t('crowdSourcingOperationsTableColStatus')},
@@ -115,6 +115,8 @@ import WalletId from './commons/WalletId.vue';
 					{ key: 'outcome_yes_or_no', sortable: true, label: this.$t('crowdSourcingOperationsTableColOutcome')},
 					{ key: 'staked_on_outcome', sortable: true, label: this.$t('crowdSourcingOperationsTableColStakedOnOutcome')},
 					{ key: 'total_staked', sortable: true, label: this.$t('crowdSourcingOperationsTableColTotalStaked')},
+					{ key: 'end', sortable: true, label: "end"},
+
 					{ key: 'action', label: this.$t('crowdSourcingOperationsTableColAction') }
 				],
 				items: [
@@ -127,8 +129,7 @@ import WalletId from './commons/WalletId.vue';
 		
 		},
 		beforeDestroy(){
-			console.log("will destroy timer for operations");
-				clearInterval(this.timerId);
+			clearInterval(this.timerId);
 		},
 		methods:{
 			getData(){
@@ -152,8 +153,12 @@ import WalletId from './commons/WalletId.vue';
 								item.exchange = row.exchange;
 								item.key = row.key;
 								item.url_proofs_by_outcome = row.url_proofs_by_outcome;
+								item.countdown_start = row.countdown_start;
 								if ((new Date().getTime() / 1000 - row.countdown_start) > conf.challenge_period_length){
 									item.is_commitable = true;
+									item.end = 'ended';
+								} else {
+									item.end = moment().to(moment.unix(conf.challenge_period_length  + Number(row.countdown_start)));
 								}
 
 								if (item.status == "committed"){

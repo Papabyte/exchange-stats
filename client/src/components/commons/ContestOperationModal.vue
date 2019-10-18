@@ -99,7 +99,7 @@ export default {
 		},
 
 		amountLeftToReverse: function(){
-			return ((this.reversalStakeGb - this.stakeAmount) );
+			return ((this.reversalStake - this.stakeAmount) );
 		},
 		newTotalOppositeStakeForReversal: function(){
 			return this.reversalStake + (this.operation_item.total_staked - this.operation_item.staked_on_outcome);
