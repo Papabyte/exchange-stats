@@ -16,7 +16,15 @@
 
 				<b-row class="text-center" v-if="walletOwner">
 					<span class="pr-2">{{$t("explorerTransactionsBelongsTo")}}</span> <Exchange :id="walletOwner"/>
-					<b-button v-if="wallet_id" class="ml-2" variant="primary" size="sm" @click="isRemoving=true;walletIdToEdit=wallet_id;$bvModal.show('editWallet');">{{$t("explorerTransactionsButtonRemoveFromExchange")}}</b-button>
+					<b-button 
+					v-if="wallet_id" 
+					variant="primary"  
+					@click="isRemoving=true;walletIdToEdit=wallet_id;$bvModal.show('editWallet');" 
+					class="ml-2 button-xs" 
+					v-b-tooltip.hover 
+					:title="$t('explorerTransactionsButtonRemoveFromExchangeTip')"
+					>
+					<v-icon name='x' class="x-icon"/></b-button>
 
 				</b-row>
 				<b-row v-if="wallet_id&&!walletOwner">
@@ -28,7 +36,13 @@
 						<div v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
 							<b-col >
 								<wallet-id :id="wallet"/>
-								<b-button variant="primary" @click="isRemoving=true;walletIdToEdit=wallet;$bvModal.show('editWallet');" class="ml-2" size="sm">{{$t("explorerTransactionsRemoveWallet", {wallet: wallet})}}</b-button>
+								<b-button 
+								variant="primary" 
+								@click="isRemoving=true;walletIdToEdit=wallet;$bvModal.show('editWallet');" 
+								v-b-tooltip.hover 
+								:title="$t('explorerTransactionsButtonRemoveFromExchangeTip')"
+								class="ml-2 button-xs" >
+								<v-icon name='x' class="x-icon"/></b-button>
 							</b-col>
 						</div>
 					</b-row >
@@ -208,5 +222,17 @@ function isTxId(hex){
 
 </script>
 
-<style >
+<style>
+.x-icon{
+	height: 20px;
+	width: 20px;
+	margin-left: -8px;
+		margin-top: -10px;
+
+}
+
+.button-xs{
+	height: 30px;
+	width: 30px;
+}
 </style>

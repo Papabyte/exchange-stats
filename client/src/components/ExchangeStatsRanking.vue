@@ -26,12 +26,38 @@
 					responsive
 					sort-icon-left
 					>
+						<template v-slot:head(reported_volume)="data">
+							<span v-b-tooltip.hover :title="$t('rankingTableColReportedVolumeTip')">{{data.label}}</span>
+						</template>
+
+						<template v-slot:head(nb_withdrawal_addresses)="data">
+								<span v-b-tooltip.hover :title="$t('rankingTableColNbWithdrawalAddressesTip')">{{data.label}}</span>
+						</template>
+
+						<template v-slot:head(nb_deposit_addresses)="data">
+								<span v-b-tooltip.hover :title="$t('rankingTableColNbDepositAddressesTip')">{{data.label}}</span>
+						</template>
+
+						<template v-slot:head(last_day_deposits)="data">
+							<span v-b-tooltip.hover :title="$t('rankingTableColLastDayDepositsTip')">{{data.label}}</span>
+						</template>
+
 						<template v-slot:cell(last_day_deposits)="data">
 							<BtcAmount v-if="data.item.last_day_deposits" :amount="data.item.last_day_deposits"/>
 						</template>
+
+						<template v-slot:head(last_day_withdrawals)="data">
+							<span v-b-tooltip.hover :title="$t('rankingTableColLastDayWithdrawalsTip')">{{data.label}}</span>
+						</template>
+
 						<template v-slot:cell(last_day_withdrawals)="data">
 							<BtcAmount v-if="data.item.last_day_withdrawals" :amount="data.item.last_day_withdrawals"/>
 						</template>
+
+						<template v-slot:head(total_btc_wallet)="data">
+							<span v-b-tooltip.hover :title="$t('rankingTableColTotalBtcWalletTip')">{{data.label}}</span>
+						</template>
+
 						<template v-slot:cell(total_btc_wallet)="data">
 							<BtcAmount v-if="data.item.total_btc_wallet" :amount="data.item.total_btc_wallet"/>
 						</template>
@@ -39,22 +65,18 @@
 							<BtcAmount :amount="data.item.reported_volume"/>
 						</template>
 						<template v-slot:cell(action)="data">
-
-
-						<b-button-group class="mr-2">
-								<b-link v-if="data.item.total_btc_wallet"  :to="'/explorer/'+ data.item.exchange_id">
-								<b-button  variant="primary" size="m" >
-									Explore wallet
-								</b-button>
-							</b-link>
-								<b-dropdown right text="edit" variant="primary" size="m" >
-			
-									<b-dropdown-item  v-on:click="isRemoving=false;clicked_exchange=data.item.exchange_id;$bvModal.show('editWallet');">Add wallet</b-dropdown-item>
-									<b-dropdown-item v-if="data.item.total_btc_wallet" v-on:click="isRemoving=true;clicked_exchange=data.item.exchange_id;$bvModal.show('editWallet');">Remove wallet</b-dropdown-item>
-								</b-dropdown>
-		
-							</b-button-group>
-
+							<b-button-group class="mr-2">
+									<b-link v-if="data.item.total_btc_wallet"  :to="'/explorer/'+ data.item.exchange_id">
+									<b-button  variant="primary" size="m" >
+										Explore wallets
+									</b-button>
+								</b-link>
+									<b-dropdown right text="edit" variant="primary" size="m" >
+				
+										<b-dropdown-item  v-on:click="isRemoving=false;clicked_exchange=data.item.exchange_id;$bvModal.show('editWallet');">Add wallet</b-dropdown-item>
+										<b-dropdown-item v-if="data.item.total_btc_wallet" v-on:click="isRemoving=true;clicked_exchange=data.item.exchange_id;$bvModal.show('editWallet');">Remove wallet</b-dropdown-item>
+									</b-dropdown>
+								</b-button-group>
 						</template>
 					</b-table>
 				</b-row>

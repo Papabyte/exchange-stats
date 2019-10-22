@@ -31,7 +31,7 @@
 					{{$t("explorerOrBrowseExchanges")}}
 					<b-row class="py-4" align-h="start">
 						<div v-for="(exchange,index) in arrExchanges" v-bind:key="index">
-							<b-col >	<b-link :to="'/explorer/'+exchange.id">{{exchange.name}}</b-link></b-col>
+							<b-col >	<exchange :showIcon="false" :id="exchange.id"/></b-col>
 						</div>
 					</b-row >
 				</div>
@@ -47,11 +47,13 @@
 <script>
 import NavBar from './commons/NavBar.vue'
 import Transactions from './ExplorerTransactions.vue'
+import Exchange from './commons/Exchange.vue';
 
 export default {
 	components: {
 		NavBar,
-		Transactions
+		Transactions,
+		Exchange
 	},
 	props: {
 		url_input: {

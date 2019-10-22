@@ -5,7 +5,7 @@
 		</div>
 			<div class="d-inline">
 				<b-link target="_blank" :href="'https://blockstream.info/tx/'+tx_id">
-				<v-icon name='external-link' class="custom-icon"/>
+				<v-icon name='external-link' class="link-icon"/>
 			</b-link>
 		</div>
 	</div>
@@ -29,7 +29,7 @@ export default {
 </script>
 
 <style lang='scss' scoped>
-	.custom-icon {
+	.link-icon {
 			height: 20px;
 	}
 

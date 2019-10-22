@@ -5,6 +5,7 @@
 	<span v-else>
 		<span v-if="label"> {{label}} </span>
 		<span class="wallet-link"><b-link :target="target" :to="'/explorer/'+id">
+			<v-icon name='folder' class="folder-icon"/>
 			{{id}}
 	</b-link></span>
 	</span>
@@ -48,5 +49,13 @@ export default {
 .wallet-link a{
 	color: blue;
 	font-weight: 600;
+}
+
+.folder-icon{
+	height: 20px;
+	padding: auto;
+	margin-right: -2px;
+		color: black;
+
 }
 </style>
