@@ -3,7 +3,7 @@
 		<b-container v-if="!link" fluid >
 			<b-row class="pt-3" >
 				<label for="range-1">{{$t("contestModalAmountToStake")}}</label>
-				<b-form-input id="range-1" v-model="stakeAmountGb" type="range" :number="true" min="0.001" :max="reversalStakeGb" :step="reversalStakeGb/100"></b-form-input>
+				<b-form-input id="range-1" v-model="stakeAmountGb" type="range" :number="true" min="0.001" :max="reversalStakeGb*1.01" :step="reversalStakeGb/100"></b-form-input>
 			</b-row >
 			<b-row>
 				<span v-if="text_error" class="pt-3">{{text_error}}</span>
@@ -22,7 +22,7 @@
 			<div class="pt-3">
 				<i18n path="contestModalAmountLeft" id="amount-left">
 					<template #amount>
-						<byte-amount :amount="amountLeftToReverse" /> l
+						<byte-amount :amount="amountLeftToReverse" />
 					</template>
 					<template #gain_amount>
 						<byte-amount :amount="potentialGainAmount" /> 
@@ -116,12 +116,16 @@ export default {
 			if(!this.operationItem)
 				return;
 			this.operation_item = this.operationItem;
-			this.reversalStake = (conf.challenge_coef*this.operation_item.staked_on_outcome+1001);
+			this.reversalStake = (conf.challenge_coef*this.operation_item.staked_on_outcome - this.operation_item.staked_on_opposite);
 			this.reversalStakeGb = this.reversalStake/1000000000;
 			this.stakeAmountGb = this.reversalStakeGb;
 			this.reset();
 		},
 		stakeAmountGb: function(){
+			if (this.stakeAmountGb > this.reversalStakeGb)
+				this.stakeAmountGb = this.reversalStakeGb;
+			if (this.stakeAmountGb < conf.challenge_min_stake)
+				this.stakeAmountGb = conf.challenge_min_stake;
 			this.stakeAmount = this.stakeAmountGb * 1000000000;
 		}
 	},

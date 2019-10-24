@@ -1,7 +1,8 @@
 const conf = require('ocore/conf.js');
-const light_wallet = require('ocore/light_wallet.js');
+const lightWallet = require('ocore/light_wallet.js');
 const myWitnesses = require('ocore/my_witnesses.js');
-
+const async = require('async');
+const mutex = require('ocore/mutex.js');
 const network = require('ocore/network.js');
 const db = require('ocore/db.js');
 
@@ -26,7 +27,7 @@ myWitnesses.readMyWitnesses(function (arrWitnesses) {
 
 
 function start(){
-	light_wallet.setLightVendorHost(conf.hub);
+	lightWallet.setLightVendorHost(conf.hub);
 	db.query("INSERT "+db.getIgnore()+" INTO my_watched_addresses (address) VALUES (?)", [conf.aa_address], function(){
 		network.addLightWatchedAddress(conf.address);
 		refresh(),
@@ -35,6 +36,8 @@ function start(){
 }
 
 function refresh(){
+	lightWallet.refreshLightClientHistory();
+	catchUpOperationsHistory();
 	network.requestFromLightVendor('light/get_aa_state_vars', {address: conf.aa_address},function(error, request, objStateVars){
 
 		indexOperations(objStateVars);
@@ -42,6 +45,46 @@ function refresh(){
 
 	});
 
+}
+
+function catchUpOperationsHistory(){
+	mutex.lock(["catchUpOperationsHistory"], function(unlock){
+		//units table is joined to get trigger unit timestamp
+		db.query("SELECT * FROM aa_responses INNER JOIN units ON aa_responses.trigger_unit=units.unit WHERE mci >=(SELECT \n\
+			CASE WHEN mci IS NOT NULL THEN MAX(mci) \n\
+			ELSE 0 \n\
+			END max_mci\n\
+			from operations_history) AND aa_address=?", [conf.aa_address], function(rows){
+				async.eachOf(rows, function(row, index, cb) {
+					console.log("eachOf");
+
+				const objResponse = JSON.parse(row.response).responseVars;
+				if(!objResponse)
+					return cb();
+				if (objResponse.expected_reward)
+					var operation_type = "initial_stake";
+				else if (objResponse.outcome)
+					var operation_type = "stake";
+				else if (objResponse.committed_outcome)
+					var operation_type = "commit";
+				else if (objResponse.paid_out_amount)
+					var operation_type = "withdraw";
+
+				if (operation_type){
+
+					var operation_id = objResponse.operation_id;
+					if (!operation_id)
+						throw Error("No operation id " + row.response);
+					var pair = objResponse.pair;
+					if (!pair)
+						throw Error("No pair " + row.response);
+					db.query("INSERT "+db.getIgnore()+" INTO operations_history (operation_id, pair, operation_type, mci, aa_address, response, trigger_unit,timestamp) VALUES \n\
+					(?,?,?,?,?,?,?,?)",[operation_id,pair,operation_type,row.mci,row.aa_address,JSON.stringify(objResponse), row.trigger_unit, row.timestamp], cb);
+				} else
+					cb();
+			}, unlock);
+		});
+	});
 }
 
 function indexRewardPools(objStateVars){
@@ -252,7 +295,7 @@ function getBestPoolForExchange(exchange){
 
 function getLastTransactionsToAA(handle){
 
-	db.query("SELECT is_stable,payload,units.unit,timestamp FROM units INNER JOIN outputs USING(unit) INNER JOIN messages USING(unit) WHERE outputs.address=? ORDER BY main_chain_index ASC",[conf.aa_address],
+	db.query("SELECT is_stable,payload,units.unit,timestamp FROM units INNER JOIN outputs USING(unit) INNER JOIN messages USING(unit) WHERE outputs.address=? ORDER BY main_chain_index DESC",[conf.aa_address],
 	function(rows){
 		var results = [];
 		rows.forEach(function(row){
@@ -274,7 +317,15 @@ function getLastTransactionsToAA(handle){
 	});
 }
 
- 
+function getOperationHistory(id, handle){
+	db.query("SELECT operation_type,timestamp,response FROM operations_history WHERE operation_id=? ORDER BY mci DESC",[id], function(rows){
+		return handle(
+			rows.map(function(row){
+				return {operation_type: row.operation_type, response: JSON.parse(row.response), timestamp: row.timestamp};
+			})
+		)
+	});
+}
 
  exports.getCurrentPools = getCurrentPools;
  exports.getCurrentOperations = getCurrentOperations;
@@ -282,3 +333,4 @@ function getLastTransactionsToAA(handle){
  exports.getBestPoolForExchange = getBestPoolForExchange;
  exports.getCurrentExchangeByWalletId = getCurrentExchangeByWalletId;
  exports.getLastTransactionsToAA = getLastTransactionsToAA;
+ exports.getOperationHistory = getOperationHistory;

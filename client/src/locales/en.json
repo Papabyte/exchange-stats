@@ -61,7 +61,7 @@
 	"crowdSourcingOperationsTableColStatus" : "status",
 	"crowdSourcingOperationsTableColOperation" : "Operation",
 	"crowdSourcingOperationsTableColOutcome" : "Outcome",
-	"crowdSourcingOperationsTableColStakedOnOutcome" : "Staked on noutcome",
+	"crowdSourcingOperationsTableColStakedOnOutcome" : "Staked on outcome",
 	"crowdSourcingOperationsTableColTotalStaked" : "Total staked",
 	"crowdSourcingOperationsTableColAction" : "action",
 	"crowdSourcingOperationsYes" : "yes",

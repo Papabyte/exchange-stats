@@ -5,7 +5,7 @@
 	<span v-else>
 		<span v-if="label"> {{label}} </span>
 		<span class="wallet-link"><b-link :target="target" :to="'/explorer/'+id">
-			<v-icon name='folder' class="folder-icon"/>
+			<v-icon v-if="showIcon" name='folder' class="folder-icon"/>
 			{{id}}
 	</b-link></span>
 	</span>
@@ -33,6 +33,11 @@ export default {
 			type: Boolean,
 			required: false,
 			default: false
+		},
+		showIcon: {
+			type: Boolean,
+			required: false,
+			default: true
 		}
 	},
 	computed:{

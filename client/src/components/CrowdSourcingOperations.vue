@@ -5,6 +5,7 @@
 		<claim-gain-modal  :operationItem="clicked_item"/>
 		<view-url-proofs-modal :operationItem="clicked_item"/>
 		<commit-operation-modal :operationItem="clicked_item"/>
+		<operation-history-modal :operationItem="clicked_item"/>
 		<b-pagination
 			v-model="currentPage"
 			:total-rows="totalRows"
@@ -73,7 +74,12 @@
 					v-if="data.item.status == 'committed' && data.item.claimAddresses.length>0" 
 					v-on:click="clicked_item=data.item;$bvModal.show('claimGain');"  
 					class="mr-2" size="s" >{{$t("crowdSourcingOperationsButtonClaim")}}</b-button>
+													<b-button 
+					variant="primary" 
+					v-on:click="clicked_item=data.item;$bvModal.show('operationHistory');"  
+					class="mr-2" size="s" >{{$t("crowdSourcingOperationsButtonHistory")}}</b-button>
 				</template>
+
 			</b-table>
 		</b-row>
 </template>
@@ -85,6 +91,8 @@ import ContestOperationModal from './commons/ContestOperationModal.vue';
 import ClaimGainModal from './commons/ClaimGainModal.vue';
 import CommitOperationModal from './commons/CommitModal.vue';
 import ViewUrlProofsModal from './commons/ViewUrlProofsModal.vue';
+import OperationHistoryModal from './commons/OperationHistoryModal.vue';
+
 import Exchange from './commons/Exchange.vue';
 import WalletId from './commons/WalletId.vue';
 import moment from 'moment/src/moment'
@@ -97,7 +105,8 @@ import moment from 'moment/src/moment'
 			ViewUrlProofsModal,
 			Exchange,
 			WalletId,
-			CommitOperationModal
+			CommitOperationModal,
+			OperationHistoryModal
 		},
 		data() {
 			return {
@@ -154,6 +163,7 @@ import moment from 'moment/src/moment'
 								item.key = row.key;
 								item.url_proofs_by_outcome = row.url_proofs_by_outcome;
 								item.countdown_start = row.countdown_start;
+								item.staked_on_opposite = Number(row.staked_on_opposite);
 								if ((new Date().getTime() / 1000 - row.countdown_start) > conf.challenge_period_length){
 									item.is_commitable = true;
 									item.end = 'ended';

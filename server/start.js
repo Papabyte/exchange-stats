@@ -135,6 +135,16 @@ require('./modules/sqlite_tables.js').create().then(function(){
 				return response.status(400).send('Not wallet id nor BTC address');
 	});
 
+	app.get('/api/operation-history/:id', function(request, response){
+		const id = request.params.id;
+		if (!validationUtils.isNonemptyString(id))
+			return response.status(400).send('Invalid operation id');
+			aa_handler.getOperationHistory(id, function(objHistory){
+				return response.send(objHistory);
+			});
+	});
+
+
 	app.listen(conf.api_port);
 
 });

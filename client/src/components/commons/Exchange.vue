@@ -3,11 +3,15 @@
 		{{exchangeName}}
 	</span>
 	<span v-else>
-		<span v-if="label"> {{label}} </span>
-		<span class="exchange-link"><b-link :to="'/explorer/'+id" >
-					<v-icon v-if="showIcon" name='trending-up' class="exchange-icon"/>
-	{{exchangeName}}
-	</b-link></span>
+		<span v-if="label"> 
+			{{label}}
+		</span>
+		<span class="exchange-link">
+			<b-link :to="'/explorer/'+id" >
+			<v-icon v-if="showIcon" name='trending-up' class="exchange-icon"/>
+			{{exchangeName}}
+			</b-link>
+		</span>
 	</span>
 </template>
 
