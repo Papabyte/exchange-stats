@@ -31,11 +31,11 @@
 						</template>
 
 						<template v-slot:head(nb_withdrawal_addresses)="data">
-								<span v-b-tooltip.hover :title="$t('rankingTableColNbWithdrawalAddressesTip')">{{data.label}}</span>
+							<span v-b-tooltip.hover :title="$t('rankingTableColNbWithdrawalAddressesTip')">{{data.label}}</span>
 						</template>
 
 						<template v-slot:head(nb_deposit_addresses)="data">
-								<span v-b-tooltip.hover :title="$t('rankingTableColNbDepositAddressesTip')">{{data.label}}</span>
+							<span v-b-tooltip.hover :title="$t('rankingTableColNbDepositAddressesTip')">{{data.label}}</span>
 						</template>
 
 						<template v-slot:head(last_day_deposits)="data">
@@ -66,15 +66,14 @@
 						</template>
 						<template v-slot:cell(action)="data">
 							<b-button-group class="mr-2">
-									<b-link v-if="data.item.total_btc_wallet"  :to="'/explorer/'+ data.item.exchange_id">
+									<b-link v-if="data.item.total_btc_wallet || data.item.nb_withdrawal_addresses"  :to="'/explorer/'+ data.item.exchange_id">
 									<b-button  variant="primary" size="m" >
 										Explore wallets
 									</b-button>
 								</b-link>
-									<b-dropdown right text="edit" variant="primary" size="m" >
-				
-										<b-dropdown-item  v-on:click="isRemoving=false;clicked_exchange=data.item.exchange_id;$bvModal.show('editWallet');">Add wallet</b-dropdown-item>
-										<b-dropdown-item v-if="data.item.total_btc_wallet" v-on:click="isRemoving=true;clicked_exchange=data.item.exchange_id;$bvModal.show('editWallet');">Remove wallet</b-dropdown-item>
+									<b-dropdown right :text="$t('rankingTableButtonEdit')" variant="primary" size="m" >
+										<b-dropdown-item  v-on:click="isRemoving=false;clicked_exchange=data.item.exchange_id;$bvModal.show('editWallet');">{{$t('rankingTableButtonAddWallet')}}</b-dropdown-item>
+										<b-dropdown-item v-if="data.item.total_btc_wallet || data.item.nb_withdrawal_addresses" v-on:click="isRemoving=true;clicked_exchange=data.item.exchange_id;$bvModal.show('editWallet');">{{$t('rankingTableButtonRemoveWallet')}}</b-dropdown-item>
 									</b-dropdown>
 								</b-button-group>
 						</template>

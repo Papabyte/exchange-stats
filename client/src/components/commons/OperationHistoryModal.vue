@@ -1,5 +1,5 @@
 <template>
-	<b-modal id="operationHistory" hide-footer>
+	<b-modal id="operationHistory" hide-footer scrollable>
  		 <template v-slot:modal-title>	
 					<i18n v-if="operationItem.initial_outcome=='in'" tag="span" path="crowdSourcingOperationsAddXToX" id="action">
 						<template #wallet>
@@ -19,22 +19,43 @@
 					</i18n>
 		</template>
 		<b-container>
-			<b-row v-for="item in historyItems" class="my-4" :key="item.operation_id">
+			<b-row v-for="item in historyItems" class="pb-3 my-4 border" :key="item.operation_id">
 				<b-col cols="12">
-					<b-row v-if="item.operation_type =='stake' || item.operation_type=='initial_stake'" class="m-y-3">
+					<b-row v-if="item.operation_type =='stake' || item.operation_type=='initial_stake'" >
 						<b-col cols="12">
-							<b-progress  :max="item.staked_on_yes + item.staked_on_no" show-value height="1.5rem">
-								<b-progress-bar :value="item.staked_on_yes" variant="success"><b><byte-amount :amount="item.staked_on_yes"/></b> </b-progress-bar>
-								<b-progress-bar :value="item.staked_on_no" variant="danger"><b><byte-amount :amount="item.staked_on_no"/></b> </b-progress-bar>
-							</b-progress>
-							<div class="event-block pt-2">
-							{{item.time}}
-							<b>{{item.author}}</b> staked <b><byte-amount :amount="item.stake_amount"/></b> on <b>{{item.stake_on}}</b>
+							<span class="d-block event-block"><b>{{item.operation_type =='stake' ? 'Counter stake' : 'Initial stake'}} </b> - {{item.time}} </span>
+	
+							<div class="pt-2">
+								<span class="d-block text-break"><b>{{item.author}}</b> staked <b><byte-amount :amount="item.accepted_amount"/></b> on <b>{{item.stake_on}}</b></span>
+								<span class="d-block">Resulting outcome: <b>{{item.resulting_outcome}}</b></span>
+								<span v-if="item.expected_reward" class="d-block">Expected reward: <b><byte-amount :amount="item.expected_reward"/></b></span>
+								<b-progress :max="item.staked_on_yes + item.staked_on_no" show-value height="1.5rem" class="mt-1">
+									<b-progress-bar :value="item.staked_on_yes" variant="success"><b><byte-amount :amount="item.staked_on_yes"/></b> </b-progress-bar>
+									<b-progress-bar :value="item.staked_on_no" variant="danger"><b><byte-amount :amount="item.staked_on_no"/></b> </b-progress-bar>
+								</b-progress>
+							</div>
+						</b-col>
+					</b-row>
+					<b-row v-if="item.operation_type =='commit'">
+						<b-col cols="12">
+							<span class="d-block event-block"><b>Committed</b> - {{item.time}} </span>
+							<div class="pt-2">
+							<span v-if="item.paid_out_amount" class="d-block"><b><byte-amount :amount="item.paid_out_amount"/></b> paid to <b>{{item.paid_out_address}}</b></span>
+							</div>
+						</b-col>
+					</b-row>
+					<b-row v-if="item.operation_type =='withdraw'" >
+						<b-col cols="12">
+							<span class="d-block event-block"><b>Withdraw</b> - {{item.time}} </span>
+							<div class="pt-2">
+							<span v-if="item.paid_out_amount" class="d-block"><b><byte-amount :amount="item.paid_out_amount"/></b> paid to <b>{{item.paid_out_address}}</b></span>
 							</div>
 						</b-col>
 					</b-row>
 				</b-col>
 			</b-row>
+
+			
 		</b-container>
 	</b-modal>
 </template>
@@ -84,7 +105,13 @@ export default {
 						item.staked_on_no = Number(row.response['staked_on_' + (this.operationItem.initial_outcome == 'in' ? 'out' : 'in')]);
 						item.time = moment.unix(row.timestamp).format('LLLL');
 						item.stake_on = row.response.proposed_outcome == this.operationItem.initial_outcome ? 'yes' : 'no';
-						item.stake_amount = Number(row.response.your_stake);
+						item.accepted_amount = Number(row.response.accepted_amount);
+						item.resulting_outcome = row.response.outcome == this.operationItem.initial_outcome ? 'yes' : 'no';
+						item.paid_out_amount = Number(row.response.paid_out_amount);
+						item.paid_out_address = row.response.paid_out_address;
+						item.expected_reward = Number(row.response.expected_reward);
+
+
 						this.historyItems.push(item);
 						
 					});
@@ -98,6 +125,6 @@ export default {
 
 <style lang='scss' scoped>
 .event-block{
-	background-color: gainsboro
+	background-color: gainsboro;
 }
 </style>

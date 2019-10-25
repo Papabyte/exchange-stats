@@ -150,7 +150,7 @@ export default {
 			isOkDisabled: true,
 			rewardAmount: false,
 			isCheckButtonActive: false,
-			stakeAmount: conf.challenge_min_stake,
+			stakeAmount: conf.challenge_min_stake*1000000000,
 			link: false,
 			url_1: null,
 			url_2: null

@@ -51,35 +51,47 @@
 					<byte-amount :amount="data.item.total_staked" />
 				</template>
 				<template v-slot:cell(action)="data">
-				<b-button 
-					variant="primary" 
-					v-if="data.item.status == 'onreview' && !data.item.is_commitable " 
-					v-on:click="clicked_item=data.item;$bvModal.show('contestOperation');" 
-					class="mr-2" 
-					size="s">{{$t("crowdSourcingOperationsButtonContest")}}</b-button>
-				<b-button 
-					variant="primary" 
-					v-if="data.item.status == 'onreview' && data.item.is_commitable"
-					v-on:click="clicked_item=data.item;$bvModal.show('commitOperation');"
-					class="mr-2" 
-					size="s">{{$t("crowdSourcingOperationsButtonCommit")}}</b-button>
-				<b-button 
-					variant="primary"
-					v-if="data.item.status == 'onreview'"
-					v-on:click="clicked_item=data.item;$bvModal.show('viewUrlProofs');"
-					class="mr-2" 
-					size="s">{{$t("crowdSourcingOperationsButtonViewProofs")}}</b-button>
-				<b-button 
-					variant="primary" 
-					v-if="data.item.status == 'committed' && data.item.claimAddresses.length>0" 
-					v-on:click="clicked_item=data.item;$bvModal.show('claimGain');"  
-					class="mr-2" size="s" >{{$t("crowdSourcingOperationsButtonClaim")}}</b-button>
-													<b-button 
-					variant="primary" 
-					v-on:click="clicked_item=data.item;$bvModal.show('operationHistory');"  
-					class="mr-2" size="s" >{{$t("crowdSourcingOperationsButtonHistory")}}</b-button>
+					<b-button-group class="mr-2">
+						<b-button 
+							variant="primary" 
+							v-if="data.item.status == 'onreview' && !data.item.is_commitable " 
+							v-on:click="clicked_item=data.item;$bvModal.show('contestOperation');" 
+							class="mr-2" 
+							size="s">
+							{{$t("crowdSourcingOperationsButtonContest")}}
+						</b-button>
+						<b-button 
+							variant="primary" 
+							v-if="data.item.status == 'onreview' && data.item.is_commitable"
+							v-on:click="clicked_item=data.item;$bvModal.show('commitOperation');"
+							class="mr-2" 
+							size="s">
+							{{$t("crowdSourcingOperationsButtonCommit")}}
+						</b-button>
+						<b-button 
+							variant="primary" 
+							v-if="data.item.status == 'committed' && data.item.claimAddresses.length>0" 
+							v-on:click="clicked_item=data.item;$bvModal.show('claimGain');"  
+							class="mr-2" size="s" >
+							{{$t("crowdSourcingOperationsButtonClaim")}}
+						</b-button>
+						<b-dropdown right text="view" variant="primary" size="m" >
+							<b-dropdown-item 
+								variant="primary"
+								v-on:click="clicked_item=data.item;$bvModal.show('viewUrlProofs');"
+								class="mr-2" 
+								size="s">
+								{{$t("crowdSourcingOperationsButtonViewProofs")}}
+							</b-dropdown-item>
+							<b-dropdown-item
+								variant="primary" 
+								v-on:click="clicked_item=data.item;$bvModal.show('operationHistory');"  
+								class="mr-2" size="s" >
+								{{$t("crowdSourcingOperationsButtonHistory")}}
+							</b-dropdown-item>
+						</b-dropdown>
+					</b-button-group>
 				</template>
-
 			</b-table>
 		</b-row>
 </template>
