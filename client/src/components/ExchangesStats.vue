@@ -32,10 +32,9 @@ export default {
 	},
 	created(){
 		document.title = this.$t('rankingPageTitle');
-				document
-			.getElementsByTagName('meta')
-			.namedItem('description')
-			.setAttribute('content', this.$t("rankingMetaDescription"))
+		var meta = document.createElement('meta');
+		meta.name = "description";
+		meta.content = this.$t("rankingMetaDescription");
 	}
 }
 </script>

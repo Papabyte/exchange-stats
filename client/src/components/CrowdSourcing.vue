@@ -1,6 +1,6 @@
 <template>
 	<div>
-	<nav-bar selected_item='2'/>
+		<nav-bar selected_item='2'/>
 		<b-container fluid >
 				<b-row>
 					<b-col offset-lg="2" lg="8" cols="12" class="py-3">
@@ -61,10 +61,10 @@ export default {
 	},
 	created(){
 		document.title = this.$t("crowdSourcingPageTitle");
-		document
-			.getElementsByTagName('meta')
-			.namedItem('description')
-			.setAttribute('content', this.$t("crowdSourcingMetaDescription"))
+		var meta = document.createElement('meta');
+		meta.name = "description";
+		meta.content = this.$t("crowdSourcingMetaDescription");
+		document.getElementsByTagName('head')[0].appendChild(meta);
 	}
 }
 </script>

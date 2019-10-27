@@ -85,10 +85,9 @@ export default {
 	},
 	created(){
 		document.title = this.$t("explorerPageTitle");
-				document
-			.getElementsByTagName('meta')
-			.namedItem('description')
-			.setAttribute('content', this.$t("explorerMetaDescription"));
+		var meta = document.createElement('meta');
+		meta.name = "description";
+		meta.content = this.$t("explorerMetaDescription");
 	},
 	methods:{ 
 		onSubmit(){

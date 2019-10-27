@@ -21,8 +21,6 @@
 					per-page="10"
 					:items="items"
 					:fields="fields"
-					:sort-by.sync="sortBy"
-					:sort-desc.sync="sortDesc"
 					responsive
 					sort-icon-left>	
 						<template v-slot:cell(reward_amount)="data">
