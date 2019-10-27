@@ -25,11 +25,9 @@
 							responsive
 								sort-icon-left
 						>	
-							<template v-slot:cell(unit)="data">
-									<b-link class="text-break" target="_blank" :href="(isTestnet ? 'https://testnetexplorer.obyte.org/#' : 'https://explorer.obyte.org/#')+data.item.unit">
-									{{data.item.unit}}
-									</b-link>
-							</template>
+						<template v-slot:cell(income)="data">
+							<byte-amount :isNegative="data.item.income<0" :isPositive="data.item.income>0" :amount="data.item.income"/>
+						</template>
 						</b-table>
 					</b-col>
 				</b-row>
@@ -40,10 +38,11 @@
 <script>
 
 	const conf = require("../conf.js");
+	import ByteAmount from './commons/ByteAmount.vue';
 
 	export default {
 		components: {
-			
+			ByteAmount
 		},
 		data() {
 			return {
@@ -51,10 +50,13 @@
 				isSpinnerActive: true,
 				currentPage:1,
 				totalRows:0,
+				sortBy: 'initiatives',
+				sortDesc: true,
 				fields: [
-					{ key: 'type', sortable: true ,},
-					{ key: 'unit', sortable: true },
-					{ key: 'is_stable', sortable: true }
+					{ key: 'address', sortable: true},
+					{ key: 'initiatives', sortable: true },
+					{ key: 'successes', sortable: true },
+					{ key: 'income', label:"Profit/Loss", sortable: true }
 				],
 				items: [
 				]
@@ -69,7 +71,7 @@
 		},
 		methods:{
 			getData(){
-				this.axios.get('/api/aa_transactions').then((response) => {
+				this.axios.get('/api/contributors-ranking/').then((response) => {
 					this.items = response.data;
 					this.totalRows = this.items.length;
 					this.isSpinnerActive= false

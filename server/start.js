@@ -144,7 +144,17 @@ require('./modules/sqlite_tables.js').create().then(function(){
 			});
 	});
 
+	app.get('/api/contributors-ranking/', function(request, response){
+			aa_handler.getContributorsRanking(function(rankingRows){
+				return response.send(rankingRows);
+			});
+	});
 
+	app.get('/api/donators-ranking/', function(request, response){
+		aa_handler.getDonatorsRanking(function(rankingRows){
+			return response.send(rankingRows);
+		});
+});
 	app.listen(conf.api_port);
 
 });

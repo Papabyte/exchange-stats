@@ -5,6 +5,7 @@ const request = require('request');
 const async = require('async');
 const mutex = require('ocore/mutex.js');
 const zlib = require('zlib');
+const stats = require("./stats.js");
 
 const confirmationsBeforeIndexing = 3;
 const activeRedirectionFromHeight = 	process.env.testnet ? 9000 : 598000;
@@ -269,7 +270,10 @@ function downloadNextWhileProcessing(blockheight, start_tx_index,  objBlock){
 					downloadBlockAndParse(blockheight + 1, callback);
 				},
 				function(callback) {
-					processBlock(objBlock, start_tx_index, callback);
+					processBlock(objBlock, start_tx_index, function(){
+						stats.clearCaches();
+						callback();
+					});
 				}
 			],
 			function(error, arrResults) {

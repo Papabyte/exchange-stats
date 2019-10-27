@@ -17,7 +17,6 @@ var currentOperations = [];
 var assocCurrentOperationsByExchange = {};
 var assocStakedByKeyAndAddress = {};
 var assocProofsByKeyAndOutcome = {}
-const assocWalletIdsByExchange = {};
 
 myWitnesses.readMyWitnesses(function (arrWitnesses) {
 	if (arrWitnesses.length > 0)
@@ -47,6 +46,7 @@ function refresh(){
 
 }
 
+//we push in an indexed table all information coming from aa responses
 function catchUpOperationsHistory(){
 	mutex.lock(["catchUpOperationsHistory"], function(unlock){
 		//units table is joined to get trigger unit timestamp
@@ -56,19 +56,39 @@ function catchUpOperationsHistory(){
 			END max_mci\n\
 			from operations_history) AND aa_address=?", [conf.aa_address], function(rows){
 				async.eachOf(rows, function(row, index, cb) {
-					console.log("eachOf");
 
 				const objResponse = JSON.parse(row.response).responseVars;
 				if(!objResponse)
 					return cb();
-				if (objResponse.expected_reward)
+
+				var paid_in = 0;
+				var paid_out = 0;
+
+				if (objResponse.expected_reward){
 					var operation_type = "initial_stake";
-				else if (objResponse.outcome)
+					paid_in = objResponse.your_stake;
+					concerned_address = objResponse.your_address;
+				} else if (objResponse.your_stake){
 					var operation_type = "stake";
-				else if (objResponse.committed_outcome)
+					paid_in = objResponse.your_stake;
+					concerned_address = objResponse.your_address;
+				} else if (objResponse.committed_outcome){
 					var operation_type = "commit";
-				else if (objResponse.paid_out_amount)
+					paid_out = objResponse.paid_out_amount;
+					concerned_address = objResponse.paid_out_address;
+				} else if (objResponse.paid_out_amount){
 					var operation_type = "withdraw";
+					paid_out = objResponse.paid_out_amount;
+					concerned_address = objResponse.paid_out_address;
+				} else if (objResponse.created_pool){
+					var operation_type = "create_pool";
+					paid_in = objResponse.amount;
+					concerned_address = objResponse.your_address;
+				} else if (objResponse.destroyed_pool){
+					var operation_type = "destroy_pool";
+					paid_out = objResponse.amount;
+					concerned_address = objResponse.your_address;
+				}
 
 				if (operation_type){
 
@@ -78,8 +98,8 @@ function catchUpOperationsHistory(){
 					var pair = objResponse.pair;
 					if (!pair)
 						throw Error("No pair " + row.response);
-					db.query("INSERT "+db.getIgnore()+" INTO operations_history (operation_id, pair, operation_type, mci, aa_address, response, trigger_unit,timestamp) VALUES \n\
-					(?,?,?,?,?,?,?,?)",[operation_id,pair,operation_type,row.mci,row.aa_address,JSON.stringify(objResponse), row.trigger_unit, row.timestamp], cb);
+					db.query("INSERT "+db.getIgnore()+" INTO operations_history (operation_id, paid_in, paid_out, concerned_address, pair, operation_type, mci, aa_address, response, trigger_unit,timestamp) VALUES \n\
+					(?,?,?,?,?,?,?,?,?,?,?)",[operation_id, paid_in, paid_out, concerned_address, pair, operation_type, row.mci, row.aa_address, JSON.stringify(objResponse), row.trigger_unit, row.timestamp], cb);
 				} else
 					cb();
 			}, unlock);
@@ -87,12 +107,12 @@ function catchUpOperationsHistory(){
 	});
 }
 
+//we read state vars to index pool rewards in assocCurrentPoolsByExchange
 function indexRewardPools(objStateVars){
 
 	const poolKeys = extractPoolKeys(objStateVars);
 	const pools = [];
-	assocPoolsByExchange
-	//var currentPools = [];
+
 	var assocPoolsByExchange = {};
 	poolKeys.forEach(function(poolKey){
 		if(objStateVars[poolKey+'_number_of_rewards'] > 0){
@@ -117,8 +137,10 @@ function indexRewardPools(objStateVars){
 }
 
 function indexOperations(objStateVars){
+
 	extractStakedByKeyAndAddress(objStateVars);
 	extractProofUrls(objStateVars);
+
 	const operationKeys = extractOperationKeys(objStateVars);
 	const operations = [];
 	const assocOperationsByExchange = {};
@@ -327,10 +349,41 @@ function getOperationHistory(id, handle){
 	});
 }
 
- exports.getCurrentPools = getCurrentPools;
- exports.getCurrentOperations = getCurrentOperations;
- exports.getCurrentOperationsForExchange = getCurrentOperationsForExchange;
- exports.getBestPoolForExchange = getBestPoolForExchange;
- exports.getCurrentExchangeByWalletId = getCurrentExchangeByWalletId;
- exports.getLastTransactionsToAA = getLastTransactionsToAA;
- exports.getOperationHistory = getOperationHistory;
+function getContributorsRanking(handle){
+	db.query("SELECT CASE WHEN initiatives IS NOT NULL THEN initiatives \n\
+	ELSE 0 \n\
+	END initiatives,\n\
+	CASE WHEN successes IS NOT NULL THEN successes \n\
+	ELSE 0 \n\
+	END successes,\n\
+	income,s1.address FROM\n\
+	(SELECT concerned_address AS address FROM operations_history GROUP BY address)s1 \n\
+	LEFT JOIN\n\
+	(SELECT COUNT(*) AS successes, concerned_address AS address FROM operations_history WHERE operation_type='commit' GROUP BY address)s2 USING (address) \n\
+	LEFT JOIN\n\
+	(SELECT COUNT(*) AS initiatives, concerned_address AS address FROM operations_history WHERE operation_type='initial_stake' GROUP BY address)s3 USING (address) \n\
+	LEFT JOIN\n\
+	(SELECT (SUM(paid_out) - SUM(paid_in)) as income, concerned_address AS address FROM operations_history \n\
+	WHERE (operation_type='initial_stake' OR operation_type='stake' OR operation_type='withdraw' OR operation_type='commit') GROUP BY address)s4 USING (address)",
+	function(rows){
+		handle(rows);
+	});
+}
+
+function getDonatorsRanking(handle){
+	db.query("SELECT (SUM(paid_in) - SUM(paid_out)) as income, concerned_address AS address FROM operations_history \n\
+	WHERE (operation_type='create_pool' OR operation_type='destroyed_pool') \n\
+	GROUP BY concerned_address",function(rows){
+		handle(rows);
+	});
+}
+
+exports.getCurrentPools = getCurrentPools;
+exports.getCurrentOperations = getCurrentOperations;
+exports.getCurrentOperationsForExchange = getCurrentOperationsForExchange;
+exports.getBestPoolForExchange = getBestPoolForExchange;
+exports.getCurrentExchangeByWalletId = getCurrentExchangeByWalletId;
+exports.getLastTransactionsToAA = getLastTransactionsToAA;
+exports.getOperationHistory = getOperationHistory;
+exports.getContributorsRanking = getContributorsRanking;
+exports.getDonatorsRanking = getDonatorsRanking;

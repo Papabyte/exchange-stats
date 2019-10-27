@@ -15,6 +15,12 @@
 						<current-operations />
 				</b-col>
 			</b-row >
+						<b-row >
+				<b-col offset-lg="2" lg="8"  cols="12" class="py-3">
+					<h3 class="text-center">{{$t("crowdSourcingRanking")}}</h3>
+						<rankings />
+				</b-col>
+			</b-row >
 			<b-row >
 				<b-col offset-lg="2" lg="8"  cols="12" class="py-3">
 					<b-row >
@@ -38,13 +44,15 @@ import NavBar from './commons/NavBar.vue'
 import CurrentPools from './CrowdSourcingPools.vue'
 import CurrentOperations from './CrowdSourcingOperations.vue'
 import LastTransactions from './CrowdSourcingTransactions.vue'
+import Rankings from './CrowdSourcingRankings.vue'
 
 export default {
 	components: {
 		NavBar,
 		CurrentPools,
 		CurrentOperations,
-		LastTransactions
+		LastTransactions,
+		Rankings
 	},
 	computed:{
 		welcomeMessageShow(){

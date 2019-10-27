@@ -49,6 +49,7 @@
 	"urlProofModalTitle" : "View proofs",
 	"crowdSourcingCurrentOperations" : "Current operations",
 	"crowdSourcingCurrentRewards": "Current rewards",
+	"crowdSourcingRanking": "Contributors ranking",
 	"crowdSourcingLastTransactions": "Last transactions to AA",
 	"crowdSourcingPageTitle" : "Crowdsourcing",
 	"crowdSourcingMetaDescription" : "Tracking of exchanges wallet with counterstake protocole.",
@@ -70,7 +71,7 @@
 	"crowdSourcingPoolsButtonDonate" : "Donate a reward",
 	"crowdSourcingPoolsNbOfRewards" : "Number of rewards",
 	"crowdSourcingPoolsRewardAmount" : "Reward amount",
-	"crowdSourcingPoolsExchange" : "exchange",
+	"crowdSourcingPoolsExchange" : "For exchange",
 	"rankingTitle" : "On-chain activity ranking",
 	"rankingPageTitle" : "Exchange onchain statistics",
 	"rankingWelcomeMessage": "These statistics are made from activity happening on-chain concerning exchanges. The exchange's wallets identification is crowdsourced by users, they interact with an Obyte autonomous agent and earn rewards for their contributions.",
@@ -117,6 +118,6 @@
 	"explorerTransactionsNoWalletKnown" : "No wallet known for exchange {exchange}.",
 	"explorerTransactionsNoTransactionFound" : "No transaction found for exchange {exchange}.",
 	"explorerWelcomeMessage" : "Here you can explore BTC blockchain with transactions sorted by wallets or exchanges.",
-	"crowdSourcingWelcomeMessage" : "Help us to identify wallets used by exchanges and earn gain through counterstake protocol."
+	"crowdSourcingWelcomeMessage" : "Help us to identify wallets used by exchanges and earn rewards."
 }
 

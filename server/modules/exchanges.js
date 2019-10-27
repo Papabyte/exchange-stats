@@ -72,8 +72,10 @@ function getLastRanking(handle){
 }
 
 function getExchangeWalletIds(exchange){
-	console.log(assocWalletIdsByExchange);
-	return assocWalletIdsByExchange[exchange] || [];
+	if(assocWalletIdsByExchange) // check for initialization
+		return assocWalletIdsByExchange[exchange] || [];
+	else
+		return [];
 }
 
 function getExchangeName(exchange){

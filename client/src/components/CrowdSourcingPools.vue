@@ -57,8 +57,6 @@ import DonateRewardModal from './commons/DonateRewardModal.vue';
 				currentPage:1,
 				totalRows:0,
 				timerId: null,
-				sortBy: 'age',
-				sortDesc: false,
 				fields: [
 					{ key: 'number_rewards', sortable: true, label: this.$t("crowdSourcingPoolsNbOfRewards")},
 					{ key: 'reward_amount', sortable: true, label: this.$t("crowdSourcingPoolsRewardAmount")},

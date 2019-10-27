@@ -67,6 +67,9 @@ exports.create = function(){
 			operation_id VARCHAR(60) NOT NULL, \n\
 			pair VARCHAR(46) NOT NULL, \n\
 			operation_type VARCHAR(30) NOT NULL, \n\
+			concerned_address CHAR(32) NOT NULL, \n\
+			paid_in INTEGER DEFAULT 0,\n\
+			paid_out INTEGER DEFAULT 0,\n\
 			mci INT NOT NULL, \n\
 			aa_address CHAR(32) NOT NULL, \n\
 			response TEXT NULL, \n\
@@ -78,6 +81,7 @@ exports.create = function(){
 		await db.query("CREATE INDEX IF NOT EXISTS operationsHistoryByMci ON operations_history(mci)");
 		await db.query("CREATE INDEX IF NOT EXISTS operationsHistoryByPair ON operations_history(pair)");
 		await db.query("CREATE INDEX IF NOT EXISTS operationsHistoryByOperationId ON operations_history(operation_id)");
+		await db.query("CREATE INDEX IF NOT EXISTS operationsHistoryByConcernedAddress ON operations_history(concerned_address)");
 
 	console.error("all tables created");
 	resolve();
