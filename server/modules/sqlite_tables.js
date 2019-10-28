@@ -64,8 +64,8 @@ exports.create = function(){
 			)");
 
 		await db.query("CREATE TABLE IF NOT EXISTS operations_history (\n\
-			operation_id VARCHAR(60) NOT NULL, \n\
-			pair VARCHAR(46) NOT NULL, \n\
+			operation_id VARCHAR(60), \n\
+			pair VARCHAR(46), \n\
 			operation_type VARCHAR(30) NOT NULL, \n\
 			concerned_address CHAR(32) NOT NULL, \n\
 			paid_in INTEGER DEFAULT 0,\n\

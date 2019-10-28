@@ -62,6 +62,7 @@
 
 <script>
 import ByteAmount from './ByteAmount.vue';
+
 const conf = require("../../conf.js");
 export default {	
 	components: {

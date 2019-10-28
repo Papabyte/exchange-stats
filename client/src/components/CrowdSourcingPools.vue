@@ -1,8 +1,8 @@
 <template>
 		<b-row class="main-col">
 			<DonateRewardModal />
-			<b-col  cols="12">
-				<b-row>
+			<b-col  cols="12"  >
+				<b-row >
 					<b-col  cols="3">
 						<b-pagination
 							v-model="currentPage"
@@ -13,9 +13,12 @@
 							class="p-4 my-0"
 							></b-pagination> 
 					</b-col>
+					<b-col  offset="5" cols="3" class="align-bottom">
+						<b-button variant="primary" class="text-nowrap mt-3" size="m"  v-b-modal.donateReward>{{$t("crowdSourcingPoolsButtonDonate")}}</b-button>
+					</b-col>
 				</b-row>	
 			<b-row>
-				<b-col  cols="12">
+				<b-col  cols="12" class="text-left">
 					<b-table 
 					:current-page="currentPage"
 					per-page="10"
@@ -29,11 +32,6 @@
 					</b-table>
 				</b-col>
 			</b-row>	
-			<b-row>
-				<b-col  offset="4" cols="4">
-					<b-button variant="primary"  class="mb-2" size="m"  v-b-modal.donateReward>{{$t("crowdSourcingPoolsButtonDonate")}}</b-button>
-				</b-col>
-			</b-row>
 		</b-col>
 	</b-row>	
 </template>

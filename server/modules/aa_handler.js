@@ -17,6 +17,7 @@ var currentOperations = [];
 var assocCurrentOperationsByExchange = {};
 var assocStakedByKeyAndAddress = {};
 var assocProofsByKeyAndOutcome = {}
+var assocNicknamesByAddress = {};
 
 myWitnesses.readMyWitnesses(function (arrWitnesses) {
 	if (arrWitnesses.length > 0)
@@ -30,7 +31,7 @@ function start(){
 	db.query("INSERT "+db.getIgnore()+" INTO my_watched_addresses (address) VALUES (?)", [conf.aa_address], function(){
 		network.addLightWatchedAddress(conf.address);
 		refresh(),
-		setInterval(refresh, 60 *1000);
+		setInterval(refresh, 60 * 1000);
 	});
 }
 
@@ -38,12 +39,10 @@ function refresh(){
 	lightWallet.refreshLightClientHistory();
 	catchUpOperationsHistory();
 	network.requestFromLightVendor('light/get_aa_state_vars', {address: conf.aa_address},function(error, request, objStateVars){
-
 		indexOperations(objStateVars);
 		indexRewardPools(objStateVars);
-
+		indexNicknames(objStateVars);
 	});
-
 }
 
 //we push in an indexed table all information coming from aa responses
@@ -91,13 +90,8 @@ function catchUpOperationsHistory(){
 				}
 
 				if (operation_type){
-
 					var operation_id = objResponse.operation_id;
-					if (!operation_id)
-						throw Error("No operation id " + row.response);
 					var pair = objResponse.pair;
-					if (!pair)
-						throw Error("No pair " + row.response);
 					db.query("INSERT "+db.getIgnore()+" INTO operations_history (operation_id, paid_in, paid_out, concerned_address, pair, operation_type, mci, aa_address, response, trigger_unit,timestamp) VALUES \n\
 					(?,?,?,?,?,?,?,?,?,?,?)",[operation_id, paid_in, paid_out, concerned_address, pair, operation_type, row.mci, row.aa_address, JSON.stringify(objResponse), row.trigger_unit, row.timestamp], cb);
 				} else
@@ -141,7 +135,7 @@ function indexOperations(objStateVars){
 
 	extractStakedByKeyAndAddress(objStateVars);
 	extractProofUrls(objStateVars);
-
+	
 	const operationKeys = extractOperationKeys(objStateVars);
 	const operations = [];
 	const assocOperationsByExchange = {};
@@ -149,13 +143,13 @@ function indexOperations(objStateVars){
 	const assocExchangeByWalletId = {};
 
 	operationKeys.forEach(function(key){
-
 		const operation = {};
 		operation.status = objStateVars[key];
-		const pairKey = convertOperationKeyToPairKey(key)
+		const pairKey = convertOperationKeyToPairKey(key);
 		const exchange = objStateVars[pairKey + "_exchange"];
 		const wallet_id = objStateVars[pairKey + "_wallet_id"];
 		operation.exchange = exchange;
+
 		operation.wallet_id = wallet_id;
 
 		if(!assocWalletIdsByExchange[exchange])
@@ -197,8 +191,8 @@ function extractProofUrls(objStateVars){
 		if (key.indexOf("k_") == 0){
 		var splitKey = key.split('_');
 		 if (splitKey[3] == "url" && splitKey[4] == "proof"){
-			var outcome = splitKey[6];
-			var operation_key = splitKey[0] + '_' + splitKey[1] + '_' + splitKey[2];
+			var outcome = splitKey[7];
+			var operation_key = splitKey[0] + '_' + splitKey[1] + '_' + splitKey[2] + '_' + splitKey[3];
 			if (!assocProofsByKeyAndOutcome[operation_key])
 				assocProofsByKeyAndOutcome[operation_key] = {};
 			if(!assocProofsByKeyAndOutcome[operation_key][outcome])
@@ -207,7 +201,15 @@ function extractProofUrls(objStateVars){
 		 }
 		}
 	}
+}
 
+function indexNicknames(objStateVars){
+	for (var key in objStateVars){
+		if (key.indexOf("nickname_") == 0){
+			var splitKey = key.split('_');
+			assocNicknamesByAddress[splitKey[1]] = objStateVars[key];
+		}
+	}
 }
 
 function extractStakedByKeyAndAddress(objStateVars){
@@ -216,9 +218,9 @@ function extractStakedByKeyAndAddress(objStateVars){
 		if (key.indexOf("k_") == 0){
 		var splitKey = key.split('_');
 		 if (splitKey[3] == "total" && splitKey[7] == "by"){
-			var address = splitKey[8];
-			var outcome = splitKey[6];
-			var operation_key = splitKey[0] + '_' + splitKey[1] + '_' + splitKey[2];
+			var address = splitKey[9];
+			var outcome = splitKey[7];
+			var operation_key = splitKey[0] + '_' + splitKey[1] + '_' + splitKey[2] + '_' + splitKey[3];
 			if (!assocStakedByKeyAndAddress[operation_key])
 				assocStakedByKeyAndAddress[operation_key] = {};
 			if(!assocStakedByKeyAndAddress[operation_key][address])
@@ -235,7 +237,7 @@ function extractOperationKeys(objStateVars){
 	 for (var key in objStateVars){
 		 if (key.indexOf("k_") == 0){
 			var splitKey = key.split('_');
-			assocOperationKeys[splitKey[0] + '_' + splitKey[1] + '_' + splitKey[2]] = true;
+			assocOperationKeys[splitKey[0] + '_' + splitKey[1] + '_' + splitKey[2] + '_' + splitKey[3]] = true;
 		 }
 	 }
 	 const operationKeys = [];
@@ -247,25 +249,10 @@ function extractOperationKeys(objStateVars){
 
 
 function convertOperationKeyToPairKey(operationKey){
-	operationKey = "p" + operationKey.substring(1);
-	return 	operationKey.slice(0, 46)
+	var splitKey = operationKey.split('_');
+	return 	"p" + "_" + splitKey[1] + "_" + splitKey[2];
 }
 
-
-function extractPairKeys(objStateVars){
- const assocPairKeys = {};
-	for (var key in objStateVars){
-		if (key.indexOf("p_") == 0){
-			assocPairKeys[key.slice(0, 46)] = true;
-		}
-	}
-
-	const pairKeys = [];
-	for (var key in assocPairKeys){
-		pairKeys.push(key);
-	}
-	return pairKeys;
-}
 
 function extractPoolKeys(objStateVars){
 	const assocPoolKeys = {};
@@ -280,14 +267,17 @@ function extractPoolKeys(objStateVars){
 		poolKeys.push(key);
 	 }
 	 return poolKeys;
- }
+}
  
+function getNicknameForAddress(address){
+	return assocNicknamesByAddress[address];
+}
 
- function getCurrentPools(){
+function getCurrentPools(){
 	return currentPools;
- }
+}
 
- function getCurrentOperations(){
+function getCurrentOperations(){
 	return currentOperations;
 }
 
@@ -368,14 +358,22 @@ function getContributorsRanking(handle){
 	(SELECT (SUM(paid_out) - SUM(paid_in)) as income, concerned_address AS address FROM operations_history \n\
 	WHERE (operation_type='initial_stake' OR operation_type='stake' OR operation_type='withdraw' OR operation_type='commit') GROUP BY address)s4 USING (address)",
 	function(rows){
+		rows.forEach(function(row){
+			if (assocNicknamesByAddress[row.address])
+				row.nickname = assocNicknamesByAddress[row.address];
+		})
 		handle(rows);
 	});
 }
 
 function getDonatorsRanking(handle){
-	db.query("SELECT (SUM(paid_in) - SUM(paid_out)) as income, concerned_address AS address FROM operations_history \n\
+	db.query("SELECT (SUM(paid_in) - SUM(paid_out)) as amount, concerned_address AS address FROM operations_history \n\
 	WHERE (operation_type='create_pool' OR operation_type='destroyed_pool') \n\
 	GROUP BY concerned_address",function(rows){
+		rows.forEach(function(row){
+			if (assocNicknamesByAddress[row.address])
+				row.nickname = assocNicknamesByAddress[row.address];
+		})
 		handle(rows);
 	});
 }
@@ -389,3 +387,4 @@ exports.getLastTransactionsToAA = getLastTransactionsToAA;
 exports.getOperationHistory = getOperationHistory;
 exports.getContributorsRanking = getContributorsRanking;
 exports.getDonatorsRanking = getDonatorsRanking;
+exports.getNicknameForAddress = getNicknameForAddress;
