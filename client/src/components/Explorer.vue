@@ -61,9 +61,9 @@ export default {
 			required: false
 		},
 		page: {
-			type: String,
+			type: Number,
 			required: false,
-			default: "0"
+			default: 1
 		}
 	},
 	data() {

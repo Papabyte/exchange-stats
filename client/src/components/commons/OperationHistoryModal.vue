@@ -54,8 +54,6 @@
 					</b-row>
 				</b-col>
 			</b-row>
-
-			
 		</b-container>
 	</b-modal>
 </template>
@@ -110,13 +108,9 @@ export default {
 						item.paid_out_amount = Number(row.response.paid_out_amount);
 						item.paid_out_address = row.response.paid_out_address;
 						item.expected_reward = Number(row.response.expected_reward);
-
-
 						this.historyItems.push(item);
 						
 					});
-
-					 
 				});
 		}
 	}

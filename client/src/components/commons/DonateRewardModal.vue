@@ -10,6 +10,7 @@
 				<b-form-checkbox
 				id="checkbox-1"
 				v-model="isForAny"
+				@change="exchange =''"
 				name="checkbox-1"
 				>
 				{{$t("donateModalDonateForAny")}}

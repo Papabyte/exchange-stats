@@ -61,7 +61,7 @@ export default {
 	},
 	created() {
 
-	}
+	},
 }
 </script>
 
@@ -87,6 +87,5 @@ border-bottom-style: solid;
 
 .transaction-headers{
 	background-color: gainsboro
-
 }
 </style>

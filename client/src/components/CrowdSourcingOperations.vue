@@ -17,7 +17,7 @@
 		<b-table 
 			:current-page="currentPage"
 			per-page="10"
-			:items="items"
+			:items="operations"
 			:fields="fields"
 			:sort-by.sync="sortBy"
 			:sort-desc.sync="sortDesc"
@@ -72,7 +72,7 @@
 							variant="primary" 
 							v-if="data.item.status == 'committed' && data.item.claimAddresses.length>0" 
 							v-on:click="clicked_item=data.item;$bvModal.show('claimGain');"  
-							class="mr-2" size="s" >
+							class="mr-2 text-nowrap" size="s" >
 							{{$t("crowdSourcingOperationsButtonClaim")}}
 						</b-button>
 						<b-dropdown right text="view" variant="primary" size="m" >
@@ -137,10 +137,9 @@ import moment from 'moment/src/moment'
 					{ key: 'staked_on_outcome', sortable: true, label: this.$t('crowdSourcingOperationsTableColStakedOnOutcome')},
 					{ key: 'total_staked', sortable: true, label: this.$t('crowdSourcingOperationsTableColTotalStaked')},
 					{ key: 'end', sortable: true, label: "end"},
-
 					{ key: 'action', label: this.$t('crowdSourcingOperationsTableColAction') }
 				],
-				items: [
+				operations: [
 				]
 			}
 		},
@@ -155,45 +154,45 @@ import moment from 'moment/src/moment'
 		methods:{
 			getData(){
 				this.axios.get('/api/operations').then((response) => {
-							this.items = [];
+							this.operations = [];
 							response.data.forEach((row)=>{
-								const item = {};
-								item.status = row.status ;
+								const operation = {};
+								operation.status = row.status ;
 								if (row.initial_outcome == "in"){
-									item.outcome_yes_or_no = row.outcome == "in" ? "yes" : "no";
+									operation.outcome_yes_or_no = row.outcome == "in" ? "yes" : "no";
 								}
 								else {
-									item.outcome_yes_or_no = row.outcome == "out" ? "yes" : "no";
+									operation.outcome_yes_or_no = row.outcome == "out" ? "yes" : "no";
 								}
-								item.outcome= row.outcome;
-								item.isRemovingOperation = row.outcome == "out";
-								item.initial_outcome = row.initial_outcome;
-								item.staked_on_outcome = Number(row.staked_on_outcome);
-								item.total_staked = Number(row.total_staked);
-								item.wallet_id = Number(row.wallet_id);
-								item.exchange = row.exchange;
-								item.key = row.key;
-								item.url_proofs_by_outcome = row.url_proofs_by_outcome;
-								item.countdown_start = row.countdown_start;
-								item.staked_on_opposite = Number(row.staked_on_opposite);
+								operation.outcome= row.outcome;
+								operation.isRemovingOperation = row.outcome == "out";
+								operation.initial_outcome = row.initial_outcome;
+								operation.staked_on_outcome = Number(row.staked_on_outcome);
+								operation.total_staked = Number(row.total_staked);
+								operation.wallet_id = Number(row.wallet_id);
+								operation.exchange = row.exchange;
+								operation.key = row.key;
+								operation.url_proofs_by_outcome = row.url_proofs_by_outcome;
+								operation.countdown_start = row.countdown_start;
+								operation.staked_on_opposite = Number(row.staked_on_opposite);
 								if ((new Date().getTime() / 1000 - row.countdown_start) > conf.challenge_period_length){
-									item.is_commitable = true;
-									item.end = 'ended';
+									operation.is_commitable = true;
+									operation.end = 'ended';
 								} else {
-									item.end = moment().to(moment.unix(conf.challenge_period_length  + Number(row.countdown_start)));
+									operation.end = moment().to(moment.unix(conf.challenge_period_length  + Number(row.countdown_start)));
 								}
 
-								if (item.status == "committed"){
-									item.claimAddresses = [];
+								if (operation.status == "committed"){
+									operation.claimAddresses = [];
 									const assocStakedByAdress =	row.staked_by_address;
 									const outcome = row.outcome
 									for (var key in assocStakedByAdress){
 										if (assocStakedByAdress[key][outcome])
-											item.claimAddresses.push(key);
+											operation.claimAddresses.push(key);
 									}
 								}
-								this.items.push(item);
-								this.totalRows = this.items.length;
+								this.operations.push(operation);
+								this.totalRows = this.operations.length;
 							})
 							this.isSpinnerActive= false
 						});

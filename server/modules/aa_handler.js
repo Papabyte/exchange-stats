@@ -136,6 +136,7 @@ function indexRewardPools(objStateVars){
 	assocCurrentPoolsByExchange = assocPoolsByExchange;
 }
 
+//we read state vars to read all past and ongoing operations and sort them in different associative arrays
 function indexOperations(objStateVars){
 
 	extractStakedByKeyAndAddress(objStateVars);
@@ -160,7 +161,8 @@ function indexOperations(objStateVars){
 		if(!assocWalletIdsByExchange[exchange])
 			assocWalletIdsByExchange[exchange] = [];
 		if (objStateVars[pairKey + "_committed_outcome"] == "in") {
-			assocWalletIdsByExchange[exchange].push(wallet_id);
+			if (assocWalletIdsByExchange[exchange].indexOf(wallet_id) === -1)
+				assocWalletIdsByExchange[exchange].push(wallet_id);
 			assocExchangeByWalletId[wallet_id] = exchange;
 		}
 		const outcome = objStateVars[key + "_outcome"]

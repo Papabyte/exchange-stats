@@ -20,11 +20,6 @@
 				<b-form-datalist 
 					id="input-list"
 					:options="assocExchanges"></b-form-datalist>
-				<b-button 
-					variant="primary"
-					v-if="validExchange"
-					v-on:click="getBestPool"
-					size="s">check</b-button>
 			</b-row >
 
 			<b-row v-if="!prop_wallet_id && !isRemoving">
@@ -55,7 +50,6 @@
 					</b-form-group>
 				</div>
 			</b-row >
-
 
 			<b-row >
 				<span v-if="text_error" class="pt-3">{{text_error}}</span>
@@ -88,7 +82,10 @@
 							<exchange :id="exchange" noUrl />
 						</template>
   			</i18n>
-				<UrlInputs v-on:url_1_update="update_url_1" v-on:url_2_update="update_url_2"/>
+				<div class="mt-4">
+					{{$t('editModalProofExplanation')}}
+				</div>
+				<UrlInputs :requireOneUrl="true" v-on:url_1_update="update_url_1" v-on:url_2_update="update_url_2"/>
 				</div>
 			</b-row >
 
@@ -115,6 +112,7 @@ import ByteAmount from './ByteAmount.vue';
 import Exchange from './Exchange.vue';
 import UrlInputs from './UrlInputs.vue';
 import validate from 'bitcoin-address-validation';
+const isUrl = require('is-url');
 
 export default {	
 	components: {
@@ -148,6 +146,7 @@ export default {
 			isOperationAllowed: false,
 			isSpinnerActive: false,
 			isOkDisabled: true,
+			isPoolAvailable: false,
 			rewardAmount: false,
 			isCheckButtonActive: false,
 			stakeAmount: conf.challenge_min_stake*1000000000,
@@ -192,18 +191,28 @@ export default {
 			this.reset();
 		},
 		prop_wallet_id:function(){
-			this.wallet = this.prop_wallet_id;
 			this.exchange = this.propExchange;
+			this.wallet = this.prop_wallet_id;
 
-			if (this.propExchange)
+			if (this.propExchange) // we have an exchange and wallet id as prop, let's go to check directly
 				this.check()
 			this.reset();
 		},
 		wallet: function(){
-			this.isCheckButtonActive = validate(this.wallet) || this.isWalletId(this.wallet);
+			if (this.wallet)
+				this.isCheckButtonActive = validate(this.wallet.toString()) || this.isWalletId(this.wallet);
+			else
+				this.isCheckButtonActive = false;
 		},
 		isRemoving: function(){
 
+		},
+		exchange: function(){
+			if (this.prop_wallet_id && this.assocExchanges[this.exchange])// we have a wallet id as prop and exchange input is valid, let's go to check
+				this.check();
+		},
+		url_1: function(){
+			this.isOkDisabled = !isUrl(this.url_1) && this.isPoolAvailable;
 		}
 	},
 	created(){
@@ -225,6 +234,7 @@ export default {
 			this.isCheckButtonActive = false;
 			this.text_error = null;
 			this.isOkDisabled = true;
+			this.isPoolAvailable = false;
 			this.bestPoolId = false;
 			this.rewardAmount = 0;
 			if (!this.wallet && this.exchange && this.isRemoving){
@@ -289,7 +299,7 @@ this.check();
 				if (response.data.pool_id){
 					this.bestPoolId = response.data.pool_id;
 					this.rewardAmount = Number(response.data.reward_amount);
-					this.isOkDisabled = false;
+					this.isPoolAvailable = true;
 				} else {
 					this.text_error = this.$t("editModalNoRewardAvailable");
 				}

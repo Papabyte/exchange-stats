@@ -67,7 +67,7 @@
 						<template v-slot:cell(action)="data">
 							<b-button-group class="mr-2">
 									<b-link v-if="data.item.total_btc_wallet || data.item.nb_withdrawal_addresses"  :to="'/explorer/'+ data.item.exchange_id">
-									<b-button  variant="primary" size="m" >
+									<b-button  variant="primary" size="m" class="text-nowrap">
 										Explore wallets
 									</b-button>
 								</b-link>

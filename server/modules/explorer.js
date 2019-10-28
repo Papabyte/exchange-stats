@@ -2,7 +2,7 @@ const db = require('ocore/db.js');
 const aa_handler = require("./aa_handler.js");
 const stats = require("./stats.js");
 
-const ITEMS_PER_PAGE = 50;
+const ITEMS_PER_PAGE = 20;
 
 async function getTransactionsFromWallets(arrIds, page, handle){
 	const idsSqlFilter = arrIds.join(",");

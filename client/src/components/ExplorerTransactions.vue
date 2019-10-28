@@ -25,11 +25,12 @@
 					:title="$t('explorerTransactionsButtonRemoveFromExchangeTip')"
 					>
 					<v-icon name='x' class="x-icon"/></b-button>
-
 				</b-row>
+
 				<b-row v-if="wallet_id&&!walletOwner">
 					<b-button variant="primary" size="sm" @click="isRemoving=false;$bvModal.show('editWallet');">{{$t("explorerTransactionsButtonAddToExchange")}}</b-button>
 				</b-row>
+
 				<b-row v-if="exchangeWallets">
 					{{$t("explorerTransactionsWalletsForExchange")}}
 					<b-row class="pl-3" align-h="start">
@@ -69,13 +70,13 @@
 		<b-pagination
 			v-model="currentPage"
 			:total-rows="count_total"
-			per-page="50"
+			per-page="20"
 			@change="onPageChanged"
 			size="l"
 			class="pl-4 pt-2 my-0"
 			></b-pagination> 
 					<div  class="w-100" v-for="(transaction,key,index) in transactions" v-bind:key="key">
-					<transaction :tx_id="key" :transaction="transaction" :no_border="index == (Object.keys(transactions).length-1)" :about_wallet_ids="redirected_ids"/>
+					<transaction v-if="progressive_display_level>index" :tx_id="key" :transaction="transaction" :no_border="index == (Object.keys(transactions).length-1)" :about_wallet_ids="redirected_ids"/>
 				</div>
 				</b-row>
 			</b-col>
@@ -106,7 +107,7 @@ export default {
 			required: true
 		},
 		page: {
-			type: Number,
+			type: Number || String,
 			required: false,
 			default: 1
 		}
@@ -126,8 +127,10 @@ export default {
 			isRemoving: null,
 			walletOwner: null,
 			walletIdToEdit: null,
-			total_on_wallets: null
-			}
+			total_on_wallets: null,
+			progressive_display_level: 1,
+			timerId: null
+		}
 	},
 	watch: {
 		$route(route) {
@@ -138,6 +141,12 @@ export default {
 	created() {
 		this.currentPage = this.page || 1;
 		this.getTransactions();
+		this.timerId = setInterval(() => {
+			this.progressive_display_level++;
+		}, 200);
+	},
+	beforeDestroy(){
+		clearInterval(this.timerId);
 	},
 	methods: {
 		onPageChanged(value){
@@ -161,6 +170,7 @@ export default {
 			if (Number(this.request_input)) { // it's a wallet id
 				this.title = this.$t("explorerTransactionsTransactionsForWallet") + this.request_input;
 				this.axios.get('/api/wallet/' + this.request_input+'/' + (this.currentPage-1)).then((response) => {
+				this.progressive_display_level = 1;
 				this.title = this.$t("explorerTransactionsTransactionsForWallet") + response.data.redirected_id;
 				if (response.data.txs){
 					this.transactions = response.data.txs.txs;

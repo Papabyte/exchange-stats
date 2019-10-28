@@ -78,7 +78,6 @@ import DonateRewardModal from './commons/DonateRewardModal.vue';
 					this.totalRows = this.items.length;
 					this.isSpinnerActive= false
 				});
-
 			}
 		}
 	}

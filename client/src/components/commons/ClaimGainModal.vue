@@ -6,7 +6,7 @@
 			</b-row>
 			<b-row v-if="this.operation_item.claimAddresses" class="pt-3" >
 				<div v-for="(address,index) in this.operation_item.claimAddresses" :key="index">
-					<b-button variant="primary" @click="claim(address)" class="mb-2" size="m" >{{address}}</b-button>
+					<b-button variant="primary" @click="claim(address)" class="mb-2 text-monospace" size="m" >{{address}}</b-button>
 				</div>
 			</b-row >
 		</b-container>

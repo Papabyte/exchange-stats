@@ -1,5 +1,11 @@
 <template>
-	<b-modal id="contestOperation" :title="getTitle" :hide-footer="!!link" @close="link=false" @ok="handleOk">
+	<b-modal 
+	id="contestOperation" 
+	:title="getTitle" 
+	:hide-footer="!!link"
+	:okDisabled="isOkDisabled" 
+	@close="link=false" 
+	@ok="handleOk">
 		<b-container v-if="!link" fluid >
 			<b-row class="pt-3" >
 				<label for="range-1">{{$t("contestModalAmountToStake")}}</label>
@@ -31,6 +37,9 @@
 			</div>
 			</b-row >
 			<b-row>
+				<div class="mt-4">
+					{{$t('contestModalProofExplanation')}}
+				</div>
 				<UrlInputs v-on:url_1_update="update_url_1" v-on:url_2_update="update_url_2"/>
 			</b-row >
 		</b-container>
@@ -57,6 +66,7 @@
 const conf = require("../../conf.js");
 import ByteAmount from './ByteAmount.vue';
 import UrlInputs from './UrlInputs.vue';
+const isUrl = require('is-url');
 
 export default {	
 	components: {
@@ -83,6 +93,7 @@ export default {
 			reversalStake: 0,
 			stakeAmountGb: 0,
 			stakeAmount: 0,
+			isOkDisabled: false,
 			link: false,
 			url_1: null,
 			url_2: null,
@@ -127,6 +138,12 @@ export default {
 			if (this.stakeAmountGb < conf.challenge_min_stake)
 				this.stakeAmountGb = conf.challenge_min_stake;
 			this.stakeAmount = this.stakeAmountGb * 1000000000;
+		},
+		url_1: function(){
+			this.isOkDisabled = this.url_1 && !isUrl(this.url_1);
+		},
+		url_2: function(){
+			this.isOkDisabled = this.url_1 && !isUrl(this.url_2);
 		}
 	},
 	methods:{
