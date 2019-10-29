@@ -12,6 +12,8 @@ exports.create = function(){
 		await db.query("CREATE TABLE IF NOT EXISTS btc_wallets (\n\
 			id INTEGER PRIMARY KEY AUTOINCREMENT,\n\
 			addr_count INTEGER DEFAULT 1, \n\
+			txs_count INTEGER DEFAULT 0, \n\
+			balance INTEGER DEFAULT 0, \n\
 			redirection INTEGER\n\
 			)");
 		await db.query("CREATE INDEX IF NOT EXISTS walletByRedirection ON btc_wallets(redirection) WHERE redirection IS NOT NULL");
@@ -46,6 +48,8 @@ exports.create = function(){
 			block_time INTEGER,\n\
 			tx_index INTEGER NOT NULL )")
 		await db.query("INSERT OR IGNORE INTO processed_blocks (block_height,tx_index) VALUES (0,-1)");
+
+
 		if (process.env.delete)
 			await db.query("PRAGMA journal_mode=DELETE");
 		else
@@ -82,7 +86,11 @@ exports.create = function(){
 		await db.query("CREATE INDEX IF NOT EXISTS operationsHistoryByPair ON operations_history(pair)");
 		await db.query("CREATE INDEX IF NOT EXISTS operationsHistoryByOperationId ON operations_history(operation_id)");
 		await db.query("CREATE INDEX IF NOT EXISTS operationsHistoryByConcernedAddress ON operations_history(concerned_address)");
-
+		if (process.env.faster){
+		//	await db.query("PRAGMA journal_mode=MEMORY");
+			await db.query("PRAGMA synchronous = 0 ");
+		//	await db.query("PRAGMA LOCKING_MODE = EXCLUSIVE");
+		}
 	console.error("all tables created");
 	resolve();
 	});
