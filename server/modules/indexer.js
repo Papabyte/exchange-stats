@@ -201,7 +201,7 @@ function saveInputAddressesAndTransactions(bFirstTreated, objInputs, tx_id, heig
 			}
 
 			conn.addQuery(arrQueries,"INSERT INTO transactions_from (id, wallet_id,amount) VALUES \n\
-				((SELECT MAX(id) FROM transactions),(SELECT MAX(id) FROM btc_wallets),?)",[objInputs.value_in]);
+				((SELECT MAX(id) FROM transactions),(SELECT wallet_id FROM btc_addresses WHERE id IN("+InputaddressesSqlString+") LIMIT 1),?)",[objInputs.value_in]);
 
 			conn.addQuery(arrQueries, "COMMIT");
 			async.series(arrQueries, function() {
