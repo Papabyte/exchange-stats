@@ -60,7 +60,7 @@ export default {
 	height: 20px;
 	padding: auto;
 	margin-right: -2px;
-		color: black;
+	color: black;
 
 }
 </style>

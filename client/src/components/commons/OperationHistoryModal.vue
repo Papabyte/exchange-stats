@@ -26,7 +26,7 @@
 							<span class="d-block event-block"><b>{{item.operation_type =='stake' ? 'Counter stake' : 'Initial stake'}} </b> - {{item.time}} </span>
 	
 							<div class="pt-2">
-								<span class="d-block text-break"><b>{{item.author}}</b> staked <b><byte-amount :amount="item.accepted_amount"/></b> on <b>{{item.stake_on}}</b></span>
+								<span class="d-block text-break"><b><user :address="item.author_address" :nickname="item.author_nickname"/></b> staked <b><byte-amount :amount="item.accepted_amount"/></b> on <b>{{item.stake_on}}</b></span>
 								<span class="d-block">Resulting outcome: <b>{{item.resulting_outcome}}</b></span>
 								<span v-if="item.expected_reward" class="d-block">Expected reward: <b><byte-amount :amount="item.expected_reward"/></b></span>
 								<b-progress :max="item.staked_on_yes + item.staked_on_no" show-value height="1.5rem" class="mt-1">
@@ -63,13 +63,15 @@ const conf = require("../../conf.js");
 import moment from 'moment/src/moment'
 import Exchange from '../commons/Exchange.vue';
 import WalletId from '../commons/WalletId.vue';
-import ByteAmount from '../commons/ByteAmount.vue';
+import ByteAmount from './ByteAmount.vue';
+import User from './User.vue';
 
 export default {	
 	components: {
 		Exchange,
 		WalletId,
-		ByteAmount
+		ByteAmount,
+		User
 	},
 	props: {
 		operationItem: {
@@ -98,7 +100,8 @@ export default {
 					response.data.forEach((row)=>{
 						const item = {};
 						item.operation_type = row.operation_type;
-						item.author = row.response.your_address;
+						item.author_address = row.response.your_address;
+						item.author_nickname = row.response.nickname;
 						item.staked_on_yes = Number(row.response['staked_on_' + this.operationItem.initial_outcome]);
 						item.staked_on_no = Number(row.response['staked_on_' + (this.operationItem.initial_outcome == 'in' ? 'out' : 'in')]);
 						item.time = moment.unix(row.timestamp).format('LLLL');

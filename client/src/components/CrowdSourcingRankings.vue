@@ -1,10 +1,10 @@
 <template>
 	<b-row class="main-col pt-3">
-		<b-col cols="12" class="text-right">
+		<b-col cols="12" class="text-center text-lg-right">
 			<b-button 
 				variant="primary" 
 				v-on:click="clicked_item=data.item;$bvModal.show('claimGain');"  
-				class="mb-n5 mr-2 text-nowrap" size="s" >
+				class="mb-2 mb-lg-n5 mr-2 text-nowrap" size="s" >
 				Set my nickname
 			</b-button>
 			<b-tabs content-class="mt-3 text-left">

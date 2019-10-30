@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="d-inline">
 		<span v-if="nickname" v-b-tooltip.hover :title="address">{{nickname}}</span>
 		<span v-else>{{address}}</span>
 	</div>

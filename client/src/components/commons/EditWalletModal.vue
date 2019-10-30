@@ -294,8 +294,6 @@ this.check();
 		},
 		getBestPool(){
 			this.axios.get('/api/pool/'+this.exchange).then((response) => {
-				console.log("pool");
-				console.log(response.data);
 				if (response.data.pool_id){
 					this.bestPoolId = response.data.pool_id;
 					this.rewardAmount = Number(response.data.reward_amount);
