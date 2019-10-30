@@ -75,7 +75,7 @@
 							class="mr-2 text-nowrap" size="s" >
 							{{$t("crowdSourcingOperationsButtonClaim")}}
 						</b-button>
-						<b-dropdown right text="view" variant="primary" size="m" >
+						<b-dropdown right :text="$t('crowdSourcingOperationsButtonView')" variant="primary" size="m" >
 							<b-dropdown-item 
 								variant="primary"
 								v-on:click="clicked_item=data.item;$bvModal.show('viewUrlProofs');"
@@ -136,7 +136,7 @@ import moment from 'moment/src/moment'
 					{ key: 'outcome_yes_or_no', sortable: true, label: this.$t('crowdSourcingOperationsTableColOutcome')},
 					{ key: 'staked_on_outcome', sortable: true, label: this.$t('crowdSourcingOperationsTableColStakedOnOutcome')},
 					{ key: 'total_staked', sortable: true, label: this.$t('crowdSourcingOperationsTableColTotalStaked')},
-					{ key: 'end', sortable: true, label: "end"},
+					{ key: 'end', sortable: true, label: this.$t('crowdSourcingOperationsTableColEnd')},
 					{ key: 'action', label: this.$t('crowdSourcingOperationsTableColAction') }
 				],
 				operations: [
@@ -177,7 +177,7 @@ import moment from 'moment/src/moment'
 								operation.staked_on_opposite = Number(row.staked_on_opposite);
 								if ((new Date().getTime() / 1000 - row.countdown_start) > conf.challenge_period_length){
 									operation.is_commitable = true;
-									operation.end = 'ended';
+									operation.end = this.$t('crowdSourcingOperationsTableEnded');
 								} else {
 									operation.end = moment().to(moment.unix(conf.challenge_period_length  + Number(row.countdown_start)));
 								}

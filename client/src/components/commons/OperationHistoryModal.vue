@@ -1,24 +1,25 @@
 <template>
 	<b-modal id="operationHistory" hide-footer scrollable>
- 		 <template v-slot:modal-title>	
-					<i18n v-if="operationItem.initial_outcome=='in'" tag="span" path="crowdSourcingOperationsAddXToX" id="action">
-						<template #wallet>
-							<wallet-id :id="operationItem.wallet_id" :showIcon="false"/>
-						</template>
-						<template #exchange>
-							<exchange :id="operationItem.exchange" :showIcon="false"/>
-						</template>
-					</i18n>
-					<i18n v-else tag="span" path="crowdSourcingOperationsRemoveXFromX" id="action">
-						<template #wallet>
-							<wallet-id :id="operationItem.wallet_id" :showIcon="false"/>
-						</template>
-						<template #exchange>
-							<exchange :id="operationItem.exchange" :showIcon="false"/>
-						</template>
-					</i18n>
+		<template v-slot:modal-title>	
+			<i18n v-if="operationItem.initial_outcome=='in'" tag="span" path="crowdSourcingOperationsAddXToX" id="action">
+				<template #wallet>
+					<wallet-id :id="operationItem.wallet_id" :showIcon="false"/>
+				</template>
+				<template #exchange>
+					<exchange :id="operationItem.exchange" :showIcon="false"/>
+				</template>
+			</i18n>
+			<i18n v-else tag="span" path="crowdSourcingOperationsRemoveXFromX" id="action">
+				<template #wallet>
+					<wallet-id :id="operationItem.wallet_id" :showIcon="false"/>
+				</template>
+				<template #exchange>
+					<exchange :id="operationItem.exchange" :showIcon="false"/>
+				</template>
+			</i18n>
 		</template>
 		<b-container>
+			<div v-if="!isSpinnerActive">
 			<b-row v-for="item in historyItems" class="pb-3 my-4 border" :key="item.operation_id">
 				<b-col cols="12">
 					<b-row v-if="item.operation_type =='stake' || item.operation_type=='initial_stake'" >
@@ -54,6 +55,10 @@
 					</b-row>
 				</b-col>
 			</b-row>
+			</div>
+			<div v-if="isSpinnerActive" class="text-center w-100">
+					<b-spinner label="Spinning"></b-spinner>
+			</div>
 		</b-container>
 	</b-modal>
 </template>
@@ -84,7 +89,8 @@ export default {
 	},
 	data(){
 		return {
-			historyItems: []
+			historyItems: [],
+			isSpinnerActive: false,
 		}
 	},
 	watch:{
@@ -95,7 +101,8 @@ export default {
 	},
 	methods:{
 		getHistory(){
-			if (this.operationItem.key)
+			if (this.operationItem.key){
+				this.isSpinnerActive = true;
 				this.axios.get('/api/operation-history/'+ encodeURIComponent(this.operationItem.key)).then((response) => {
 					response.data.forEach((row)=>{
 						const item = {};
@@ -112,9 +119,10 @@ export default {
 						item.paid_out_address = row.response.paid_out_address;
 						item.expected_reward = Number(row.response.expected_reward);
 						this.historyItems.push(item);
-						
+						this.isSpinnerActive = false;
 					});
 				});
+			}
 		}
 	}
 }

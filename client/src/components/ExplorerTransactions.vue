@@ -213,7 +213,7 @@ export default {
 						this.redirected_ids = response.data.redirected_ids;
 						this.exchange = this.request_input;
 						this.total_on_wallets = response.data.txs.total_on_wallets;
-					} else if (!response.data.wallet_ids.length == 0){
+					} else if (response.data.wallet_ids.length == 0){
 						this.failoverText = this.$t("explorerTransactionsNoWalletKnown", {exchange:  response.data.name});
 					} else {
 						this.failoverText = this.$t("explorerTransactionsNoTransactionFound", {exchange:  response.data.name});

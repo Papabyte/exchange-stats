@@ -37,9 +37,9 @@ export default new Router({
 			component: lazyLoading('components/Explorer')
 		},
 		{
-			name: 'about',
-			path: '/about',
-			component: lazyLoading('components/About')
+			name: 'faq',
+			path: '/faq',
+			component: lazyLoading('components/Faq')
 		}	,
 		{
 			name: 'crowdsourcing',

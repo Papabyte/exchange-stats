@@ -62,7 +62,6 @@ function catchUpOperationsHistory(){
 
 				var paid_in = 0;
 				var paid_out = 0;
-
 				if (objResponse.expected_reward){
 					var operation_type = "initial_stake";
 					paid_in = objResponse.your_stake;
@@ -335,11 +334,16 @@ function getOperationHistory(id, handle){
 	db.query("SELECT operation_type,timestamp,response FROM operations_history WHERE operation_id=? ORDER BY mci DESC",[id], function(rows){
 		return handle(
 			rows.map(function(row){
-				return {operation_type: row.operation_type, response: JSON.parse(row.response), timestamp: row.timestamp};
+				var objResponse = JSON.parse(row.response);
+				console.log(objResponse);
+				if (assocNicknamesByAddress[objResponse.your_address])
+					objResponse.nickname = assocNicknamesByAddress[objResponse.your_address];
+				return {operation_type: row.operation_type, response: objResponse, timestamp: row.timestamp};
 			})
 		)
 	});
 }
+
 
 function getContributorsRanking(handle){
 	db.query("SELECT CASE WHEN initiatives IS NOT NULL THEN initiatives \n\

@@ -1,11 +1,12 @@
 <template>
 	<b-row class="main-col pt-3">
+		<set-nickname-modal />
 		<b-col cols="12" class="text-center text-lg-right">
 			<b-button 
 				variant="primary" 
-				v-on:click="clicked_item=data.item;$bvModal.show('claimGain');"  
+				v-on:click="$bvModal.show('setNickname');"  
 				class="mb-2 mb-lg-n5 mr-2 text-nowrap" size="s" >
-				Set my nickname
+				{{$t('crowdsourcingRankingButtonSetNickname')}}
 			</b-button>
 			<b-tabs content-class="mt-3 text-left">
 				<b-tab title="Contributors" active>
@@ -24,11 +25,13 @@
 	const conf = require("../conf.js");
 	import ContributorsRanking from './CrowdSourcingRankingContributors.vue';
 	import DonatorsRanking from './CrowdSourcingRankingDonators.vue';
+	import SetNicknameModal from './commons/SetNicknameModal.vue';
 
 	export default {
 		components: {
 			ContributorsRanking,
-			DonatorsRanking
+			DonatorsRanking,
+			SetNicknameModal
 		},
 		data() {
 			return {

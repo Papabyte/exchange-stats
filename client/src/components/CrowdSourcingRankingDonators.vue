@@ -58,8 +58,8 @@
 				sortBy: 'initiatives',
 				sortDesc: true,
 				fields: [
-					{ key: 'address', label:"User", sortable: true},
-					{ key: 'amount', sortable: true },
+					{ key: 'address', label: this.$t("crowdSourcingDonatorsTableColAddress"), sortable: true},
+					{ key: 'amount', label: this.$t("crowdSourcingDonatorsTableColAmount"), sortable: true},
 				],
 				items: [
 				]

@@ -31,6 +31,15 @@
 							<template v-slot:cell(address)="data">
 								<user :address="data.item.address" :nickname="data.item.nickname"/>
 							</template>
+							<template v-slot:head(initiatives)="data">
+								<span v-b-tooltip.hover :title="$t('crowdSourcingContributorsTableColInitiativesTip')">{{data.label}}</span>
+							</template>
+							<template v-slot:head(successes)="data">
+								<span v-b-tooltip.hover :title="$t('crowdSourcingContributorsTableColSuccessesTip')">{{data.label}}</span>
+							</template>
+							<template v-slot:head(income)="data">
+								<span v-b-tooltip.hover :title="$t('crowdSourcingContributorsTableColIncomeTip')">{{data.label}}</span>
+							</template>
 						</b-table>
 					</b-col>
 				</b-row>
@@ -58,10 +67,10 @@
 				sortBy: 'initiatives',
 				sortDesc: true,
 				fields: [
-					{ key: 'address', label:"User", sortable: true},
-					{ key: 'initiatives', sortable: true },
-					{ key: 'successes', sortable: true },
-					{ key: 'income', label:"Profit/Loss", sortable: true }
+					{ key: 'address', label: this.$t("crowdSourcingContributorsTableColAddress"), sortable: true},
+					{ key: 'initiatives',label: this.$t("crowdSourcingContributorsTableColInitiatives"),  sortable: true },
+					{ key: 'successes', label: this.$t("crowdSourcingContributorsTableColSuccesses"), sortable: true },
+					{ key: 'income', label: this.$t("crowdSourcingContributorsTableColIncome"), sortable: true }
 				],
 				items: [
 				]
