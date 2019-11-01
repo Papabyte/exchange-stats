@@ -135,6 +135,7 @@
 	"explorerTransactionsBelongsTo" : "Belongs to exchange:",
 	"explorerTransactionsButtonAddToExchange" : "Add to an exchange",
 	"explorerTransactionsButtonRemoveFromExchangeTip": "Remove from exchange",
+	"explorerTransactionsButtonAddWallet" :	"Add a wallet",
 	"explorerTransactionsWalletsForExchange" : "Wallets for this exchange: ",
 	"explorerTransactionsRemoveWallet" : "Remove wallet {wallet}",
 	"explorerTransactionsTotalOnWallet" : "Total on wallets: ",

@@ -10,51 +10,62 @@
 
 		<b-col offset-lg="1" lg="10" cols="12" class="py-3">
 			<div v-if="!isSpinnerActive">
-				<b-row class="text-center" v-if="failoverText">
-					{{failoverText}}
-				</b-row>
+				<b-row>
+					<b-col cols="10">
+						<b-row class="text-center" v-if="failoverText">
+							{{failoverText}}
+						</b-row>
 
-				<b-row class="text-center" v-if="walletOwner">
-					<span class="pr-2">{{$t("explorerTransactionsBelongsTo")}}</span> <Exchange :id="walletOwner"/>
-					<b-button 
-					v-if="wallet_id" 
-					variant="primary"  
-					@click="isRemoving=true;walletIdToEdit=wallet_id;$bvModal.show('editWallet');" 
-					class="ml-2 button-xs" 
-					v-b-tooltip.hover 
-					:title="$t('explorerTransactionsButtonRemoveFromExchangeTip')"
-					>
-					<v-icon name='x' class="x-icon"/></b-button>
-				</b-row>
+						<b-row class="text-center" v-if="walletOwner">
+							<span class="pr-2">{{$t("explorerTransactionsBelongsTo")}}</span> <Exchange :id="walletOwner"/>
+							<b-button 
+							v-if="wallet_id" 
+							variant="primary"  
+							@click="isRemoving=true;walletIdToEdit=wallet_id;$bvModal.show('editWallet');" 
+							class="ml-2 button-xs" 
+							v-b-tooltip.hover 
+							:title="$t('explorerTransactionsButtonRemoveFromExchangeTip')"
+							>
+							<v-icon name='x' class="x-icon"/></b-button>
+						</b-row>
 
-				<b-row v-if="wallet_id&&!walletOwner">
-					<b-button variant="primary" size="sm" @click="isRemoving=false;$bvModal.show('editWallet');">{{$t("explorerTransactionsButtonAddToExchange")}}</b-button>
-				</b-row>
+						<b-row v-if="wallet_id&&!walletOwner">
+							<b-button variant="primary" size="sm" @click="isRemoving=false;$bvModal.show('editWallet');">{{$t("explorerTransactionsButtonAddToExchange")}}</b-button>
+						</b-row>
 
-				<b-row v-if="exchangeWallets">
-					{{$t("explorerTransactionsWalletsForExchange")}}
-					<b-row class="pl-3" align-h="start">
-						<div v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
-							<b-col >
-								<wallet-id :id="Number(wallet)"/>
-								<b-button 
-								variant="primary" 
-								@click="isRemoving=true;walletIdToEdit=Number(wallet);$bvModal.show('editWallet');" 
-								v-b-tooltip.hover 
-								:title="$t('explorerTransactionsButtonRemoveFromExchangeTip')"
-								class="ml-2 button-xs" >
-								<v-icon name='x' class="x-icon"/></b-button>
-							</b-col>
-						</div>
-					</b-row >
-				</b-row>
+						<b-row v-if="exchangeWallets">
+							{{$t("explorerTransactionsWalletsForExchange")}}
+							<b-row class="pl-3" align-h="start">
+								<div v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
+									<b-col >
+										<wallet-id :id="Number(wallet)"/>
+										<b-button 
+										variant="primary" 
+										@click="isRemoving=true;walletIdToEdit=Number(wallet);$bvModal.show('editWallet');" 
+										v-b-tooltip.hover 
+										:title="$t('explorerTransactionsButtonRemoveFromExchangeTip')"
+										class="ml-2 button-xs" >
+										<v-icon name='x' class="x-icon"/></b-button>
+									</b-col>
+								</div>
+							</b-row >
+						</b-row>
 
-				<b-row class="text-center" v-if="total_on_wallets">
-					<span class="pr-1">{{$t("explorerTransactionsTotalOnWallet")}}</span> <btc-amount :amount="total_on_wallets"/>
-				</b-row>
+						<b-row class="text-center" v-if="total_on_wallets">
+							<span class="pr-1">{{$t("explorerTransactionsTotalOnWallet")}}</span> <btc-amount :amount="total_on_wallets"/>
+						</b-row>
 
-				<b-row v-if="count_total">
-				{{$t("explorerTransactionsTotalTransactions")}}{{count_total}}
+						<b-row v-if="count_total">
+							{{$t("explorerTransactionsTotalTransactions")}}{{count_total}}
+						</b-row>
+					</b-col>
+					<b-col cols="2" v-if="exchange" class="float-right">
+						<b-button 
+						variant="primary"
+						@click="isRemoving=false;$bvModal.show('editWallet');">
+						{{$t('explorerTransactionsButtonAddWallet')}}
+						</b-button>
+					</b-col>
 				</b-row>
 			</div>
 			<b-row v-else>
@@ -211,13 +222,13 @@ export default {
 						this.count_total = response.data.txs.count_total;
 						this.exchangeWallets = response.data.wallet_ids;
 						this.redirected_ids = response.data.redirected_ids;
-						this.exchange = this.request_input;
 						this.total_on_wallets = response.data.txs.total_on_wallets;
 					} else if (response.data.wallet_ids.length == 0){
 						this.failoverText = this.$t("explorerTransactionsNoWalletKnown", {exchange:  response.data.name});
 					} else {
 						this.failoverText = this.$t("explorerTransactionsNoTransactionFound", {exchange:  response.data.name});
 					}
+					this.exchange = this.request_input;
 					this.exchangeName =  response.data.name;
 					this.isSpinnerActive = false;
 				});
