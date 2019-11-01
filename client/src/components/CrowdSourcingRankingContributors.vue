@@ -26,7 +26,7 @@
 								sort-icon-left
 						>	
 							<template v-slot:cell(income)="data">
-								<byte-amount :isNegative="data.item.income<0" :isPositive="data.item.income>0" :amount="data.item.income"/>
+								<byte-amount :isNegative="data.item.income<0" :isPositive="data.item.income>0" :amount="data.item.income || 0"/>
 							</template>
 							<template v-slot:cell(address)="data">
 								<user :address="data.item.address" :nickname="data.item.nickname"/>

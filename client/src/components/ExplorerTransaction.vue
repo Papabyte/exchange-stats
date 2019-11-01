@@ -67,9 +67,8 @@ export default {
 
 <style scoped>
 .bordered{
-border-bottom: 2px;
-border-bottom-style: solid;
-
+	border-bottom: 2px;
+	border-bottom-style: solid;
 }
 
 

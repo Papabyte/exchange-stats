@@ -1,6 +1,6 @@
 <template>
 	<b-container fluid>
-		<edit-wallet-modal :propExchange="exchange || walletOwner" :prop_wallet_id="walletIdToEdit" :isRemoving="isRemoving"/>
+		<edit-wallet-modal :propExchange="exchange || walletOwner" :propWalletId="walletIdToEdit" :isRemoving="isRemoving"/>
 
 		<b-row v-if="title">
 			<b-col offset-lg="1" lg="10" cols="12" class="py-3">
@@ -36,10 +36,10 @@
 					<b-row class="pl-3" align-h="start">
 						<div v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
 							<b-col >
-								<wallet-id :id="wallet"/>
+								<wallet-id :id="Number(wallet)"/>
 								<b-button 
 								variant="primary" 
-								@click="isRemoving=true;walletIdToEdit=wallet;$bvModal.show('editWallet');" 
+								@click="isRemoving=true;walletIdToEdit=Number(wallet);$bvModal.show('editWallet');" 
 								v-b-tooltip.hover 
 								:title="$t('explorerTransactionsButtonRemoveFromExchangeTip')"
 								class="ml-2 button-xs" >

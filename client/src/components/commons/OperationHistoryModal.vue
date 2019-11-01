@@ -112,9 +112,9 @@ export default {
 						item.staked_on_yes = Number(row.response['staked_on_' + this.operationItem.initial_outcome]);
 						item.staked_on_no = Number(row.response['staked_on_' + (this.operationItem.initial_outcome == 'in' ? 'out' : 'in')]);
 						item.time = moment.unix(row.timestamp).format('LLLL');
-						item.stake_on = row.response.proposed_outcome == this.operationItem.initial_outcome ? 'yes' : 'no';
+						item.stake_on = row.response.proposed_outcome == this.operationItem.initial_outcome ? this.$t('crowdSourcingOperationsYes') : this.$t('crowdSourcingOperationsNo');
 						item.accepted_amount = Number(row.response.accepted_amount);
-						item.resulting_outcome = row.response.outcome == this.operationItem.initial_outcome ? 'yes' : 'no';
+						item.resulting_outcome = row.response.outcome == this.operationItem.initial_outcome ? this.$t('crowdSourcingOperationsYes') : this.$t('crowdSourcingOperationsNo');
 						item.paid_out_amount = Number(row.response.paid_out_amount);
 						item.paid_out_address = row.response.paid_out_address;
 						item.expected_reward = Number(row.response.expected_reward);

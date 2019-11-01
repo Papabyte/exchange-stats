@@ -41,8 +41,15 @@
 						</template>
 					</i18n>
 				</template>
-				<template v-slot:cell(outcome)="data">
-					{{data.item.outcome == "yes" ? $t("crowdSourcingOperationsYes") : $t("crowdSourcingOperationsNo")}}/>
+
+				<template v-slot:head(outcome_yes_or_no)="data">
+					<span v-b-tooltip.hover :title="$t('crowdSourcingOperationsTableColOutcomeTip')">{{data.label}}</span>
+				</template>
+				<template v-slot:head(staked_on_outcome)="data">
+					<span v-b-tooltip.hover :title="$t('crowdSourcingOperationsTableColStakedOnOutcomeTip')">{{data.label}}</span>
+				</template>
+				<template v-slot:head(total_staked)="data">
+					<span v-b-tooltip.hover :title="$t('crowdSourcingOperationsTableColTotalStakedTip')">{{data.label}}</span>
 				</template>
 				<template v-slot:cell(staked_on_outcome)="data">
 					<byte-amount :amount="data.item.staked_on_outcome" />
@@ -55,7 +62,8 @@
 						<b-button 
 							variant="primary" 
 							v-if="data.item.status == 'onreview' && !data.item.is_commitable " 
-							v-on:click="clicked_item=data.item;$bvModal.show('contestOperation');" 
+							v-on:click="clicked_item=data.item;$bvModal.show('contestOperation');"
+							v-b-tooltip.hover :title="$t('crowdSourcingOperationsButtonContestTip')"
 							class="mr-2" 
 							size="s">
 							{{$t("crowdSourcingOperationsButtonContest")}}
@@ -64,6 +72,7 @@
 							variant="primary" 
 							v-if="data.item.status == 'onreview' && data.item.is_commitable"
 							v-on:click="clicked_item=data.item;$bvModal.show('commitOperation');"
+							v-b-tooltip.hover :title="$t('crowdSourcingOperationsButtonCommitTip')"
 							class="mr-2" 
 							size="s">
 							{{$t("crowdSourcingOperationsButtonCommit")}}
@@ -71,8 +80,10 @@
 						<b-button 
 							variant="primary" 
 							v-if="data.item.status == 'committed' && data.item.claimAddresses.length>0" 
-							v-on:click="clicked_item=data.item;$bvModal.show('claimGain');"  
-							class="mr-2 text-nowrap" size="s" >
+							v-on:click="clicked_item=data.item;$bvModal.show('claimGain');"
+							v-b-tooltip.hover :title="$t('crowdSourcingOperationsButtonClaimTip')"
+							class="mr-2 text-nowrap"
+							size="s" >
 							{{$t("crowdSourcingOperationsButtonClaim")}}
 						</b-button>
 						<b-dropdown right :text="$t('crowdSourcingOperationsButtonView')" variant="primary" size="m" >
@@ -159,10 +170,10 @@ import moment from 'moment/src/moment'
 								const operation = {};
 								operation.status = row.status ;
 								if (row.initial_outcome == "in"){
-									operation.outcome_yes_or_no = row.outcome == "in" ? "yes" : "no";
+									operation.outcome_yes_or_no = row.outcome == "in" ? this.$t('crowdSourcingOperationsYes') : this.$t('crowdSourcingOperationsNo');
 								}
 								else {
-									operation.outcome_yes_or_no = row.outcome == "out" ? "yes" : "no";
+									operation.outcome_yes_or_no = row.outcome == "out" ? this.$t('crowdSourcingOperationsYes') : this.$t('crowdSourcingOperationsNo');
 								}
 								operation.outcome= row.outcome;
 								operation.isRemovingOperation = row.outcome == "out";
@@ -175,11 +186,11 @@ import moment from 'moment/src/moment'
 								operation.url_proofs_by_outcome = row.url_proofs_by_outcome;
 								operation.countdown_start = row.countdown_start;
 								operation.staked_on_opposite = Number(row.staked_on_opposite);
-								if ((new Date().getTime() / 1000 - row.countdown_start) > conf.challenge_period_length){
+								if ((new Date().getTime() / 1000 - row.countdown_start) > conf.challenge_period_in_days*24*3600 ){
 									operation.is_commitable = true;
 									operation.end = this.$t('crowdSourcingOperationsTableEnded');
 								} else {
-									operation.end = moment().to(moment.unix(conf.challenge_period_length  + Number(row.countdown_start)));
+									operation.end = moment().to(moment.unix(conf.challenge_period_in_days*24*3600  + Number(row.countdown_start)));
 								}
 
 								if (operation.status == "committed"){

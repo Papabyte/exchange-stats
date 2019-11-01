@@ -1,11 +1,12 @@
 <template>
 	<span>
 		<span v-if="label"> {{label}}</span>
-		<span v-bind:class="amountClass">{{(amount/1000000000).toPrecision(6)}} GB</span>
+		<span v-bind:class="amountClass">{{(amount/gb_to_bytes).toPrecision(6)}} GB</span>
 	</span>
 </template>
 
 <script>
+const conf = require("../../conf.js");
 
 export default {
 	props: {
@@ -26,6 +27,11 @@ export default {
 			type: Boolean,
 			required: false,
 			default: false
+		}
+	},
+	data(){
+		return {
+			gb_to_bytes: conf.gb_to_bytes
 		}
 	},
 	computed:{

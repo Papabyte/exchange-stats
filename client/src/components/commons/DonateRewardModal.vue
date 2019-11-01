@@ -19,7 +19,7 @@
 			<b-row class="pt-3" >
 				<label for="range-1">{{$t("donateModalIndividualRewardAmount")}}</label>
 			<b-form-input id="range-1" v-model="amount" type="range" min="0.01" max="10" step="0.01"></b-form-input>
-				<byte-amount :amount="amount*1000000000"/>
+				<byte-amount :amount="amount*gb_to_bytes"/>
 			</b-row >
 			<b-row class="pt-3" >
 				<label for="range-2">{{$t("donateModalNumberOfRewards")}}</label>
@@ -62,8 +62,8 @@
 
 <script>
 import ByteAmount from './ByteAmount.vue';
-
 const conf = require("../../conf.js");
+
 export default {	
 	components: {
 		ByteAmount
@@ -72,10 +72,11 @@ export default {
 		return {
 				objExchanges: {},
 				isForAny: false,
-				amount: 0.1,
+				amount: conf.min_reward_gb,
 				exchange: "",
 				nb_reward:1,
-				link: false
+				link: false,
+				gb_to_bytes: conf.gb_to_bytes
 		}
 	},
 	computed: {
@@ -98,14 +99,14 @@ export default {
 			const base64url = require('base64url');
 			const data = {
 					number_of_rewards: this.nb_reward,
-					reward_amount: this.amount * 1000000000
+					reward_amount: this.amount * conf.gb_to_bytes
 			};
 			if (!this.isForAny)
 				data.exchange = this.exchange;
 			const json_string = JSON.stringify(data);
 			const base64data = base64url(json_string);
 			this.link = (conf.testnet ? "byteball-tn" :"byteball")+":"+conf.aa_address+"?amount="
-				+(Math.round(this.nb_reward * this.amount * 1000000000))+"&base64data="+base64data;
+				+(Math.round(this.nb_reward * this.amount * conf.gb_to_bytes))+"&base64data="+base64data;
 		}
 	}
 }

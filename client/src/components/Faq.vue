@@ -8,41 +8,41 @@
 					</b-col>
 				</b-row >
 				<b-row>
-					<b-col offset-lg="1" lg="10" cols="12" class="main-col p-5">
+					<b-col offset-lg="2" lg="8" cols="12" class="main-col p-5">
 						<b-media>
-							<h5 class="mt-3 question"> {{$t('FaqQuestion1')}}</h5>
+							<h5 class="mt-3 question"> {{$t('faqQuestion1')}}</h5>
 							<p class="answer">
-							{{$t('FaqAnswer1')}}
+							{{$t('faqAnswer1')}}
 							</p>
 						</b-media>
 						<b-media>
-							<h5 class="mt-3 question"> {{$t('FaqQuestion2')}}</h5>
+							<h5 class="mt-3 question"> {{$t('faqQuestion2')}}</h5>
 							<p class="answer">
-							{{$t('FaqAnswer2')}}
+							{{$t('faqAnswer2')}}
 							</p>
 						</b-media>
 						<b-media>
-							<h5 class="mt-3 question"> {{$t('FaqQuestion3')}}</h5>
+							<h5 class="mt-3 question"> {{$t('faqQuestion3')}}</h5>
 							<p class="answer">
-							{{$t('FaqAnswer3')}}
+							{{$t('faqAnswer3')}}
 							</p>
 						</b-media>
 						<b-media>
-							<h5 class="mt-3 question"> {{$t('FaqQuestion4')}}</h5>
+							<h5 class="mt-3 question"> {{$t('faqQuestion4')}}</h5>
 							<p class="answer">
-							{{$t('FaqAnswer4')}}
+							{{$t('faqAnswer4')}}
 							</p>
 						</b-media>
 						<b-media>
-							<h5 class="mt-3 question"> {{$t('FaqQuestion5')}}</h5>
+							<h5 class="mt-3 question"> {{$t('faqQuestion5')}}</h5>
 							<p class="answer">
-							{{$t('FaqAnswer5')}}
+							{{$t('faqAnswer5',{initial_stake: conf.challenge_min_stake_gb, period: conf.challenge_period_in_days,  coeff: conf.challenge_coeff})}}
 							</p>
 						</b-media>
 						<b-media>
-							<h5 class="mt-3 question"> {{$t('FaqQuestion6')}}</h5>
+							<h5 class="mt-3 question"> {{$t('faqQuestion6')}}</h5>
 							<p class="answer">
-							{{$t('FaqAnswer6')}}
+							{{$t('faqAnswer6')}}
 							</p>
 						</b-media>
 					</b-col>
@@ -53,10 +53,24 @@
 
 <script>
 import NavBar from './commons/NavBar.vue'
+const conf = require("../conf.js");
+
 
 export default {
 	components: {
 		NavBar
+	},
+	data() {
+		return {
+			conf: conf
+		}
+	},
+	created(){
+		document.title = this.$t("faqPageTitle");
+		var meta = document.createElement('meta');
+		meta.name = "description";
+		meta.content = this.$t("faqMetaDescription");
+		document.getElementsByTagName('head')[0].appendChild(meta);
 	}
 }
 </script>

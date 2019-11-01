@@ -58,13 +58,13 @@ export default {
 			return nickname.length >= 3;
 		},
 		format(value, event) {
-			return value = value.replace(' ','');
+			return value = value.replace(' ','').replace('_','');
 		},
 		handleOk(bvModalEvt){
 				bvModalEvt.preventDefault()	;
 				const base64url = require('base64url');
 				const data = {
-						nickname: this.nickname
+					nickname: this.nickname
 				};
 				if (this.url_1)
 					data.url_1 = this.url_1;

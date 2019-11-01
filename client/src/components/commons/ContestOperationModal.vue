@@ -9,7 +9,13 @@
 		<b-container v-if="!link" fluid >
 			<b-row class="pt-3" >
 				<label for="range-1">{{$t("contestModalAmountToStake")}}</label>
-				<b-form-input id="range-1" v-model="stakeAmountGb" type="range" :number="true" min="0.001" :max="reversalStakeGb*1.01" :step="reversalStakeGb/100"></b-form-input>
+				<b-form-input id="range-1" 
+				v-model="stakeAmountGb" 
+				type="range" 
+				:number="true" 
+				:min="conf.challenge_min_stake_gb" 
+				:max="reversalStakeGb*1.01" 
+				:step="reversalStakeGb/100"></b-form-input>
 			</b-row >
 			<b-row>
 				<span v-if="text_error" class="pt-3">{{text_error}}</span>
@@ -56,10 +62,7 @@
 				{{$t("contestModalLinkFooter")}}
 			</b-row >
 		</b-container>
-
 	</b-modal>
-
-
 </template>
 
 <script>
@@ -85,10 +88,7 @@ export default {
 	data(){
 		return {
 			text_error: null,
-			isOperationAllowed: false,
-			isCheckButtonActive: true,
-			isSpinnerActive: false,
-			coeff: conf.coef_challenge,
+			conf: conf,
 			reversalStakeGb:0,
 			reversalStake: 0,
 			stakeAmountGb: 0,
@@ -98,7 +98,6 @@ export default {
 			url_1: null,
 			url_2: null,
 			operation_item:{}
-			
 		}
 	},
 	computed:{
@@ -127,17 +126,17 @@ export default {
 			if(!this.operationItem)
 				return;
 			this.operation_item = this.operationItem;
-			this.reversalStake = (conf.challenge_coef*this.operation_item.staked_on_outcome - this.operation_item.staked_on_opposite);
-			this.reversalStakeGb = this.reversalStake/1000000000;
+			this.reversalStake = (conf.challenge_coeff*this.operation_item.staked_on_outcome - this.operation_item.staked_on_opposite);
+			this.reversalStakeGb = this.reversalStake/conf.gb_to_bytes;
 			this.stakeAmountGb = this.reversalStakeGb;
 			this.reset();
 		},
 		stakeAmountGb: function(){
 			if (this.stakeAmountGb > this.reversalStakeGb)
 				this.stakeAmountGb = this.reversalStakeGb;
-			if (this.stakeAmountGb < conf.challenge_min_stake)
-				this.stakeAmountGb = conf.challenge_min_stake;
-			this.stakeAmount = this.stakeAmountGb * 1000000000;
+			if (this.stakeAmountGb < conf.challenge_min_stake_gb)
+				this.stakeAmountGb = conf.challenge_min_stake_gb;
+			this.stakeAmount = this.stakeAmountGb * conf.gb_to_bytes;
 		},
 		url_1: function(){
 			this.isOkDisabled = this.url_1 && !isUrl(this.url_1);
@@ -154,11 +153,7 @@ export default {
 			this.url_2 = value;
 		},
 		reset(){
-			this.isSpinnerActive = false;
-			this.isCheckButtonActive = true;
 			this.text_error = null;
-			this.bestPoolId = false;
-			this.rewardAmount = 0;
 		},
 		handleOk(bvModalEvt){
 				bvModalEvt.preventDefault()	;
@@ -178,7 +173,7 @@ export default {
 				const json_string = JSON.stringify(data);
 				const base64data = base64url(json_string);
 				this.link = (conf.testnet ? "byteball-tn" :"byteball")+":"+conf.aa_address+"?amount="
-					+Math.round(this.stakeAmountGb*1000000000)+"&base64data="+base64data;
+					+Math.round(this.stakeAmountGb*conf.gb_to_bytes)+"&base64data="+base64data;
 		}
 	}
 }

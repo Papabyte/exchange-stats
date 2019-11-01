@@ -14,7 +14,7 @@
 					v-on:input="reset" 
 					:state="validExchange"
 					list="input-list"
-					v-model="exchange"
+					v-model="selectedExchange"
 					id="input-with-list"
 					></b-form-input>
 				<b-form-datalist 
@@ -22,13 +22,13 @@
 					:options="assocExchanges"></b-form-datalist>
 			</b-row >
 
-			<b-row v-if="!prop_wallet_id && !isRemoving">
+			<b-row v-if="!propWalletId && !isRemoving">
 				<b-col cols="9" >
 				<b-form-input
 					v-on:input="reset"
 					type='text'
 					no-wheel
-					v-model="wallet"
+					v-model="selectedWalletId"
 					:placeholder="$t('editModalHolderEnterIdOrAddress')"></b-form-input>
 				</b-col>
 				<b-col cols="2" >
@@ -37,13 +37,13 @@
 					v-if="!isSpinnerActive && isCheckButtonActive"
 					v-on:click="check" 
 					size="s">check</b-button>
-						<div v-if="isSpinnerActive" class="text-center w-100">
-						<b-spinner label="Spinning"></b-spinner>
+				<div v-if="isSpinnerActive" class="text-center w-100">
+					<b-spinner label="Spinning"></b-spinner>
 				</div>
 				</b-col>
 			</b-row >
 
-			<b-row v-if="!prop_wallet_id && isRemoving">
+			<b-row v-if="!propWalletId && isRemoving">
 				<div>
 					<b-form-group label="Select wallet to be removed" >
 						<b-form-radio  v-for="wallet_id in wallet_choices" name="some-radios" :value="wallet_id" :key="wallet_id" @change="onRadioSelected">{{wallet_id}} </b-form-radio>
@@ -62,10 +62,10 @@
 							<byte-amount :amount="rewardAmount" /> 
 						</template>
 						<template #wallet>
-							{{wallet}}
+							{{selectedWalletId}}
 						</template>
 						<template #exchange>
-							<exchange :id="exchange" noUrl />
+							<exchange :id="selectedExchange" noUrl />
 						</template>
 					</i18n>
 					<i18n v-else path="editModalGainIfAdded" id="potential-gain">
@@ -76,10 +76,10 @@
 							<byte-amount :amount="rewardAmount" /> 
 						</template>
 						<template #wallet>
-							{{wallet}}
+							{{selectedWalletId}}
 						</template>
 						<template #exchange>
-							<exchange :id="exchange" noUrl />
+							<exchange :id="selectedExchange" noUrl />
 						</template>
   			</i18n>
 				<div class="mt-4">
@@ -121,7 +121,7 @@ export default {
 		Exchange
 	},
 	props: {
-		prop_wallet_id: {
+		propWalletId: {
 			type: Number,
 			required: false,
 			default: null
@@ -140,16 +140,16 @@ export default {
 	data(){
 		return {
 			text_error: null,
-			wallet: null,
+			selectedWalletId: null,
 			wallet_choices: [],
-			exchange: null,
+			selectedExchange: null,
 			isOperationAllowed: false,
 			isSpinnerActive: false,
 			isOkDisabled: true,
 			isPoolAvailable: false,
 			rewardAmount: false,
 			isCheckButtonActive: false,
-			stakeAmount: conf.challenge_min_stake*1000000000,
+			stakeAmount: conf.challenge_min_stake_gb*conf.gb_to_bytes,
 			link: false,
 			url_1: null,
 			url_2: null
@@ -160,55 +160,55 @@ export default {
 
 		getTitle:function(){
 			if (this.propExchange){
-				if (this.wallet && this.exchange){
-					return (this.isRemoving ? this.$t('editModalRemoveXFromX', {exchange: this.assocExchanges[this.exchange], wallet: this.wallet}): 
-					this.$t('editModalAddXToX', {exchange:this.assocExchanges[this.exchange], wallet: this.isWalletId(this.wallet)? this.wallet : ""}));
+				if (this.selectedWalletId && this.selectedExchange){
+					return (this.isRemoving ? this.$t('editModalRemoveXFromX', {exchange: this.assocExchanges[this.selectedExchange], wallet: this.selectedWalletId}): 
+					this.$t('editModalAddXToX', {exchange:this.assocExchanges[this.selectedExchange], wallet: this.isWalletId(this.selectedWalletId)? this.selectedWalletId : ""}));
 				}
-				else if (this.exchange){
-					return (this.isRemoving ? this.$t('editModalRemoveFromX',{exchange:this.assocExchanges[this.exchange]}):
-					this.$t('editModalAddToX',{exchange:this.assocExchanges[this.exchange]}));
+				else if (this.selectedExchange){
+					return (this.isRemoving ? this.$t('editModalRemoveFromX',{exchange:this.assocExchanges[this.selectedExchange]}):
+					this.$t('editModalAddToX',{exchange:this.assocExchanges[this.selectedExchange]}));
 				}
-				else if (this.wallet){
-					return (this.isRemoving ? this.$t('editModalRemoveXFrom', {wallet: this.wallet}): 
-					this.$t('editModalAddXTo', {wallet: this.isWalletId(this.wallet) ? this.wallet : ""}));
+				else if (this.selectedWalletId){
+					return (this.isRemoving ? this.$t('editModalRemoveXFrom', {wallet: this.selectedWalletId}): 
+					this.$t('editModalAddXTo', {wallet: this.isWalletId(this.selectedWalletId) ? this.selectedWalletId : ""}));
 				}
-			} else if (this.prop_wallet_id){
-					return this.$t('editModalAddXToX', {exchange:this.assocExchanges[this.exchange], wallet: this.isWalletId(this.wallet) ? this.wallet : ""});
+			} else if (this.propWalletId){
+					return this.$t('editModalAddXToX', {exchange:this.assocExchanges[this.selectedExchange], wallet: this.isWalletId(this.selectedWalletId) ? this.selectedWalletId : ""});
 			 } else
 				 return "";
 		},
 		validExchange() {
-			return !!this.assocExchanges[this.exchange]
+			return !!this.assocExchanges[this.selectedExchange]
 		},
 		assocExchanges() {
 			return this.$store.state.exchangesById;
 		}
 	},
-		watch:{
+	watch:{
 		propExchange:function(){
-			this.exchange = this.propExchange;
-			this.wallet = this.prop_wallet_id;
+			this.selectedExchange = this.propExchange;
+			this.selectedWalletId = this.propWalletId;
 			this.reset();
 		},
-		prop_wallet_id:function(){
-			this.exchange = this.propExchange;
-			this.wallet = this.prop_wallet_id;
+		propWalletId:function(){
+			this.selectedExchange = this.propExchange;
+			this.selectedWalletId = this.propWalletId;
 
 			if (this.propExchange) // we have an exchange and wallet id as prop, let's go to check directly
 				this.check()
 			this.reset();
 		},
-		wallet: function(){
-			if (this.wallet)
-				this.isCheckButtonActive = validate(this.wallet.toString()) || this.isWalletId(this.wallet);
+		selectedWalletId: function(){
+			if (this.selectedWalletId)
+				this.isCheckButtonActive = validate(this.selectedWalletId.toString()) || this.isWalletId(this.selectedWalletId);
 			else
 				this.isCheckButtonActive = false;
 		},
 		isRemoving: function(){
 
 		},
-		exchange: function(){
-			if (this.prop_wallet_id && this.assocExchanges[this.exchange])// we have a wallet id as prop and exchange input is valid, let's go to check
+		selectedExchange: function(){
+			if (this.propWalletId && this.assocExchanges[this.selectedExchange])// we have a wallet id as prop and exchange input is valid, let's go to check
 				this.check();
 		},
 		url_1: function(){
@@ -216,8 +216,8 @@ export default {
 		}
 	},
 	created(){
-		if (this.prop_wallet_id)
-			this.wallet = this.prop_wallet_id;
+		if (this.propWalletId)
+			this.selectedWalletId = this.propWalletId;
 	},
 	methods:{
 		isWalletId(wallet){
@@ -237,16 +237,15 @@ export default {
 			this.isPoolAvailable = false;
 			this.bestPoolId = false;
 			this.rewardAmount = 0;
-			if (!this.wallet && this.exchange && this.isRemoving){
-				this.axios.get('/api/exchange-wallets/'+this.exchange).then((response) => {
+			if (!this.selectedWalletId && this.selectedExchange && this.isRemoving){
+				this.axios.get('/api/exchange-wallets/'+this.selectedExchange).then((response) => {
 					this.wallet_choices = response.data;
 				});
 			}
 		},
 		onRadioSelected(arg){
-this.wallet = arg;
-this.check();
-
+			this.selectedWalletId = arg;
+			this.check();
 		},
 		check(){
 			this.text_error = null;
@@ -256,32 +255,32 @@ this.check();
 			this.isSpinnerActive = true;
 			this.isCheckButtonActive = false;
 
-			this.axios.get('/api/redirection/'+this.wallet).then((response) => {
-				this.wallet = response.data.redirected_id;
-				if (!this.wallet)
+			this.axios.get('/api/redirection/'+this.selectedWalletId).then((response) => {
+				this.selectedWalletId = response.data.redirected_id;
+				if (!this.selectedWalletId)
 					this.text_error = this.$t("editModalWalletNotFound");
 
-				this.axios.get('/api/operations/'+this.exchange).then((response) => {
+				this.axios.get('/api/operations/'+this.selectedExchange).then((response) => {
 					const operations = response.data;
 					var bFound = false;
 					for (var i=0; i< operations.length; i++){
-						if (operations[i].wallet_id != this.wallet || operations[i].exchange != this.exchange)
+						if (operations[i].wallet_id != this.selectedWalletId || operations[i].exchange != this.selectedExchange)
 							continue;
 						bFound = true;
 						if (operations[i].committed_outcome == "in" && !this.isRemoving){
-							this.text_error = this.$t("editModalAlreadyBelongs", {wallet: this.wallet, exchange: this.exchange});
+							this.text_error = this.$t("editModalAlreadyBelongs", {wallet: this.selectedWalletId, exchange: this.selectedExchange});
 							break;
 						}
 						if ((!operations[i].committed_outcome || operations[i].committed_outcome == "out") && this.isRemoving){
-							this.text_error = this.$t("editModalDoesntBelong", {wallet: this.wallet, exchange: this.exchange});
+							this.text_error = this.$t("editModalDoesntBelong", {wallet: this.selectedWalletId, exchange: this.selectedExchange});
 							break;
 						}
 						if (operations[i].status == "onreview")
-							this.text_error = this.$t("editModalOperationOnGoing", {wallet: this.wallet, exchange: this.exchange});
+							this.text_error = this.$t("editModalOperationOnGoing", {wallet: this.selectedWalletId, exchange: this.selectedExchange});
 					}
 
 						if(!bFound && this.isRemoving)
-							this.text_error = this.$t("editModalDoesntBelong", {wallet: this.wallet, exchange: this.exchange});
+							this.text_error = this.$t("editModalDoesntBelong", {wallet: this.selectedWalletId, exchange: this.selectedExchange});
 
 						if (!this.text_error) {
 							this.getBestPool()
@@ -293,7 +292,7 @@ this.check();
 			});
 		},
 		getBestPool(){
-			this.axios.get('/api/pool/'+this.exchange).then((response) => {
+			this.axios.get('/api/pool/'+this.selectedExchange).then((response) => {
 				if (response.data.pool_id){
 					this.bestPoolId = response.data.pool_id;
 					this.rewardAmount = Number(response.data.reward_amount);
@@ -308,7 +307,7 @@ this.check();
 				bvModalEvt.preventDefault();
 				const base64url = require('base64url');
 				const data = {
-						exchange: this.exchange,
+						exchange: this.selectedExchange,
 						pool_id: this.bestPoolId
 				};
 
@@ -318,9 +317,9 @@ this.check();
 					data.url_2 = this.url_2;
 
 				if (this.isRemoving)
-					data.remove_wallet_id = this.wallet;
+					data.remove_wallet_id = this.selectedWalletId;
 				else
-					data.add_wallet_id = this.wallet;
+					data.add_wallet_id = this.selectedWalletId;
 
 				const json_string = JSON.stringify(data);
 				const base64data = base64url(json_string);

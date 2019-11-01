@@ -9,10 +9,10 @@
 				{{$t('crowdsourcingRankingButtonSetNickname')}}
 			</b-button>
 			<b-tabs content-class="mt-3 text-left">
-				<b-tab title="Contributors" active>
+				<b-tab :title="$t('crowdSourcingContributorsTitle')" active>
 					<contributors-ranking />
 				</b-tab>
-				<b-tab title="Donators">
+				<b-tab :title="$t('crowdSourcingDonatorsTitle')">
 					<donators-ranking />
 				</b-tab>
 			</b-tabs>

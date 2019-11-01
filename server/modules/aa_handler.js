@@ -189,7 +189,7 @@ function extractProofUrls(objStateVars){
 	for (var key in objStateVars){
 		if (key.indexOf("k_") == 0){
 		var splitKey = key.split('_');
-		 if (splitKey[3] == "url" && splitKey[4] == "proof"){
+		 if (splitKey[4] == "url" && splitKey[5] == "proof"){
 			var outcome = splitKey[7];
 			var operation_key = splitKey[0] + '_' + splitKey[1] + '_' + splitKey[2] + '_' + splitKey[3];
 			if (!assocProofsByKeyAndOutcome[operation_key])
