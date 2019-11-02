@@ -2,9 +2,9 @@
 	<b-container fluid>
 		<edit-wallet-modal :propExchange="exchange || walletOwner" :propWalletId="walletIdToEdit" :isRemoving="isRemoving"/>
 
-		<b-row v-if="title">
+		<b-row v-if="blockTitle">
 			<b-col offset-lg="1" lg="10" cols="12" class="py-3">
-			<h3 class="text-center">{{title}}</h3>
+			<h3 class="text-center">{{blockTitle}}</h3>
 			</b-col>
 		</b-row >
 
@@ -103,6 +103,7 @@ import EditWalletModal from './commons/EditWalletModal.vue';
 import Exchange from './commons/Exchange.vue';
 import BtcAmount from './commons/BtcAmount.vue';
 import WalletId from './commons/WalletId.vue';
+const conf = require("../conf.js");
 
 export default {
 		components: {
@@ -138,6 +139,7 @@ export default {
 			isRemoving: null,
 			walletOwner: null,
 			walletIdToEdit: null,
+			tx_id: null,
 			total_on_wallets: null,
 			progressive_display_level: 1,
 			timerId: null
@@ -160,6 +162,22 @@ export default {
 		clearInterval(this.timerId);
 	},
 	methods: {
+		updateTitleAndDescription(){
+			if (this.wallet_id){
+				document.title =  this.$t("explorerTransactionsPageTitleWalletId", {wallet_id: this.wallet_id, website_name: conf.website_name});;
+				if (this.walletOwner)
+					var description = this.$t("explorerTransactionsMetaDescriptionWalletIdWithOwner", {wallet_id: this.wallet_id, exchange: this.walletOwner});
+				else
+					var description = this.$t("explorerTransactionsMetaDescriptionWalletId", {wallet_id: this.wallet_id});
+			} else if (this.tx_id){
+				document.title =  this.$t("explorerTransactionsPageTitleTxId", {tx_id: this.tx_id, website_name: conf.website_name});
+				var description = this.$t("explorerTransactionsMetaDescriptionTxId", {tx_id: this.tx_id});
+			} else if (this.exchangeName){
+				document.title =  this.$t("explorerTransactionsPageExchange", {exchange: this.exchangeName, website_name: conf.website_name});
+				var description = this.$t("explorerTransactionsMetaDescriptionExchange", {exchange: this.exchangeName});
+			}
+			document.getElementsByName('description')[0].setAttribute('content', description);
+		},
 		onPageChanged(value){
 			this.$router.push({ name: 'explorerInputPaged', params: { url_input: this.request_input, page: value } })
 		},
@@ -170,34 +188,37 @@ export default {
 			this.exchangeName = null;
 			this.exchangeWallets = null;
 			this.exchange = null;
-			this.title = null;
+			this.blockTitle = null;
 			this.failoverText =null;
 			this.redirected_ids = [];
 			this.wallet_id = null;
 			this.walletOwner = null;
 			this.walletIdToEdit = null;
 			this.total_on_wallets = null;
+			this.tx_id = null;
 
 			if (Number(this.request_input)) { // it's a wallet id
-				this.title = this.$t("explorerTransactionsTransactionsForWallet") + this.request_input;
+				this.blockTitle = this.$t("explorerTransactionsTransactionsForWallet") + this.request_input;
 				this.axios.get('/api/wallet/' + this.request_input+'/' + (this.currentPage-1)).then((response) => {
-				this.progressive_display_level = 1;
-				this.title = this.$t("explorerTransactionsTransactionsForWallet") + response.data.redirected_id;
-				if (response.data.txs){
-					this.transactions = response.data.txs.txs;
-					this.count_total = response.data.txs.count_total;
-					this.redirected_ids = [response.data.redirected_id];
-					this.total_on_wallets = response.data.txs.total_on_wallets;
-				} else {
-					this.failoverText = this.$t("explorerTransactionsNoTransactionsFound") + this.request_input;
-				}
-					this.wallet_id = Number(response.data.redirected_id);
-					this.walletIdToEdit = this.wallet_id;
-					this.walletOwner = response.data.exchange;
-					this.isSpinnerActive = false;
-				});
+					this.progressive_display_level = 1;
+					this.blockTitle = this.$t("explorerTransactionsTransactionsForWallet") + response.data.redirected_id;
+					if (response.data.txs){
+						this.transactions = response.data.txs.txs;
+						this.count_total = response.data.txs.count_total;
+						this.redirected_ids = [response.data.redirected_id];
+						this.total_on_wallets = response.data.txs.total_on_wallets;
+					} else {
+						this.failoverText = this.$t("explorerTransactionsNoTransactionsFound") + this.request_input;
+					}
+						this.wallet_id = Number(response.data.redirected_id);
+						this.walletIdToEdit = this.wallet_id;
+						this.walletOwner = response.data.exchange;
+						this.isSpinnerActive = false;
+						this.updateTitleAndDescription();
+					});
 			} else if (isTxId(this.request_input)) { // it's a tx id
-				this.title = "Transaction " + this.request_input;
+				this.blockTitle = "Transaction " + this.request_input;
+				this.tx_id = this.request_input;
 				this.axios.get('/api/txid/' + this.request_input).then((response) => {
 					if (response.data.txs){
 						this.transactions = response.data.txs;
@@ -206,17 +227,19 @@ export default {
 					} else {
 						this.failoverText = this.$t("explorerTransactionsTransactionsNotFound", {transaction:  this.request_input});
 					}
+					this.updateTitleAndDescription();
 				});
 
 			} else if (validate(this.request_input)) { // it's a BTC address
-				this.title = this.$t("explorerTransactionsLookingForWallet", {address: this.request_input});
+				this.blockTitle = this.$t("explorerTransactionsLookingForWallet", {address: this.request_input});
 				this.axios.get('/api/address/' + this.request_input).then((response) => {
 					this.$router.push({ name: 'explorerInputPaged', params: { url_input: response.data.redirected_id}})
 				});
 
 			} else if (this.request_input) { // should be an exchange
 				this.axios.get('/api/exchange/' + this.request_input+'/' + (this.currentPage-1)).then((response) => {
-					this.title = this.$t("explorerTransactionsTransactionsForExchange", {exchange:  response.data.name});
+					this.progressive_display_level = 1;
+					this.blockTitle = this.$t("explorerTransactionsTransactionsForExchange", {exchange:  response.data.name});
 					if (response.data.txs){
 						this.transactions = response.data.txs.txs;
 						this.count_total = response.data.txs.count_total;
@@ -231,6 +254,7 @@ export default {
 					this.exchange = this.request_input;
 					this.exchangeName =  response.data.name;
 					this.isSpinnerActive = false;
+					this.updateTitleAndDescription();
 				});
 			}
 		}

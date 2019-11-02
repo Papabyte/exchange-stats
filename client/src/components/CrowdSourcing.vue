@@ -45,6 +45,7 @@ import CurrentPools from './CrowdSourcingPools.vue'
 import CurrentOperations from './CrowdSourcingOperations.vue'
 import LastTransactions from './CrowdSourcingTransactions.vue'
 import Rankings from './CrowdSourcingRankings.vue'
+const conf = require("../conf.js");
 
 export default {
 	components: {
@@ -60,11 +61,8 @@ export default {
 		}
 	},
 	created(){
-		document.title = this.$t("crowdSourcingPageTitle");
-		var meta = document.createElement('meta');
-		meta.name = "description";
-		meta.content = this.$t("crowdSourcingMetaDescription");
-		document.getElementsByTagName('head')[0].appendChild(meta);
+		document.title = this.$t("crowdSourcingPageTitle", {website_name: conf.website_name});
+		document.getElementsByName('description')[0].setAttribute('content',this.$t("crowdSourcingMetaDescription"));
 	}
 }
 </script>

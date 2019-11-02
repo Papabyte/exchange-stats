@@ -11,9 +11,7 @@
 					<b-col offset-lg="2" lg="8" cols="12" class="main-col p-5">
 						<b-media>
 							<h5 class="mt-3 question"> {{$t('faqQuestion1')}}</h5>
-							<p class="answer">
-							{{$t('faqAnswer1')}}
-							</p>
+							<p class="answer" v-html="$t('faqAnswer1')"/>
 						</b-media>
 						<b-media>
 							<h5 class="mt-3 question"> {{$t('faqQuestion2')}}</h5>
@@ -29,9 +27,7 @@
 						</b-media>
 						<b-media>
 							<h5 class="mt-3 question"> {{$t('faqQuestion4')}}</h5>
-							<p class="answer">
-							{{$t('faqAnswer4')}}
-							</p>
+							<p class="answer" v-html="$t('faqAnswer4')"/>
 						</b-media>
 						<b-media>
 							<h5 class="mt-3 question"> {{$t('faqQuestion5')}}</h5>
@@ -41,9 +37,7 @@
 						</b-media>
 						<b-media>
 							<h5 class="mt-3 question"> {{$t('faqQuestion6')}}</h5>
-							<p class="answer">
-							{{$t('faqAnswer6')}}
-							</p>
+							<p class="answer" v-html="$t('faqAnswer6')"/>
 						</b-media>
 					</b-col>
 				</b-row >
@@ -55,7 +49,6 @@
 import NavBar from './commons/NavBar.vue'
 const conf = require("../conf.js");
 
-
 export default {
 	components: {
 		NavBar
@@ -66,11 +59,8 @@ export default {
 		}
 	},
 	created(){
-		document.title = this.$t("faqPageTitle");
-		var meta = document.createElement('meta');
-		meta.name = "description";
-		meta.content = this.$t("faqMetaDescription");
-		document.getElementsByTagName('head')[0].appendChild(meta);
+		document.title = this.$t("faqPageTitle", {website_name: conf.website_name});
+		document.getElementsByName('description')[0].setAttribute('content',this.$t("faqMetaDescription"));
 	}
 }
 </script>

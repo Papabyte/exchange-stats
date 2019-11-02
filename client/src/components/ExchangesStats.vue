@@ -18,6 +18,7 @@
 import NavBar from './commons/NavBar.vue'
 import RankingTable from './ExchangeStatsRanking.vue'
 import BtcAmount from './commons/BtcAmount.vue';
+const conf = require("../conf.js");
 
 export default {
 	name: 'ExchangesStats',
@@ -31,10 +32,8 @@ export default {
 		}
 	},
 	created(){
-		document.title = this.$t('rankingPageTitle');
-		var meta = document.createElement('meta');
-		meta.name = "description";
-		meta.content = this.$t("rankingMetaDescription");
+		document.title = this.$t('rankingPageTitle', {website_name: conf.website_name});
+		document.getElementsByName('description')[0].setAttribute('content',this.$t("rankingMetaDescription"));
 	}
 }
 </script>

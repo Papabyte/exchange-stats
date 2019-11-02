@@ -48,7 +48,7 @@
 import NavBar from './commons/NavBar.vue'
 import Transactions from './ExplorerTransactions.vue'
 import Exchange from './commons/Exchange.vue';
-
+const conf = require('../conf.js');
 export default {
 	components: {
 		NavBar,
@@ -84,10 +84,8 @@ export default {
 		}
 	},
 	created(){
-		document.title = this.$t("explorerPageTitle");
-		var meta = document.createElement('meta');
-		meta.name = "description";
-		meta.content = this.$t("explorerMetaDescription");
+		document.title = this.$t("explorerPageTitle", {website_name:conf.website_name});
+		document.getElementsByName('description')[0].setAttribute('content',this.$t("explorerMetaDescription"));
 	},
 	methods:{ 
 		onSubmit(){
