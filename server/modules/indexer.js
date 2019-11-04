@@ -8,7 +8,8 @@ const zlib = require('zlib');
 const stats = require("./stats.js");
 
 const confirmationsBeforeIndexing = 3;
-const activeRedirectionFromHeight = 	process.env.testnet ? 9000 : 598000;
+const activeRedirectionFromHeight = process.env.testnet ? 9000 : 598000;
+const block_server_url = process.env.block_server;
 
 var lastBlockHeightProcessed;
 
@@ -286,7 +287,7 @@ function downloadNextWhileProcessing(blockheight, start_tx_index,  objBlock){
 function downloadBlockAndParse(blockheight, handle){
 	console.error("will request block " + blockheight);
 	request({
-		url: "http://5.39.78.212/"+blockheight+".gz",
+		url: block_server_url + blockheight + ".gz",
 		encoding: null
 	}, function(error, response, body) {
 		if (error || response.statusCode !== 200){
@@ -295,7 +296,7 @@ function downloadBlockAndParse(blockheight, handle){
 		zlib.unzip(body, function(err, unZippedData) {
 			if (err) {
 				return downloadBlockAndParse(blockheight, handle);
-			} else{
+			} else {
 				var objBlock = JSON.parse(unZippedData);
 				console.error("block " + blockheight + " downloaded");
 				handle(null, objBlock);
@@ -319,7 +320,6 @@ function getLastBlockHeight( handle){
 			return handle(e);
 		}
 ;
-
 		handle(null, objLastBlock.height);
 	});
 }

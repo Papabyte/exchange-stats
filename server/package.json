@@ -1,5 +1,5 @@
 {
-	"name": "exchanges-stats-server",
+	"name": "counterstats-server",
 	"version": "0.1.0",
 	"dependencies": {
 		"async": "^3.1.0",

@@ -35,3 +35,5 @@ server/.vscode
 
 zipper/node_modules
 zipper/package-lock.json
+zipper/.env
+
