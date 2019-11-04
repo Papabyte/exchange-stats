@@ -9,7 +9,7 @@ const stats = require("./stats.js");
 
 const confirmationsBeforeIndexing = 3;
 const activeRedirectionFromHeight = process.env.testnet ? 9000 : 598000;
-const block_server_url = process.env.
+const block_server_url = process.env.block_server;
 
 var lastBlockHeightProcessed;
 

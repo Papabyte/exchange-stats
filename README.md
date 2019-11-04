@@ -1,7 +1,7 @@
 This project has 3 parts.
 
 ## Client Webapp
-Single Application made with VueJS. Can be run locally for development with vue-cli then built into a dist folder that is served by Nginx.
+Single Page Application made with VueJS. Can be run locally for development with vue-cli then built into a dist folder that is served by Nginx.
 
 ## Server
 - Based on an Obyte light node, reads state vars and responses from counterstats AA

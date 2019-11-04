@@ -29,7 +29,9 @@ async function start(){
 
 function getBlocksAboveIndex(){
 	return new Promise(function(resolve){
+		console.log("will get block count");
 		client.getBlockCount().then(function(count){
+			console.log("BTC blocks count is " + count);
 			if (count > (current_block_index + CONFIRMATIONS)){
 				current_block_index++;
 				saveBlockOndisk(current_block_index).then(function(){
@@ -38,7 +40,10 @@ function getBlocksAboveIndex(){
 			} else {
 				resolve();
 			}
-		}).catch(resolve);
+		}).catch(function(error){
+			console.log("couldn't get block count " + error);
+			resolve();
+		});
 	});
 }
 
@@ -46,7 +51,9 @@ function getBlocksAboveIndex(){
 function saveBlockOndisk(height){
 
 	return new Promise(async function(resolve){
+		console.log("will get hash for block " + height);
 		client.getBlockHash(height).then(function(block_hash){
+			console.log("block hash for " + height + " is " +  block_hash);
 			client.getBlockByHash(block_hash, { extension: 'json' }).then(async (block) => {
 				console.log("read block " + block.height);
 				const txs = block.tx;
