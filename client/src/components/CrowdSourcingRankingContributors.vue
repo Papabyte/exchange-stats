@@ -23,7 +23,7 @@
 							:sort-by.sync="sortBy"
 							:sort-desc.sync="sortDesc"
 							responsive
-								sort-icon-left
+							sort-icon-left
 						>	
 							<template v-slot:cell(income)="data">
 								<byte-amount :isNegative="data.item.income<0" :isPositive="data.item.income>0" :amount="data.item.income || 0"/>
