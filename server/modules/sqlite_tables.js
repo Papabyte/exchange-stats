@@ -39,9 +39,10 @@ exports.create = function(){
 			n SMALLINT NOT NULL\n\
 			)");
 
-		await db.query("CREATE INDEX IF NOT EXISTS toByWalletId ON transactions_to(wallet_id ,address_id)");
+		await db.query("CREATE INDEX IF NOT EXISTS toByWalletId ON transactions_to(wallet_id)");
 		await db.query("CREATE UNIQUE INDEX IF NOT EXISTS toById ON transactions_to(id,n)");
-		await db.query("CREATE INDEX IF NOT EXISTS toByAddressId ON transactions_to(address_id)");
+		await db.query("CREATE INDEX IF NOT EXISTS toByAddressId ON transactions_to(address_id,wallet_id)");
+
 
 		await db.query("CREATE TABLE IF NOT EXISTS processed_blocks (\n\
 			block_height INTEGER  PRIMARY KEY, \n\

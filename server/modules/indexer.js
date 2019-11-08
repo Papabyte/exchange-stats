@@ -11,14 +11,14 @@ const confirmationsBeforeIndexing = 3;
 const activeRedirectionFromHeight = 	process.env.testnet ? 9000 : 598000;
 
 var lastBlockHeightProcessed;
-/*
+
 (async function(){
  if (process.env.faster){
 		await db.query("PRAGMA journal_mode=MEMORY");
 		await db.query("PRAGMA synchronous = 0 ");
 		await db.query("PRAGMA LOCKING_MODE = EXCLUSIVE");
 	}
-})();*/
+})();
 
 getLastHeightThenProcess();
 setInterval(getLastHeightThenProcess, 60000);
@@ -169,7 +169,7 @@ function saveOnlyTransactionsTo(bFirstTreated, tx_id, height, outputs, value_out
 				VALUES ((SELECT id FROM transactions WHERE tx_id=?), (SELECT wallet_id FROM btc_addresses WHERE address=?),(SELECT id FROM btc_addresses WHERE address=?),?,?)",[tx_id, outputs[i].address, outputs[i].address, outputs[i].value, outputs[i].n]);
 				conn.addQuery(arrQueries,"UPDATE btc_wallets SET balance=balance+? WHERE id=(SELECT wallet_id FROM btc_addresses WHERE address=?)",[outputs[i].value, outputs[i].address,]);
 			}
-			var inputAddressesSqlString = objInputs.input_address_ids.join(",");
+			var outputAddressesSqlString = outputs.map(function(output){return output.address}).join("','");
 			conn.addQuery(arrQueries,"UPDATE btc_wallets SET txs_count=txs_count+1 \n\
 			WHERE id IN (SELECT DISTINCT(wallet_id) FROM btc_addresses WHERE address IN('"+outputAddressesSqlString+"'))");
 
@@ -208,6 +208,7 @@ function saveInputAddressesAndTransactions(bFirstTreated, objInputs, tx_id, heig
 			[objInputs.input_address_ids.length]);	//increase address count only for addresses that are not already known
 			conn.addQuery(arrQueries,"UPDATE btc_addresses SET wallet_id=(SELECT MAX(id) FROM btc_wallets) WHERE wallet_id IS NULL AND id IN("+inputAddressesSqlString+")");
 			conn.addQuery(arrQueries,"UPDATE btc_wallets SET balance=balance+(SELECT SUM(amount) FROM transactions_to WHERE wallet_id IS NULL AND address_id IN("+inputAddressesSqlString+")) WHERE id=(SELECT MAX(id) FROM btc_wallets)");
+			conn.addQuery(arrQueries,"UPDATE btc_wallets SET txs_count=txs_count+(SELECT COUNT(ROWID) FROM transactions_to WHERE wallet_id IS NULL AND address_id IN("+inputAddressesSqlString+")) WHERE id=(SELECT MAX(id) FROM btc_wallets)");
 			conn.addQuery(arrQueries,"UPDATE transactions_to SET wallet_id=(SELECT MAX(id) FROM btc_wallets) WHERE wallet_id IS NULL AND address_id IN("+inputAddressesSqlString+")");
 
 			for (var i=0; i<outputs.length; i++){
@@ -217,7 +218,7 @@ function saveInputAddressesAndTransactions(bFirstTreated, objInputs, tx_id, heig
 			}
 			var outputAddressesSqlString = outputs.map(function(output){return output.address}).join("','");
 			conn.addQuery(arrQueries,"UPDATE btc_wallets SET txs_count=txs_count+1 \n\
-			WHERE id IN (SELECT DISTINCT(wallet_id) FROM btc_addresses WHERE address IN('"+outputAddressesSqlString+"') AND id NOT IN("+inputAddressesSqlString+"))");// tx from input will be counted at merge step
+			WHERE id IN (SELECT DISTINCT(wallet_id) FROM btc_addresses WHERE address IN('"+outputAddressesSqlString+"') OR id IN("+inputAddressesSqlString+"))");
 			conn.addQuery(arrQueries,"UPDATE btc_wallets SET balance=balance-? \n\
 			WHERE id=(SELECT wallet_id FROM btc_addresses WHERE id IN("+inputAddressesSqlString+") LIMIT 1)",[objInputs.value_in]);
 			conn.addQuery(arrQueries,"INSERT INTO transactions_from (id, wallet_id,amount) VALUES \n\
@@ -255,7 +256,7 @@ function mergeWallets(objInputs, block_height, block_time, tx_index){
 					var wallet_ids_to_update_string =  wallet_ids_to_update.join(",");
 					conn.addQuery(arrQueries, "UPDATE btc_wallets SET addr_count=addr_count+(SELECT SUM(addr_count) FROM btc_wallets WHERE id IN("+wallet_ids_to_update_string+")),\n\
 					balance=balance+(SELECT SUM(balance) FROM btc_wallets WHERE id IN("+wallet_ids_to_update_string+")),\n\
-					txs_count=txs_count+(SELECT SUM(txs_count)+1 FROM btc_wallets WHERE id IN("+wallet_ids_to_update_string+")) WHERE id=?",[rows[0].id]);
+					txs_count=txs_count+(SELECT SUM(txs_count) FROM btc_wallets WHERE id IN("+wallet_ids_to_update_string+")) WHERE id=?",[rows[0].id]);
 					if (block_height >= activeRedirectionFromHeight) {
 						conn.addQuery(arrQueries, "UPDATE btc_wallets SET addr_count=0,balance=0,txs_count=0,redirection=? WHERE id IN("+wallet_ids_to_update_string+") OR redirection IN("+wallet_ids_to_update_string+")",[rows[0].id]);
 					} else {
