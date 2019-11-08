@@ -159,23 +159,24 @@ export default {
 	computed:{
 
 		getTitle:function(){
+			var title = "";
 			if (this.propExchange){
 				if (this.selectedWalletId && this.selectedExchange){
-					return (this.isRemoving ? this.$t('editModalRemoveXFromX', {exchange: this.assocExchanges[this.selectedExchange], wallet: this.selectedWalletId}): 
-					this.$t('editModalAddXToX', {exchange:this.assocExchanges[this.selectedExchange], wallet: this.isWalletId(this.selectedWalletId)? this.selectedWalletId : ""}));
+					title = this.isRemoving ? this.$t('editModalRemoveXFromX', {exchange: this.assocExchanges[this.selectedExchange], wallet: this.selectedWalletId}): 
+					this.$t('editModalAddXToX', {exchange:this.assocExchanges[this.selectedExchange], wallet: this.isWalletId(this.selectedWalletId)? this.selectedWalletId : ""});
 				}
 				else if (this.selectedExchange){
-					return (this.isRemoving ? this.$t('editModalRemoveFromX',{exchange:this.assocExchanges[this.selectedExchange]}):
-					this.$t('editModalAddToX',{exchange:this.assocExchanges[this.selectedExchange]}));
+					title = this.isRemoving ? this.$t('editModalRemoveFromX',{exchange:this.assocExchanges[this.selectedExchange]}):
+					this.$t('editModalAddToX',{exchange:this.assocExchanges[this.selectedExchange]});
 				}
 				else if (this.selectedWalletId){
-					return (this.isRemoving ? this.$t('editModalRemoveXFrom', {wallet: this.selectedWalletId}): 
-					this.$t('editModalAddXTo', {wallet: this.isWalletId(this.selectedWalletId) ? this.selectedWalletId : ""}));
+					title = this.isRemoving ? this.$t('editModalRemoveXFrom', {wallet: this.selectedWalletId}): 
+					this.$t('editModalAddXTo', {wallet: this.isWalletId(this.selectedWalletId) ? this.selectedWalletId : ""});
 				}
 			} else if (this.propWalletId){
-					return this.$t('editModalAddXToX', {exchange:this.assocExchanges[this.selectedExchange], wallet: this.isWalletId(this.selectedWalletId) ? this.selectedWalletId : ""});
-			 } else
-				 return "";
+				title = this.$t('editModalAddXToX', {exchange:this.assocExchanges[this.selectedExchange], wallet: this.isWalletId(this.selectedWalletId) ? this.selectedWalletId : ""});
+			}
+			return title;
 		},
 		validExchange() {
 			return !!this.assocExchanges[this.selectedExchange]
