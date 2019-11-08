@@ -205,7 +205,7 @@ export default {
 			else
 				this.isCheckButtonActive = false;
 		},
-		isRemoving: function(){
+		isRemoving: function(){ // we watch isRemoving prop to keep it updated
 
 		},
 		selectedExchange: function(){
@@ -222,7 +222,7 @@ export default {
 	},
 	methods:{
 		isWalletId(wallet){
-				return (Number(wallet) && parseInt(wallet))
+			return (Number(wallet) && parseInt(wallet))
 		},
 		update_url_1(value){
 			this.url_1 = value;
@@ -305,27 +305,27 @@ export default {
 			});
 		},
 		handleOk(bvModalEvt){
-				bvModalEvt.preventDefault();
-				const base64url = require('base64url');
-				const data = {
-						exchange: this.selectedExchange,
-						pool_id: this.bestPoolId
-				};
+			bvModalEvt.preventDefault();
+			const base64url = require('base64url');
+			const data = {
+					exchange: this.selectedExchange,
+					pool_id: this.bestPoolId
+			};
 
-				if (this.url_1)
-					data.url_1 = this.url_1;
-				if (this.url_2)
-					data.url_2 = this.url_2;
+			if (this.url_1)
+				data.url_1 = this.url_1;
+			if (this.url_2)
+				data.url_2 = this.url_2;
 
-				if (this.isRemoving)
-					data.remove_wallet_id = this.selectedWalletId;
-				else
-					data.add_wallet_id = this.selectedWalletId;
+			if (this.isRemoving)
+				data.remove_wallet_id = this.selectedWalletId;
+			else
+				data.add_wallet_id = this.selectedWalletId;
 
-				const json_string = JSON.stringify(data);
-				const base64data = base64url(json_string);
-				this.link = (conf.testnet ? "byteball-tn" :"byteball")+":"+conf.aa_address+"?amount="
-					+this.stakeAmount+"&base64data="+base64data;
+			const json_string = JSON.stringify(data);
+			const base64data = base64url(json_string);
+			this.link = (conf.testnet ? "byteball-tn" :"byteball")+":"+conf.aa_address+"?amount="
+				+this.stakeAmount+"&base64data="+base64data;
 		}
 	}
 }
