@@ -13,6 +13,7 @@ client/yarn-debug.log*
 client/yarn-error.log*
 
 # Editor directories and files
+.idea/
 client/.idea
 client/.vscode
 
