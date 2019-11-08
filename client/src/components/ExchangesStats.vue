@@ -4,7 +4,7 @@
 			<b-container fluid>
 				<b-row>
 					<b-col offset-lg="1" lg="10" cols="12" class="py-3">
-						<b-alert v-if="welcomeMessageShown" @dismissed="$store.commit('setWasRankingWelcomeMessageClosed',true)" show dismissible>
+						<b-alert v-if="welcomeMessageShown" @dismissed="$store.commit('setWasRankingWelcomeMessageClosed',true)" variant="welcome-message" show dismissible>
 						{{$t('rankingWelcomeMessage')}}
 						</b-alert>
 					</b-col>

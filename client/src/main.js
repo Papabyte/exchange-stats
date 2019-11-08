@@ -10,7 +10,7 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 import feather from 'vue-icon'
 
-import "@/assets/global.css"
+import "@/assets/custom.scss"
 import i18n from './i18n'
 import store from './store'
 

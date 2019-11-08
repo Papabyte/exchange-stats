@@ -8,7 +8,7 @@
 					</b-col>
 				</b-row >
 				<b-row>
-					<b-col offset-lg="2" lg="8" cols="12" class="main-col p-5">
+					<b-col offset-lg="2" lg="8" cols="12" class="main-block p-5">
 						<b-media>
 							<h5 class="mt-3 question"> {{$t('faqQuestion1')}}</h5>
 							<p class="answer" v-html="$t('faqAnswer1')"/>

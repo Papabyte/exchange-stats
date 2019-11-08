@@ -8,7 +8,7 @@
 						<h3 class="text-center">{{$t('rankingTitle')}}</h3>
 					</b-col >
 				</b-row >
-				<b-row class="main-col">
+				<b-row class="main-block">
 					<b-pagination
 					v-model="currentPage"
 					:total-rows="totalRows"
@@ -127,8 +127,5 @@ import EditWalletModal from './commons/EditWalletModal.vue';
 </script>
 
 <style >
-
-.main-col{
-}
 
 </style>

@@ -76,7 +76,7 @@
 		</b-col>
 
 		<b-row v-if="!isSpinnerActive && transactions">
-			<b-col offset-lg="1" lg="10" cols="12" class="py-3 main-col">
+			<b-col offset-lg="1" lg="10" cols="12" class="py-3 main-block">
 				<b-row  class="text-center">
 		<b-pagination
 			v-model="currentPage"

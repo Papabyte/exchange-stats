@@ -31,8 +31,8 @@
 								<span class="d-block">Resulting outcome: <b>{{item.resulting_outcome}}</b></span>
 								<span v-if="item.expected_reward" class="d-block">Expected reward: <b><byte-amount :amount="item.expected_reward"/></b></span>
 								<b-progress :max="item.staked_on_yes + item.staked_on_no" show-value height="1.5rem" class="mt-1">
-									<b-progress-bar :value="item.staked_on_yes" variant="success"><b><byte-amount :amount="item.staked_on_yes"/></b> </b-progress-bar>
-									<b-progress-bar :value="item.staked_on_no" variant="danger"><b><byte-amount :amount="item.staked_on_no"/></b> </b-progress-bar>
+									<b-progress-bar :value="item.staked_on_yes" variant="bar-yes"><b><byte-amount :amount="item.staked_on_yes"/></b> </b-progress-bar>
+									<b-progress-bar :value="item.staked_on_no" variant="bar-no"><b><byte-amount :amount="item.staked_on_no"/></b> </b-progress-bar>
 								</b-progress>
 							</div>
 						</b-col>

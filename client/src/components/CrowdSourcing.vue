@@ -4,7 +4,7 @@
 		<b-container fluid >
 				<b-row>
 					<b-col offset-lg="2" lg="8" cols="12" class="py-3">
-						<b-alert v-if="welcomeMessageShow" @dismissed="$store.commit('setWasCrowdSourcingWelcomeMessageClosed',true)" show dismissible>
+						<b-alert v-if="welcomeMessageShow" @dismissed="$store.commit('setWasCrowdSourcingWelcomeMessageClosed',true)" variant="welcome-message" show dismissible>
 						{{$t('crowdSourcingWelcomeMessage')}}
 						</b-alert>
 					</b-col>

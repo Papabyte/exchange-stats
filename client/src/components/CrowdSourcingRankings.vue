@@ -1,5 +1,5 @@
 <template>
-	<b-row class="main-col pt-3">
+	<b-row class="main-block pt-3">
 		<set-nickname-modal />
 		<b-col cols="12" class="text-center text-lg-right">
 			<b-button 
@@ -50,8 +50,5 @@
 </script>
 
 <style >
-
-.main-col{
-}
 
 </style>

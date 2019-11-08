@@ -97,7 +97,4 @@
 
 <style >
 
-.main-col{
-}
-
 </style>

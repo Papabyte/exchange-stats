@@ -1,6 +1,6 @@
 <template>
 
-	<b-row class="main-col">
+	<b-row class="main-block">
 		<contest-operation-modal :operationItem="clicked_item"/>
 		<claim-gain-modal  :operationItem="clicked_item"/>
 		<view-url-proofs-modal :operationItem="clicked_item"/>
@@ -216,7 +216,7 @@ import moment from 'moment/src/moment'
 
 <style >
 
-.main-col{
+.main-block{
 }
 
 </style>

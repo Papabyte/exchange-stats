@@ -1,5 +1,5 @@
 <template>
-		<b-row class="main-col">
+		<b-row class="main-block">
 			<b-col cols="12">
 				<b-row>
 					<b-col  cols="3">
@@ -78,8 +78,5 @@
 </script>
 
 <style >
-
-.main-col{
-}
 
 </style>

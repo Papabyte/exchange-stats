@@ -86,7 +86,5 @@
 
 <style >
 
-.main-col{
-}
 
 </style>
