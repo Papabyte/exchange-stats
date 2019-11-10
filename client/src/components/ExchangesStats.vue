@@ -1,15 +1,15 @@
 <template>
 	<div class="main">
 		<nav-bar selected_item='0' />
-			<b-container fluid>
-				<b-row>
-					<b-col offset-lg="1" lg="10" cols="12" class="py-3">
-						<b-alert v-if="welcomeMessageShown" @dismissed="$store.commit('setWasRankingWelcomeMessageClosed',true)" variant="welcome-message" show dismissible>
+		<b-container fluid>
+			<b-row>
+				<b-col offset-lg="1" lg="10" cols="12" class="py-3">
+					<b-alert v-if="welcomeMessageShown" @dismissed="$store.commit('setWasRankingWelcomeMessageClosed',true)" variant="info" show dismissible>
 						{{$t('rankingWelcomeMessage')}}
-						</b-alert>
-					</b-col>
-				</b-row >
-			</b-container>
+					</b-alert>
+				</b-col>
+			</b-row >
+		</b-container>
 		<ranking-table />
 	</div>
 </template>

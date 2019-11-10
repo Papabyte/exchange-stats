@@ -5,7 +5,7 @@
 			<b-col offset-lg="1" lg="10" cols="12" class="py-3">
 				<b-row >
 					<b-col cols="12" class="py-3">
-						<h3 class="text-center">{{$t('rankingTitle')}}</h3>
+						<h3>{{$t('rankingTitle')}}</h3>
 					</b-col >
 				</b-row >
 				<b-row class="main-block">
@@ -78,6 +78,13 @@
 								</b-button-group>
 						</template>
 					</b-table>
+					<b-pagination
+						v-model="currentPage"
+						:total-rows="totalRows"
+						:per-page="perPage"
+						size="l"
+						class="p-4 my-0"
+					></b-pagination>
 				</b-row>
 			</b-col>
 		</b-row>

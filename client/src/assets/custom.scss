@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,400i,500,500i,700,700i&display=swap');
+
 $theme-colors: (
 	"primary": #3e1886,
 	"bar-yes": #2c8f31,
@@ -6,8 +8,11 @@ $theme-colors: (
 	"main-block" : white
 );
 
-$body-bg:  rgb(236, 236, 235);
+$body-bg:  rgb(250, 250, 250);
 $btn-border-radius: 0px;
+$dark: #363636;
+$light: #ffffff;
+$info: #3298dc;
 
 // import must be after variables overrides
 @import 'node_modules/bootstrap/scss/bootstrap';
@@ -17,7 +22,7 @@ $btn-border-radius: 0px;
 
 // general style overrides and custom classes
 body {
-	font-family: 'Verdana', sans-serif;
+  font-family: 'Roboto', Verdana sans-serif;
 }
 
 .main-block {
