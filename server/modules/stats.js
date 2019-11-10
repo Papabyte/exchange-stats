@@ -27,7 +27,7 @@ function getTotalWithdrawnFromWallets(arrIds, from_block, to_block ){
 			return resolve(0);
 		const idsSqlFilter = arrIds.join(",");
 		const rows = await db.query("SELECT SUM(transactions_from.amount) AS amount FROM transactions INNER JOIN transactions_from USING(id) \n\
-		INNER JOIN transactions_to USING(id) WHERE transactions_to.wallet_id NOT IN("+idsSqlFilter+") AND transactions_from.wallet_id IN("+idsSqlFilter+") \n\
+		CROSS JOIN transactions_to USING(id) WHERE transactions_to.wallet_id NOT IN("+idsSqlFilter+") AND transactions_from.wallet_id IN("+idsSqlFilter+") \n\
 		AND transactions.block_height >=? AND transactions.block_height <=?",[from_block, to_block]);
 		return resolve(rows[0] && rows[0].amount ? rows[0].amount : 0);
 	})
@@ -41,7 +41,7 @@ function getTotalOnWallets(arrIds){
 		if (assocTotalOnWalletsCache[idsSqlFilter])
 			var rows = assocTotalOnWalletsCache[idsSqlFilter];
 		else {
-			var rows = await db.query("SELECT (SELECT SUM(amount) FROM transactions_to WHERE wallet_id IN("+idsSqlFilter+")) - (SELECT SUM(amount) FROM transactions_from WHERE wallet_id IN("+idsSqlFilter+")) as amount");
+			var rows = await db.query("SELECT SUM(balance) AS amount FROM btc_wallets WHERE id IN("+idsSqlFilter+")");
 			assocTotalOnWalletsCache[idsSqlFilter] = rows;
 		}
 		return resolve(rows[0] && rows[0].amount ? rows[0].amount : 0);
@@ -56,8 +56,7 @@ function getTotalTransactions(arrIds){
 		if (assocTotalTransactionsCache[idsSqlFilter])
 			var rows = assocTotalTransactionsCache[idsSqlFilter];
 		else {
-			var rows = await db.query("SELECT COUNT(DISTINCT id) AS count FROM (SELECT id FROM transactions_to WHERE wallet_id IN("+ idsSqlFilter +")\n\
-			UNION SELECT id FROM transactions_from WHERE wallet_id IN("+ idsSqlFilter +"))s");
+			var rows = await db.query("SELECT SUM(txs_count) AS count FROM btc_wallets WHERE id IN("+ idsSqlFilter +")");
 			assocTotalTransactionsCache[idsSqlFilter] = rows;
 		}
 		return resolve(rows[0] && rows[0].count ? rows[0].count : 0);
@@ -81,7 +80,7 @@ function getTotalWithdrawalAddresses(arrIds){
 			return resolve(0);
 		const idsSqlFilter = arrIds.join(",");
 		const rows = await db.query("SELECT count(id) as count FROM transactions INNER JOIN transactions_from USING(id) \n\
-		INNER JOIN transactions_to USING(id) WHERE transactions_from.wallet_id IN("+idsSqlFilter+") AND transactions_to.wallet_id NOT IN("+idsSqlFilter+")");
+		CROSS JOIN transactions_to USING(id) WHERE transactions_from.wallet_id IN("+idsSqlFilter+") AND transactions_to.wallet_id NOT IN("+idsSqlFilter+")");
 		return resolve(rows[0] && rows[0].count ? rows[0].count : 0);
 	})
 }

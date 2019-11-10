@@ -8,7 +8,7 @@ const zlib = require('zlib');
 const stats = require("./stats.js");
 
 const confirmationsBeforeIndexing = 3;
-const activeRedirectionFromHeight = 	process.env.testnet ? 9000 : 598000;
+const activeRedirectionFromHeight = process.env.testnet ? 9000 : 598000;
 
 var lastBlockHeightProcessed;
 
