@@ -8,7 +8,7 @@ const zlib = require('zlib');
 const stats = require("./stats.js");
 
 const confirmationsBeforeIndexing = 3;
-const activeRedirectionFromHeight = process.env.testnet ? 9000 : 598000;
+const activeRedirectionFromHeight = process.env.testnet && !process.env.full_indexation ? 9000 : 598000;
 const block_server_url = process.env.block_server;
 
 var lastBlockHeightProcessed;
@@ -28,7 +28,7 @@ function getLastHeightThenProcess(){
 	getLastBlockHeight(function(error, last_block_height){
 		if (error)
 			return error;
-		if (process.env.testnet)
+		if (process.env.testnet && !process.env.full_indexation)
 			processToBlockHeight(last_block_height - 420000);
 		else
 			processToBlockHeight(last_block_height - confirmationsBeforeIndexing);
