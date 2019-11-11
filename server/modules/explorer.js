@@ -7,12 +7,18 @@ const ITEMS_PER_PAGE = 20;
 async function getTransactionsFromWallets(arrIds, page, handle){
 	const idsSqlFilter = arrIds.join(",");
 	var [idRows, total_on_wallets, transactions_count] = await Promise.all([
-		db.query("SELECT DISTINCT id from (SELECT id FROM transactions_to WHERE wallet_id IN("+ idsSqlFilter +") \n\
-		UNION SELECT id FROM transactions_from WHERE wallet_id IN("+ idsSqlFilter +"))s ORDER BY id DESC LIMIT ?,?",[page*ITEMS_PER_PAGE,ITEMS_PER_PAGE]),
+		db.query("SELECT DISTINCT id FROM \n\
+		(SELECT id FROM (SELECT id FROM transactions_to WHERE wallet_id IN("+ idsSqlFilter +") ORDER BY id DESC LIMIT 1000)s1 \n\
+		UNION SELECT id FROM (SELECT id FROM transactions_from WHERE wallet_id IN("+ idsSqlFilter +") ORDER BY id DESC LIMIT 5000)s2)s ORDER BY id DESC LIMIT ?,?",[page*ITEMS_PER_PAGE,ITEMS_PER_PAGE]),
 		stats.getTotalOnWallets(arrIds),
 		stats.getTotalTransactions(arrIds)
 	]);
 
+	/*
+		db.query("SELECT DISTINCT id FROM (SELECT id FROM transactions_to WHERE wallet_id IN("+ idsSqlFilter +") \n\
+		UNION SELECT id FROM transactions_from WHERE wallet_id IN("+ idsSqlFilter +"))s ORDER BY id DESC LIMIT ?,?",[page*ITEMS_PER_PAGE,ITEMS_PER_PAGE]),
+		stats.getTotalOnWallets(arrIds),
+*/
 	if (transactions_count == 0)
 		return handle(null);
 
