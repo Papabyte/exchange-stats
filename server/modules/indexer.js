@@ -223,7 +223,7 @@ function saveInputAddressesAndTransactions(bFirstTreated, objInputs, tx_id, heig
 			conn.addQuery(arrQueries,"UPDATE btc_wallets SET balance=balance-? \n\
 			WHERE id=(SELECT wallet_id FROM btc_addresses WHERE id IN("+inputAddressesSqlString+") LIMIT 1)",[objInputs.value_in]);
 			conn.addQuery(arrQueries,"INSERT INTO transactions_from (id, wallet_id,amount) VALUES \n\
-				((SELECT MAX(id) FROM transactions),(SELECT wallet_id FROM btc_addresses WHERE id IN("+InputaddressesSqlString+") LIMIT 1),?)",[objInputs.value_in]);
+				((SELECT MAX(id) FROM transactions),(SELECT wallet_id FROM btc_addresses WHERE id IN("+inputAddressesSqlString+") LIMIT 1),?)",[objInputs.value_in]);
 
 			conn.addQuery(arrQueries, "COMMIT");
 			async.series(arrQueries, function() {
