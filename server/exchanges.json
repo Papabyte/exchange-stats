@@ -2,1510 +2,1811 @@
 	"bitbay": {
 			"name": "BitBay",
 			"url": "https://bitbay.net/en",
-			"country": "Poland"
+			"country": "Poland",
+			"gecko_id": "bitbay"
 	},
 	"indodax": {
 			"name": "Indodax",
 			"url": "https://indodax.com",
-			"country": "Indonesia"
+			"country": "Indonesia",
+			"gecko_id": "indodax"
 	},
 	"bitfinex": {
 			"name": "Bitfinex",
 			"url": "https://www.bitfinex.com",
-			"country": "British Virgin Islands"
+			"country": "British Virgin Islands",
+			"gecko_id": "bitfinex"
 	},
 	"bitflyer": {
 			"name": "bitFlyer",
 			"url": "https://bitflyer.com",
-			"country": "Japan"
+			"country": "Japan",
+			"gecko_id": "bitflyer"
 	},
 	"bithumb": {
 			"name": "Bithumb",
 			"url": "https://www.bithumb.com/",
-			"country": "South Korea"
+			"country": "South Korea",
+			"gecko_id": "bithumb"
 	},
 	"bitkonan": {
 			"name": "BitKonan",
 			"url": "https://bitkonan.com/",
-			"country": "Croatia"
+			"country": "Croatia",
+			"gecko_id": "bitkonan"
 	},
 	"bitso": {
 			"name": "Bitso",
 			"url": "https://bitso.com/",
-			"country": "Mexico"
+			"country": "Mexico",
+			"gecko_id": "bitso"
 	},
 	"bitstamp": {
 			"name": "Bitstamp",
 			"url": "https://www.bitstamp.net/",
 			"country": "United Kingdom",
-			"start_wallets" : [],
-			"current_wallets" :[50, 22, 89]
+			"start_wallets": [],
+			"current_wallets": [50, 22, 89],
+			"gecko_id": "bitstamp"
 	},
 	"bittrex": {
 			"name": "Bittrex",
 			"url": "https://bittrex.com/",
 			"country": "United States",
-			"current_wallets" :[10, 45]
+			"current_wallets": [10, 45],
+			"gecko_id": "bittrex"
 	},
 	"bleutrade": {
 			"name": "bleutrade",
 			"url": "https://bleutrade.com/exchange/",
 			"country": null,
-			"current_wallets" :[8000]
+			"current_wallets": [8000],
+			"gecko_id": "bleutrade"
 	},
-	"bx_thailand": {
+	"bxthailand": {
 			"name": "BX Thailand",
 			"url": "https://bx.in.th/",
-			"country": "Thailand"
+			"country": "Thailand",
+			"gecko_id": "bx_thailand"
 	},
-	"coin_exchange": {
+	"coinexchange": {
 			"name": "CoinExchange.io",
 			"url": "https://www.coinexchange.io/",
-			"country": "Australia"
+			"country": "Australia",
+			"gecko_id": "coin_exchange"
 	},
 	"coincheck": {
 			"name": "Coincheck",
 			"url": "https://coincheck.com/",
-			"country": "Japan"
+			"country": "Japan",
+			"gecko_id": "coincheck"
 	},
 	"coinone": {
 			"name": "Coinone",
 			"url": "https://coinone.co.kr/",
-			"country": "South Korea"
+			"country": "South Korea",
+			"gecko_id": "coinone"
 	},
 	"gdax": {
 			"name": "Coinbase Pro",
 			"url": "https://pro.coinbase.com/",
-			"country": "United States"
+			"country": "United States",
+			"gecko_id": "gdax"
 	},
 	"hitbtc": {
 			"name": "HitBTC",
 			"url": "https://hitbtc.com/",
-			"country": "Hong Kong"
+			"country": "Hong Kong",
+			"gecko_id": "hitbtc"
 	},
 	"huobi": {
 			"name": "Huobi Global",
 			"url": "https://www.hbg.com",
-			"country": "China"
+			"country": "China",
+			"gecko_id": "huobi"
 	},
 	"itbit": {
 			"name": "itBit",
 			"url": "https://www.itbit.com/",
-			"country": "United States"
+			"country": "United States",
+			"gecko_id": "itbit"
 	},
 	"korbit": {
 			"name": "Korbit",
 			"url": "https://www.korbit.co.kr/",
-			"country": "South Korea"
+			"country": "South Korea",
+			"gecko_id": "korbit"
 	},
 	"kraken": {
 			"name": "Kraken",
 			"url": "https://www.kraken.com/en-us",
-			"country": "United States"
+			"country": "United States",
+			"gecko_id": "kraken"
 	},
 	"lakebtc": {
 			"name": "LakeBTC",
 			"url": "https://www.lakebtc.com/",
-			"country": "China"
+			"country": "China",
+			"gecko_id": "lakebtc"
 	},
 	"livecoin": {
 			"name": "Livecoin",
 			"url": "https://www.livecoin.net/",
-			"country": null
+			"country": null,
+			"gecko_id": "livecoin"
 	},
 	"luno": {
 			"name": "Luno",
 			"url": "https://www.luno.com/",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "luno"
 	},
-	"mercado_bitcoin": {
+	"mercadobitcoin": {
 			"name": "Mercado Bitcoin",
 			"url": "https://www.mercadobitcoin.com.br/",
-			"country": "Brazil"
+			"country": "Brazil",
+			"gecko_id": "mercado_bitcoin"
 	},
 	"novaexchange": {
 			"name": "Nova Exchange",
 			"url": "https://novaexchange.com/",
-			"country": null
+			"country": null,
+			"gecko_id": "novaexchange"
 	},
 	"poloniex": {
 			"name": "Poloniex",
 			"url": "https://poloniex.com/",
-			"country": "United States"
+			"country": "United States",
+			"gecko_id": "poloniex"
 	},
 	"quoine": {
 			"name": "Liquid",
 			"url": "https://liquid.com/",
-			"country": "Japan"
+			"country": "Japan",
+			"gecko_id": "quoine"
 	},
 	"therocktrading": {
 			"name": "TheRockTrading",
 			"url": "https://therocktrading.com/",
-			"country": "Italy"
+			"country": "Italy",
+			"gecko_id": "therocktrading"
 	},
 	"tidex": {
 			"name": "Tidex",
 			"url": "https://tidex.com/",
-			"country": "United Kingdom"
+			"country": "United Kingdom",
+			"gecko_id": "tidex"
 	},
 	"yobit": {
 			"name": "YoBit",
 			"url": "https://yobit.net/en/",
-			"country": "Russia"
+			"country": "Russia",
+			"gecko_id": "yobit"
 	},
 	"allcoin": {
 			"name": "Allcoin",
 			"url": "https://www.allcoin.com/",
-			"country": "Canada"
+			"country": "Canada",
+			"gecko_id": "allcoin"
 	},
-	"bit_z": {
+	"bitz": {
 			"name": "Bit-Z",
 			"url": "https://www.bitz.top/",
-			"country": null
+			"country": null,
+			"gecko_id": "bit_z"
 	},
 	"gemini": {
 			"name": "Gemini",
 			"url": "https://gemini.com/",
-			"country": "United States"
+			"country": "United States",
+			"gecko_id": "gemini"
 	},
 	"binance": {
 			"name": "Binance",
 			"url": "https://www.binance.com/",
-			"country": "Malta"
+			"country": "Malta",
+			"gecko_id": "binance"
 	},
 	"mercatox": {
 			"name": "Mercatox",
 			"url": "https://mercatox.com/",
-			"country": null
+			"country": null,
+			"gecko_id": "mercatox"
 	},
 	"cex": {
 			"name": "CEX.IO",
 			"url": "https://cex.io/",
-			"country": "United Kingdom"
+			"country": "United Kingdom",
+			"gecko_id": "cex"
 	},
 	"coss": {
 			"name": "COSS",
 			"url": "https://exchange.coss.io/exchange",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "coss"
 	},
 	"exmo": {
 			"name": "EXMO",
 			"url": "https://exmo.com/",
-			"country": "United Kingdom"
+			"country": "United Kingdom",
+			"gecko_id": "exmo"
 	},
 	"gate": {
 			"name": "Gate.io",
 			"url": "https://gate.io/",
-			"country": "Hong Kong"
+			"country": "Hong Kong",
+			"gecko_id": "gate"
 	},
 	"kucoin": {
 			"name": "KuCoin",
 			"url": "https://www.kucoin.com/",
-			"country": "Seychelles"
+			"country": "Seychelles",
+			"gecko_id": "kucoin"
 	},
-	"stocks_exchange": {
+	"stocksexchange": {
 			"name": "STEX",
 			"url": "http://stex.com/",
-			"country": null
+			"country": null,
+			"gecko_id": "stocks_exchange"
 	},
-	"crypto_bridge": {
+	"cryptobridge": {
 			"name": "CryptoBridge",
 			"url": "https://crypto-bridge.org/",
-			"country": null
+			"country": null,
+			"gecko_id": "crypto_bridge"
 	},
 	"okex": {
 			"name": "OKEx",
 			"url": "https://www.okex.com/",
-			"country": "Belize"
+			"country": "Belize",
+			"gecko_id": "okex"
 	},
 	"kuna": {
 			"name": "Kuna Exchange",
 			"url": "https://kuna.io/",
-			"country": "United Kingdom"
+			"country": "United Kingdom",
+			"gecko_id": "kuna"
 	},
 	"zaif": {
 			"name": "Zaif",
 			"url": "https://zaif.jp/",
-			"country": "Japan"
+			"country": "Japan",
+			"gecko_id": "zaif"
 	},
 	"bigone": {
 			"name": "BigONE",
 			"url": "https://big.one/",
-			"country": "Seychelles"
+			"country": "Seychelles",
+			"gecko_id": "bigone"
 	},
-	"trade_ogre": {
+	"tradeogre": {
 			"name": "TradeOgre",
 			"url": "https://tradeogre.com/",
-			"country": null
+			"country": null,
+			"gecko_id": "trade_ogre"
 	},
 	"ethfinex": {
 			"name": "Ethfinex",
 			"url": "https://www.ethfinex.com/",
-			"country": "British Virgin Islands"
+			"country": "British Virgin Islands",
+			"gecko_id": "ethfinex"
 	},
-	"trade_satoshi": {
+	"tradesatoshi": {
 			"name": "Trade Satoshi",
 			"url": "https://tradesatoshi.com/Exchange",
-			"country": "United Kingdom"
+			"country": "United Kingdom",
+			"gecko_id": "trade_satoshi"
 	},
 	"bancor": {
 			"name": "Bancor Network",
 			"url": "https://www.bancor.network/discover",
-			"country": null
+			"country": null,
+			"gecko_id": "bancor"
 	},
 	"coinbene": {
 			"name": "CoinBene",
 			"url": "http://www.coinbene.com/#/",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "coinbene"
 	},
 	"lykke": {
 			"name": "Lykke",
 			"url": "https://www.lykke.com/exchange",
-			"country": "Switzerland"
+			"country": "Switzerland",
+			"gecko_id": "lykke"
 	},
 	"acx": {
 			"name": "ACX",
 			"url": "https://acx.io/",
-			"country": "Australia"
+			"country": "Australia",
+			"gecko_id": "acx"
 	},
 	"bibox": {
 			"name": "Bibox",
 			"url": "https://www.bibox.com/",
-			"country": "China"
+			"country": "China",
+			"gecko_id": "bibox"
 	},
 	"zb": {
 			"name": "ZB",
 			"url": "https://www.zb.com/",
-			"country": "China"
+			"country": "China",
+			"gecko_id": "zb"
 	},
 	"upbit": {
 			"name": "Upbit",
 			"url": "https://upbit.com",
-			"country": "South Korea"
+			"country": "South Korea",
+			"gecko_id": "upbit"
 	},
 	"lbank": {
 			"name": "Lbank",
 			"url": "https://www.lbank.info/",
-			"country": "China"
+			"country": "China",
+			"gecko_id": "lbank"
 	},
-	"coin_egg": {
+	"coinegg": {
 			"name": "CoinEgg",
 			"url": "https://www.coinegg.com/?lang=en_US",
-			"country": "United Kingdom"
+			"country": "United Kingdom",
+			"gecko_id": "coin_egg"
 	},
 	"neraex": {
 			"name": "Neraex",
 			"url": "https://neraex.pro/",
-			"country": "Japan"
+			"country": "Japan",
+			"gecko_id": "neraex"
 	},
-	"k_kex": {
+	"kkex": {
 			"name": "KKEX",
 			"url": "https://kkex.com/",
-			"country": "Seychelles"
+			"country": "Seychelles",
+			"gecko_id": "k_kex"
 	},
 	"bitbank": {
 			"name": "Bitbank",
 			"url": "https://bitbank.cc/",
-			"country": "Japan"
+			"country": "Japan",
+			"gecko_id": "bitbank"
 	},
 	"idex": {
 			"name": "Idex",
 			"url": "https://idex.market",
-			"country": "Panama"
+			"country": "Panama",
+			"gecko_id": "idex"
 	},
 	"latoken": {
 			"name": "LATOKEN",
 			"url": "https://latoken.com/",
-			"country": "Cayman Islands"
+			"country": "Cayman Islands",
+			"gecko_id": "latoken"
 	},
 	"extstock": {
 			"name": "ExtStock",
 			"url": "https://extstock.com/",
-			"country": "United Kingdom"
+			"country": "United Kingdom",
+			"gecko_id": "extstock"
 	},
-	"radar_relay": {
+	"radarrelay": {
 			"name": "Radar Relay",
 			"url": "https://radarrelay.com/",
-			"country": "United States"
+			"country": "United States",
+			"gecko_id": "radar_relay"
 	},
 	"exx": {
 			"name": "EXX",
 			"url": "https://www.exx.com/",
-			"country": "China"
+			"country": "China",
+			"gecko_id": "exx"
 	},
 	"buyucoin": {
 			"name": "BuyUcoin",
 			"url": "https://www.buyucoin.com/",
-			"country": null
+			"country": null,
+			"gecko_id": "buyucoin"
 	},
-	"south_xchange": {
+	"southxchange": {
 			"name": "SouthXchange",
 			"url": "https://www.southxchange.com/",
-			"country": "Argentina"
+			"country": "Argentina",
+			"gecko_id": "south_xchange"
 	},
 	"paymium": {
 			"name": "Paymium",
 			"url": "https://www.paymium.com/",
-			"country": null
+			"country": null,
+			"gecko_id": "paymium"
 	},
-	"kyber_network": {
+	"kybernetwork": {
 			"name": "Kyber Network",
 			"url": "https://kyber.network/",
-			"country": null
+			"country": null,
+			"gecko_id": "kyber_network"
 	},
 	"coinex": {
 			"name": "CoinEx",
 			"url": "https://www.coinex.com/",
-			"country": "United Kingdom"
+			"country": "United Kingdom",
+			"gecko_id": "coinex"
 	},
 	"paribu": {
 			"name": "Paribu",
 			"url": "https://www.paribu.com/",
-			"country": "Turkey"
+			"country": "Turkey",
+			"gecko_id": "paribu"
 	},
 	"crex24": {
 			"name": "CREX24",
 			"url": "https://crex24.com/",
-			"country": "Cyprus"
+			"country": "Cyprus",
+			"gecko_id": "crex24"
 	},
 	"waves": {
 			"name": "Waves Platform",
 			"url": "https://wavesplatform.com/product/dex",
-			"country": null
+			"country": null,
+			"gecko_id": "waves"
 	},
-	"infinity_coin": {
+	"infinitycoin": {
 			"name": "Infinity Coin",
 			"url": "https://infinitycoin.exchange/",
-			"country": "British Virgin Islands"
+			"country": "British Virgin Islands",
+			"gecko_id": "infinity_coin"
 	},
 	"fisco": {
 			"name": "Fisco",
 			"url": "https://fcce.jp/",
-			"country": "Japan"
+			"country": "Japan",
+			"gecko_id": "fisco"
 	},
 	"gopax": {
 			"name": "GoPax",
 			"url": "https://www.gopax.co.kr/exchange/",
-			"country": "South Korea"
+			"country": "South Korea",
+			"gecko_id": "gopax"
 	},
 	"bit2c": {
 			"name": "Bit2c",
 			"url": "https://bit2c.co.il/",
-			"country": "Israel"
+			"country": "Israel",
+			"gecko_id": "bit2c"
 	},
 	"nlexch": {
 			"name": "NLexch",
 			"url": "https://www.nlexch.com/",
-			"country": null
+			"country": null,
+			"gecko_id": "nlexch"
 	},
 	"crxzone": {
 			"name": "CRXzone",
 			"url": "https://www.crxzone.com/",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "crxzone"
 	},
 	"btcsquare": {
 			"name": "BTCSquare",
 			"url": "https://btcsquare.net",
-			"country": null
+			"country": null,
+			"gecko_id": "btcsquare"
 	},
 	"fex": {
 			"name": "FEX",
 			"url": "http://fexpro.net/",
-			"country": "Hong Kong"
+			"country": "Hong Kong",
+			"gecko_id": "fex"
 	},
 	"zebpay": {
 			"name": "Zebpay",
 			"url": "https://www.zebpay.com",
-			"country": "India"
+			"country": "India",
+			"gecko_id": "zebpay"
 	},
 	"forkdelta": {
 			"name": "ForkDelta",
 			"url": "https://forkdelta.app/",
-			"country": null
+			"country": null,
+			"gecko_id": "forkdelta"
 	},
 	"freiexchange": {
 			"name": "Freiexchange",
 			"url": "https://freiexchange.com/",
-			"country": "Norway"
+			"country": "Norway",
+			"gecko_id": "freiexchange"
 	},
 	"btcbox": {
 			"name": "BTCBOX",
 			"url": "https://www.btcbox.co.jp/",
-			"country": "Japan"
+			"country": "Japan",
+			"gecko_id": "btcbox"
 	},
-	"btc_alpha": {
+	"btcalpha": {
 			"name": "BTC-Alpha",
 			"url": "https://btc-alpha.com/exchange/",
-			"country": null
+			"country": null,
+			"gecko_id": "btc_alpha"
 	},
 	"dsx": {
 			"name": "DSX",
 			"url": "https://dsx.uk/",
-			"country": "United Kingdom"
+			"country": "United Kingdom",
+			"gecko_id": "dsx"
 	},
 	"sistemkoin": {
 			"name": "Sistemkoin",
 			"url": "https://sistemkoin.com/",
-			"country": "Turkey"
+			"country": "Turkey",
+			"gecko_id": "sistemkoin"
 	},
 	"cpdax": {
 			"name": "CPDAX",
 			"url": "https://www.cpdax.com/",
-			"country": "South Korea"
+			"country": "South Korea",
+			"gecko_id": "cpdax"
 	},
 	"ooobtc": {
 			"name": "OOOBTC",
 			"url": "https://www.ooobtc.com/",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "ooobtc"
 	},
 	"ddex": {
 			"name": "DDEX",
 			"url": "https://ddex.io/",
-			"country": null
+			"country": null,
+			"gecko_id": "ddex"
 	},
-	"btc_trade_ua": {
+	"btctrade_ua": {
 			"name": "BTC Trade UA",
 			"url": "https://btc-trade.com.ua/",
-			"country": null
+			"country": null,
+			"gecko_id": "btc_trade_ua"
 	},
 	"coingi": {
 			"name": "Coingi",
 			"url": "https://coingi.com/",
-			"country": null
+			"country": null,
+			"gecko_id": "coingi"
 	},
 	"bithash": {
 			"name": "BitHash",
 			"url": "https://www.bithash.net/",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "bithash"
 	},
 	"abcc": {
 			"name": "ABCC",
 			"url": "https://abcc.com/",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "abcc"
 	},
 	"cryptex": {
 			"name": "Cryptex",
 			"url": "https://cryptex.net/",
-			"country": null
+			"country": null,
+			"gecko_id": "cryptex"
 	},
 	"kkcoin": {
 			"name": "KKCoin",
 			"url": "https://www.kkcoin.com",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "kkcoin"
 	},
 	"coinjar": {
 			"name": "CoinJar Exchange",
 			"url": "https://exchange.coinjar.com/",
-			"country": "Australia"
+			"country": "Australia",
+			"gecko_id": "coinjar"
 	},
 	"switcheo": {
 			"name": "Switcheo",
 			"url": "https://switcheo.exchange/",
-			"country": null
+			"country": null,
+			"gecko_id": "switcheo"
 	},
 	"coinsuper": {
 			"name": "Coinsuper",
 			"url": "https://www.coinsuper.com",
-			"country": "Hong Kong"
+			"country": "Hong Kong",
+			"gecko_id": "coinsuper"
 	},
 	"kryptono": {
 			"name": "Kryptono",
 			"url": "https://kryptono.exchange",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "kryptono"
 	},
 	"braziliex": {
 			"name": "Braziliex",
 			"url": "https://braziliex.com/",
-			"country": "Brazil"
+			"country": "Brazil",
+			"gecko_id": "braziliex"
 	},
 	"topbtc": {
 			"name": "TopBTC",
 			"url": "https://topbtc.com/",
-			"country": "Malta"
+			"country": "Malta",
+			"gecko_id": "topbtc"
 	},
 	"cybex": {
 			"name": "Cybex DEX",
 			"url": "https://dex.cybex.io/",
-			"country": null
+			"country": null,
+			"gecko_id": "cybex"
 	},
 	"exrates": {
 			"name": "Exrates",
 			"url": "https://exrates.me",
-			"country": "Estonia"
+			"country": "Estonia",
+			"gecko_id": "exrates"
 	},
 	"coinfield": {
 			"name": "Coinfield",
 			"url": "https://www.coinfield.com/",
-			"country": "Canada"
+			"country": "Canada",
+			"gecko_id": "coinfield"
 	},
 	"bcex": {
 			"name": "BCEX",
 			"url": "https://www.bcex.ca/coins",
-			"country": "Hong Kong"
+			"country": "Hong Kong",
+			"gecko_id": "bcex"
 	},
 	"idcm": {
 			"name": "IDCM",
 			"url": "https://www.idcm.io/",
-			"country": "Hong Kong"
+			"country": "Hong Kong",
+			"gecko_id": "idcm"
 	},
 	"bilaxy": {
 			"name": "Bilaxy",
 			"url": "https://bilaxy.com/",
-			"country": null
+			"country": null,
+			"gecko_id": "bilaxy"
 	},
 	"openledger": {
 			"name": "OpenLedger DEX",
 			"url": "https://dex.openledger.io/",
-			"country": "Denmark"
+			"country": "Denmark",
+			"gecko_id": "openledger"
 	},
 	"jex": {
 			"name": "Binance JEX",
 			"url": "https://www.jex.com/",
-			"country": null
+			"country": null,
+			"gecko_id": "jex"
 	},
 	"thetokenstore": {
 			"name": "Token.Store",
 			"url": "https://token.store/",
-			"country": null
+			"country": null,
+			"gecko_id": "thetokenstore"
 	},
 	"idax": {
 			"name": "Idax",
 			"url": "https://www.idax.pro/",
-			"country": "Mongolia"
+			"country": "Mongolia",
+			"gecko_id": "idax"
 	},
 	"tokenomy": {
 			"name": "Tokenomy",
 			"url": "https://www.tokenomy.com/",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "tokenomy"
 	},
 	"hotbit": {
 			"name": "Hotbit",
 			"url": "https://www.hotbit.io/",
-			"country": "China"
+			"country": "China",
+			"gecko_id": "hotbit"
 	},
 	"omnitrade": {
 			"name": "OmniTrade",
 			"url": "https://www.omnitrade.io/",
-			"country": "Brazil"
+			"country": "Brazil",
+			"gecko_id": "omnitrade"
 	},
 	"fcoin": {
 			"name": "FCoin",
 			"url": "https://www.fcoin.com/",
-			"country": "China"
+			"country": "China",
+			"gecko_id": "fcoin"
 	},
 	"cointiger": {
 			"name": "CoinTiger",
 			"url": "https://www.cointiger.com/",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "cointiger"
 	},
 	"graviex": {
 			"name": "Graviex",
 			"url": "https://graviex.net/",
-			"country": "Malta"
+			"country": "Malta",
+			"gecko_id": "graviex"
 	},
 	"altilly": {
 			"name": "Altilly",
 			"url": "https://www.altilly.com",
-			"country": "Sweden"
+			"country": "Sweden",
+			"gecko_id": "altilly"
 	},
 	"otcbtc": {
 			"name": "OTCBTC",
 			"url": "https://otcbtc.com/",
-			"country": "Taiwan"
+			"country": "Taiwan",
+			"gecko_id": "otcbtc"
 	},
 	"yunex": {
 			"name": "Yunex.io",
 			"url": "https://yunex.io/",
-			"country": "British Virgin Islands"
+			"country": "British Virgin Islands",
+			"gecko_id": "yunex"
 	},
 	"qbtc": {
 			"name": "QBTC",
 			"url": "https://www.myqbtc.com/",
-			"country": "United Kingdom"
+			"country": "United Kingdom",
+			"gecko_id": "qbtc"
 	},
 	"tokenjar": {
 			"name": "TokenJar",
 			"url": "https://tokenjar.io/",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "tokenjar"
 	},
 	"bitforex": {
 			"name": "Bitforex",
 			"url": "https://www.bitforex.com/",
-			"country": "Seychelles"
+			"country": "Seychelles",
+			"gecko_id": "bitforex"
 	},
-	"safe_trade": {
+	"safetrade": {
 			"name": "SafeTrade",
 			"url": "https://safe.trade/",
-			"country": "Canada"
+			"country": "Canada",
+			"gecko_id": "safe_trade"
 	},
 	"tidebit": {
 			"name": "Tidebit",
 			"url": "https://www.tidebit.com/",
-			"country": "Hong Kong"
+			"country": "Hong Kong",
+			"gecko_id": "tidebit"
 	},
 	"bitlish": {
 			"name": "Bitlish",
 			"url": "https://bitlish.com",
-			"country": "United Kingdom"
+			"country": "United Kingdom",
+			"gecko_id": "bitlish"
 	},
-	"max_maicoin": {
+	"maxmaicoin": {
 			"name": "Max Maicoin",
 			"url": "https://max.maicoin.com",
-			"country": "Taiwan"
+			"country": "Taiwan",
+			"gecko_id": "max_maicoin"
 	},
 	"instantbitex": {
 			"name": "Instant Bitex",
 			"url": "https://instantbitex.com/",
-			"country": "United Kingdom"
+			"country": "United Kingdom",
+			"gecko_id": "instantbitex"
 	},
 	"btcturk": {
 			"name": "BTCTurk",
 			"url": "https://www.btcturk.com/",
-			"country": null
+			"country": null,
+			"gecko_id": "btcturk"
 	},
 	"digifinex": {
 			"name": "Digifinex",
 			"url": "https://www.digifinex.com/",
-			"country": "Seychelles"
+			"country": "Seychelles",
+			"gecko_id": "digifinex"
 	},
 	"chainrift": {
 			"name": "Chainrift",
 			"url": "https://www.chainrift.com/",
-			"country": "United States"
+			"country": "United States",
+			"gecko_id": "chainrift"
 	},
 	"tdax": {
 			"name": "Satang Pro",
 			"url": "https://satang.pro",
-			"country": "Thailand"
+			"country": "Thailand",
+			"gecko_id": "tdax"
 	},
 	"c2cx": {
 			"name": "C2CX",
 			"url": "https://www.c2cx.com/",
-			"country": "China"
+			"country": "China",
+			"gecko_id": "c2cx"
 	},
-	"stellar_term": {
+	"stellarterm": {
 			"name": "StellarTerm",
 			"url": "https://stellarterm.com/",
-			"country": null
+			"country": null,
+			"gecko_id": "stellar_term"
 	},
 	"dextop": {
 			"name": "DEx.top",
 			"url": "https://dex.top/",
-			"country": null
+			"country": null,
+			"gecko_id": "dextop"
 	},
 	"btcmarkets": {
 			"name": "BTCMarkets",
 			"url": "https://www.btcmarkets.net/",
-			"country": "Australia"
+			"country": "Australia",
+			"gecko_id": "btcmarkets"
 	},
 	"coinsbank": {
 			"name": "Coinsbank",
 			"url": "https://coinsbank.com/",
-			"country": "Estonia"
+			"country": "Estonia",
+			"gecko_id": "coinsbank"
 	},
 	"bitmart": {
 			"name": "BitMart",
 			"url": "https://www.bitmart.com/",
-			"country": "Cayman Islands"
+			"country": "Cayman Islands",
+			"gecko_id": "bitmart"
 	},
 	"gbx": {
 			"name": "Gibraltar Blockchain Exchange",
 			"url": "https://exchange.gbx.gi",
-			"country": "Gibraltar"
+			"country": "Gibraltar",
+			"gecko_id": "gbx"
 	},
 	"dobitrade": {
 			"name": "Dobitrade",
 			"url": "https://www.dobitrade.com/",
-			"country": "China"
+			"country": "China",
+			"gecko_id": "dobitrade"
 	},
 	"escodex": {
 			"name": "Escodex",
 			"url": "https://www.escodex.com",
-			"country": "Estonia"
+			"country": "Estonia",
+			"gecko_id": "escodex"
 	},
 	"bisq": {
 			"name": "Bisq",
 			"url": "https://bisq.network/",
-			"country": null
+			"country": null,
+			"gecko_id": "bisq"
 	},
 	"bitbox": {
 			"name": "BITBOX",
 			"url": "https://www.bitbox.me/",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "bitbox"
 	},
-	"c_patex": {
+	"cpatex": {
 			"name": "C-Patex",
 			"url": "https://c-patex.com/",
-			"country": "Argentina"
+			"country": "Argentina",
+			"gecko_id": "c_patex"
 	},
 	"crytrex": {
 			"name": "CryTrEx",
 			"url": "https://crytrex.com/",
-			"country": "Italy"
+			"country": "Italy",
+			"gecko_id": "crytrex"
 	},
 	"ice3x": {
 			"name": "Ice3x",
 			"url": "https://ice3x.com/",
-			"country": "South Africa"
+			"country": "South Africa",
+			"gecko_id": "ice3x"
 	},
 	"bitkub": {
 			"name": "Bitkub",
 			"url": "https://www.bitkub.com/",
-			"country": "Thailand"
+			"country": "Thailand",
+			"gecko_id": "bitkub"
 	},
 	"p2pb2b": {
 			"name": "P2PB2B",
 			"url": "https://p2pb2b.io",
-			"country": "Estonia"
+			"country": "Estonia",
+			"gecko_id": "p2pb2b"
 	},
-	"nanu_exchange": {
+	"nanuexchange": {
 			"name": "Nanu Exchange",
 			"url": "https://nanu.exchange/",
-			"country": "Brazil"
+			"country": "Brazil",
+			"gecko_id": "nanu_exchange"
 	},
 	"bitrue": {
 			"name": "Bitrue",
 			"url": "https://www.bitrue.com",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "bitrue"
 	},
 	"coinplace": {
 			"name": "Coinplace",
 			"url": "https://coinplace.pro/",
-			"country": "United Arab Emirates"
+			"country": "United Arab Emirates",
+			"gecko_id": "coinplace"
 	},
 	"zbg": {
 			"name": "ZBG",
 			"url": "https://www.zbg.com/",
-			"country": "China"
+			"country": "China",
+			"gecko_id": "zbg"
 	},
 	"coinmex": {
 			"name": "CoinMex",
 			"url": "https://www.coinmex.com/",
-			"country": "Belize"
+			"country": "Belize",
+			"gecko_id": "coinmex"
 	},
 	"gobaba": {
 			"name": "Gobaba",
 			"url": "https://www.gobaba.com",
-			"country": "United Kingdom"
+			"country": "United Kingdom",
+			"gecko_id": "gobaba"
 	},
 	"everbloom": {
 			"name": "Everbloom",
 			"url": "https://app.everbloom.co/",
-			"country": "United States"
+			"country": "United States",
+			"gecko_id": "everbloom"
 	},
 	"bgogo": {
 			"name": "Bgogo",
 			"url": "https://bgogo.com/",
-			"country": "Cayman Islands"
+			"country": "Cayman Islands",
+			"gecko_id": "bgogo"
 	},
 	"coinsbit": {
 			"name": "Coinsbit",
 			"url": "https://coinsbit.io/",
-			"country": "Estonia"
+			"country": "Estonia",
+			"gecko_id": "coinsbit"
 	},
 	"altmarkets": {
 			"name": "Altmarkets",
 			"url": "https://altmarkets.io",
-			"country": "United Kingdom"
+			"country": "United Kingdom",
+			"gecko_id": "altmarkets"
 	},
-	"tokens_net": {
+	"tokensnet": {
 			"name": "TokensNet",
 			"url": "https://www.tokens.net",
-			"country": "United Kingdom"
+			"country": "United Kingdom",
+			"gecko_id": "tokens_net"
 	},
 	"coinall": {
 			"name": "CoinAll",
 			"url": "https://www.coinall.com/",
-			"country": "Hong Kong"
+			"country": "Hong Kong",
+			"gecko_id": "coinall"
 	},
 	"wazirx": {
 			"name": "WazirX",
 			"url": "https://wazirx.com/",
-			"country": "India"
+			"country": "India",
+			"gecko_id": "wazirx"
 	},
 	"chainex": {
 			"name": "ChainEX",
 			"url": "https://chainex.io/",
-			"country": "South Africa"
+			"country": "South Africa",
+			"gecko_id": "chainex"
 	},
 	"airswap": {
 			"name": "AirSwap",
 			"url": "https://www.airswap.io/",
-			"country": "United States"
+			"country": "United States",
+			"gecko_id": "airswap"
 	},
 	"bitmax": {
 			"name": "BitMax",
 			"url": "https://bitmax.io/",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "bitmax"
 	},
-	"hb_top": {
+	"hbtop": {
 			"name": "Hb.top",
 			"url": "https://www.hb.top/",
-			"country": "Hong Kong"
+			"country": "Hong Kong",
+			"gecko_id": "hb_top"
 	},
 	"bitonbay": {
 			"name": "BitOnBay",
 			"url": "https://www.bitonbay.com/",
-			"country": "Thailand"
+			"country": "Thailand",
+			"gecko_id": "bitonbay"
 	},
 	"tokok": {
 			"name": "TOKOK",
 			"url": "https://www.tokok.com/",
-			"country": "British Virgin Islands"
+			"country": "British Virgin Islands",
+			"gecko_id": "tokok"
 	},
 	"bitex": {
 			"name": "Bitex.la",
 			"url": "https://bitex.la/",
-			"country": "Netherlands"
+			"country": "Netherlands",
+			"gecko_id": "bitex"
 	},
 	"cryptology": {
 			"name": "Cryptology",
 			"url": "https://cryptology.com/",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "cryptology"
 	},
 	"coinpark": {
 			"name": "Coinpark",
 			"url": "https://www.coinpark.com/",
-			"country": "China"
+			"country": "China",
+			"gecko_id": "coinpark"
 	},
 	"coineal": {
 			"name": "Coineal",
 			"url": "https://www.coineal.com/",
-			"country": "Seychelles"
+			"country": "Seychelles",
+			"gecko_id": "coineal"
 	},
 	"bitsten": {
 			"name": "Bitsten",
 			"url": "https://bitsten.com/",
-			"country": "Indonesia"
+			"country": "Indonesia",
+			"gecko_id": "bitsten"
 	},
 	"bkex": {
 			"name": "Bkex",
 			"url": "https://www.bkex.com/",
-			"country": "British Virgin Islands"
+			"country": "British Virgin Islands",
+			"gecko_id": "bkex"
 	},
 	"fatbtc": {
 			"name": "FatBTC",
 			"url": "https://fatbtc.com/",
-			"country": "Belize"
+			"country": "Belize",
+			"gecko_id": "fatbtc"
 	},
 	"dragonex": {
 			"name": "DragonEx",
 			"url": "https://dragonex.io",
-			"country": "Thailand"
+			"country": "Thailand",
+			"gecko_id": "dragonex"
 	},
 	"gdac": {
 			"name": "GDAC",
 			"url": "https://www.gdac.co.kr/",
-			"country": "South Korea"
+			"country": "South Korea",
+			"gecko_id": "gdac"
 	},
 	"vbitex": {
 			"name": "Vbitex",
 			"url": "http://www.vbitex.com",
-			"country": "Seychelles"
+			"country": "Seychelles",
+			"gecko_id": "vbitex"
 	},
 	"purcow": {
 			"name": "Purcow",
 			"url": "https://www.purcow.io/",
-			"country": "Hong Kong"
+			"country": "Hong Kong",
+			"gecko_id": "purcow"
 	},
 	"tradeio": {
 			"name": "Trade.io",
 			"url": "https://www.trade.io/en",
-			"country": "Hong Kong"
+			"country": "Hong Kong",
+			"gecko_id": "tradeio"
 	},
 	"zgtop": {
 			"name": "ZG.TOP",
 			"url": "https://www.zgtop.io",
-			"country": "Mongolia"
+			"country": "Mongolia",
+			"gecko_id": "zgtop"
 	},
 	"letsdocoinz": {
 			"name": "Letsdocoinz",
 			"url": "https://letsdocoinz.com/",
-			"country": null
+			"country": null,
+			"gecko_id": "letsdocoinz"
 	},
 	"tideal": {
 			"name": "Tideal",
 			"url": "https://tideal.com/",
-			"country": "Hong Kong"
+			"country": "Hong Kong",
+			"gecko_id": "tideal"
 	},
 	"coindeal": {
 			"name": "Coindeal",
 			"url": "https://coindeal.com/",
-			"country": "Malta"
+			"country": "Malta",
+			"gecko_id": "coindeal"
 	},
 	"newdex": {
 			"name": "Newdex",
 			"url": "https://newdex.io/",
-			"country": "Cayman Islands"
+			"country": "Cayman Islands",
+			"gecko_id": "newdex"
 	},
 	"coinzest": {
 			"name": "Coinzest",
 			"url": "https://www.coinzest.co.kr",
-			"country": "South Korea"
+			"country": "South Korea",
+			"gecko_id": "coinzest"
 	},
 	"credoex": {
 			"name": "CredoEx",
 			"url": "https://credoex.com",
-			"country": "United States"
+			"country": "United States",
+			"gecko_id": "credoex"
 	},
 	"finexbox": {
 			"name": "FinexBox",
 			"url": "https://www.finexbox.com/",
-			"country": "Hong Kong"
+			"country": "Hong Kong",
+			"gecko_id": "finexbox"
 	},
 	"dcoin": {
 			"name": "Dcoin",
 			"url": "https://www.dcoin.com/",
-			"country": "Switzerland"
+			"country": "Switzerland",
+			"gecko_id": "dcoin"
 	},
 	"secondbtc": {
 			"name": "SecondBTC",
 			"url": "https://secondbtc.com",
-			"country": "India"
+			"country": "India",
+			"gecko_id": "secondbtc"
 	},
 	"bitrabbit": {
 			"name": "BitRabbit",
 			"url": "https://bitrabbit.com/",
-			"country": "Australia"
+			"country": "Australia",
+			"gecko_id": "bitrabbit"
 	},
 	"allbit": {
 			"name": "Allbit",
 			"url": "https://allbit.com/",
-			"country": "South Korea"
+			"country": "South Korea",
+			"gecko_id": "allbit"
 	},
 	"bw": {
 			"name": "BW.com",
 			"url": "https://www.bw.com/",
-			"country": "Australia"
+			"country": "Australia",
+			"gecko_id": "bw"
 	},
 	"alterdice": {
 			"name": "AlterDice",
 			"url": "https://alterdice.com/",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "alterdice"
 	},
 	"novadax": {
 			"name": "NovaDAX",
 			"url": "https://www.novadax.com.br/",
-			"country": "Brazil"
+			"country": "Brazil",
+			"gecko_id": "novadax"
 	},
 	"iqfinex": {
 			"name": "IQFinex",
 			"url": "https://www.iqfinex.com/",
-			"country": "Switzerland"
+			"country": "Switzerland",
+			"gecko_id": "iqfinex"
 	},
 	"etherflyer": {
 			"name": "EtherFlyer",
 			"url": "https://www.etherflyer.com",
-			"country": "Samoa"
+			"country": "Samoa",
+			"gecko_id": "etherflyer"
 	},
-	"trx_market": {
+	"trxmarket": {
 			"name": "TRXMarket",
 			"url": "https://trx.market/",
-			"country": "China"
+			"country": "China",
+			"gecko_id": "trx_market"
 	},
 	"bankera": {
 			"name": "Bankera",
 			"url": "https://exchange.bankera.com/",
-			"country": "British Virgin Islands"
+			"country": "British Virgin Islands",
+			"gecko_id": "bankera"
 	},
 	"bitfex": {
 			"name": "Bitfex",
 			"url": "https://bitfex.trade",
-			"country": "Russia"
+			"country": "Russia",
+			"gecko_id": "bitfex"
 	},
-	"btc_exchange": {
+	"btcexchange": {
 			"name": "Btc Exchange",
 			"url": "https://www.btc-exchange.com/",
-			"country": "Lithuania"
+			"country": "Lithuania",
+			"gecko_id": "btc_exchange"
 	},
 	"localtrade": {
 			"name": "LocalTrade",
 			"url": "https://localtrade.cc/",
-			"country": "United Kingdom"
+			"country": "United Kingdom",
+			"gecko_id": "localtrade"
 	},
 	"coinzo": {
 			"name": "Coinzo",
 			"url": "https://www.coinzo.com",
-			"country": "Turkey"
+			"country": "Turkey",
+			"gecko_id": "coinzo"
 	},
 	"coinlim": {
 			"name": "Coinlim",
 			"url": "https://www.coinlim.com/",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "coinlim"
 	},
 	"oceanex": {
 			"name": "Oceanex",
 			"url": "https://oceanex.pro",
-			"country": "Cayman Islands"
+			"country": "Cayman Islands",
+			"gecko_id": "oceanex"
 	},
-	"binance_jersey": {
+	"binancejersey": {
 			"name": "Binance Jersey",
 			"url": "https://www.binance.je/ ",
-			"country": "Jersey"
+			"country": "Jersey",
+			"gecko_id": "binance_jersey"
 	},
-	"six_x": {
+	"sixx": {
 			"name": "6x",
 			"url": "https://www.6x.com",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "six_x"
 	},
-	"three_xbit": {
+	"threexbit": {
 			"name": "3XBIT",
 			"url": "https://3xbit.com.br/",
-			"country": "Brazil"
+			"country": "Brazil",
+			"gecko_id": "three_xbit"
 	},
 	"uniswap": {
 			"name": "Uniswap",
 			"url": "https://uniswap.exchange",
-			"country": "United States"
+			"country": "United States",
+			"gecko_id": "uniswap"
 	},
-	"huobi_us": {
+	"huobius": {
 			"name": "Huobi US (HBUS)",
 			"url": "https://www.hbus.com/",
-			"country": "United States"
+			"country": "United States",
+			"gecko_id": "huobi_us"
 	},
 	"chaoex": {
 			"name": "CHAOEX",
 			"url": "https://www.chaoex.com/home",
-			"country": "Hong Kong"
+			"country": "Hong Kong",
+			"gecko_id": "chaoex"
 	},
-	"saturn_network": {
+	"saturnnetwork": {
 			"name": "Saturn Network",
 			"url": "https://saturn.network",
-			"country": null
+			"country": null,
+			"gecko_id": "saturn_network"
 	},
 	"catex": {
 			"name": "Catex",
 			"url": "https://www.catex.io/",
-			"country": "China"
+			"country": "China",
+			"gecko_id": "catex"
 	},
 	"cbx": {
 			"name": "CBX",
 			"url": "https://www.cbx.one",
-			"country": "United Arab Emirates"
+			"country": "United Arab Emirates",
+			"gecko_id": "cbx"
 	},
 	"vinex": {
 			"name": "Vinex",
 			"url": "https://vinex.network",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "vinex"
 	},
 	"swiftex": {
 			"name": "Swiftex",
 			"url": "https://trade.swiftex.co",
-			"country": "United Kingdom"
+			"country": "United Kingdom",
+			"gecko_id": "swiftex"
 	},
 	"bitopro": {
 			"name": "BitoPro",
 			"url": "https://www.bitopro.com/",
-			"country": "Taiwan"
+			"country": "Taiwan",
+			"gecko_id": "bitopro"
 	},
 	"dflow": {
 			"name": "Dflow",
 			"url": "https://dflowx.com",
-			"country": "Estonia"
+			"country": "Estonia",
+			"gecko_id": "dflow"
 	},
 	"financex": {
 			"name": "FinanceX",
 			"url": "https://financex.io",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "financex"
 	},
 	"exmarkets": {
 			"name": "ExMarkets",
 			"url": "https://exmarkets.com",
-			"country": "British Virgin Islands"
+			"country": "British Virgin Islands",
+			"gecko_id": "exmarkets"
 	},
 	"qtrade": {
 			"name": "qTrade",
 			"url": "https://qtrade.io",
-			"country": "United States"
+			"country": "United States",
+			"gecko_id": "qtrade"
 	},
 	"hubi": {
 			"name": "Hubi",
 			"url": "https://www.hubi.com/",
-			"country": "Hong Kong"
+			"country": "Hong Kong",
+			"gecko_id": "hubi"
 	},
 	"txbit": {
 			"name": "Txbit",
 			"url": "https://txbit.io/",
-			"country": "Netherlands"
+			"country": "Netherlands",
+			"gecko_id": "txbit"
 	},
 	"bitholic": {
 			"name": "Bithumb Singapore",
 			"url": "https://www.bithumbsg.com/",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "bitholic"
 	},
 	"codex": {
 			"name": "CODEX",
 			"url": "https://codex.one/",
-			"country": "Estonia"
+			"country": "Estonia",
+			"gecko_id": "codex"
 	},
 	"nexybit": {
 			"name": "Nexybit",
 			"url": "https://nexybit.com",
-			"country": "South Korea"
+			"country": "South Korea",
+			"gecko_id": "nexybit"
 	},
 	"probit": {
 			"name": "Probit",
 			"url": "https://www.probit.com/en-us/",
-			"country": "Seychelles"
+			"country": "Seychelles",
+			"gecko_id": "probit"
 	},
 	"daybit": {
 			"name": "Daybit",
 			"url": "https://daybit.com",
-			"country": "South Korea"
+			"country": "South Korea",
+			"gecko_id": "daybit"
 	},
 	"zbmega": {
 			"name": "ZB Mega",
 			"url": "https://www.zbm.com",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "zbmega"
 	},
 	"bitmesh": {
 			"name": "Bitmesh",
 			"url": "https://bitmesh.com/",
-			"country": "Seychelles"
+			"country": "Seychelles",
+			"gecko_id": "bitmesh"
 	},
 	"bitexbook": {
 			"name": "BITEXBOOK",
 			"url": "https://bitexbook.com",
-			"country": "Saint Vincent and the Grenadines"
+			"country": "Saint Vincent and the Grenadines",
+			"gecko_id": "bitexbook"
 	},
-	"tron_trade": {
+	"trontrade": {
 			"name": "TronTrade",
 			"url": "https://trontrade.io/",
-			"country": null
+			"country": null,
+			"gecko_id": "tron_trade"
 	},
 	"digitalprice": {
 			"name": "DigitalPrice",
 			"url": "https://digitalprice.io/",
-			"country": "Italy"
+			"country": "Italy",
+			"gecko_id": "digitalprice"
 	},
 	"dextrade": {
 			"name": "Dex-Trade",
 			"url": "https://dex-trade.com/",
-			"country": "Chile"
+			"country": "Chile",
+			"gecko_id": "dextrade"
 	},
 	"tokenize": {
 			"name": "Tokenize",
 			"url": "https://tokenize.exchange/",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "tokenize"
 	},
 	"biki": {
 			"name": "Biki",
 			"url": "https://www.biki.com",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "biki"
 	},
 	"btcexa": {
 			"name": "BTCEXA",
 			"url": "https://btcexa.com/home",
-			"country": "Australia"
+			"country": "Australia",
+			"gecko_id": "btcexa"
 	},
-	"coin_metro": {
+	"coinmetro": {
 			"name": "Coinmetro",
 			"url": "https://coinmetro.com/",
-			"country": "Estonia"
+			"country": "Estonia",
+			"gecko_id": "coin_metro"
 	},
 	"bione": {
 			"name": "Bione",
 			"url": "https://www.bione.cc/",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "bione"
 	},
 	"vindax": {
 			"name": "Vindax",
 			"url": "https://vindax.com/",
-			"country": "Vietnam"
+			"country": "Vietnam",
+			"gecko_id": "vindax"
 	},
-	"independent_reserve": {
+	"independentreserve": {
 			"name": "Independent Reserve",
 			"url": "https://www.independentreserve.com/",
-			"country": "Australia"
+			"country": "Australia",
+			"gecko_id": "independent_reserve"
 	},
 	"citex": {
 			"name": "CITEX",
 			"url": "https://www.citex.co.kr/#/home",
-			"country": "South Korea"
+			"country": "South Korea",
+			"gecko_id": "citex"
 	},
 	"coinbig": {
 			"name": "COINBIG",
 			"url": "https://www.coinbig.org/",
-			"country": "Cayman Islands"
+			"country": "Cayman Islands",
+			"gecko_id": "coinbig"
 	},
-	"binance_dex": {
+	"binancedex": {
 			"name": "Binance DEX",
 			"url": "https://www.binance.org/en/trade",
-			"country": "Malta"
+			"country": "Malta",
+			"gecko_id": "binance_dex"
 	},
 	"bitstorage": {
 			"name": "BitStorage",
 			"url": "https://bitstorage.finance/",
-			"country": "Ukraine"
+			"country": "Ukraine",
+			"gecko_id": "bitstorage"
 	},
 	"bitalong": {
 			"name": "Bitalong",
 			"url": "https://www.bitalong.com/",
-			"country": "Hong Kong"
+			"country": "Hong Kong",
+			"gecko_id": "bitalong"
 	},
 	"omgfin": {
 			"name": "Omgfin",
 			"url": "https://omgfin.com/exchange/",
-			"country": "Estonia"
+			"country": "Estonia",
+			"gecko_id": "omgfin"
 	},
 	"coinxpro": {
 			"name": "COINX.PRO",
 			"url": "https://www.coinx.pro/index",
-			"country": "Seychelles"
+			"country": "Seychelles",
+			"gecko_id": "coinxpro"
 	},
 	"ccx": {
 			"name": "CCXCanada",
 			"url": "https://ccxcanada.com/",
-			"country": "Canada"
+			"country": "Canada",
+			"gecko_id": "ccx"
 	},
 	"xt": {
 			"name": "XT",
 			"url": "https://www.xt.com/",
-			"country": "Seychelles"
+			"country": "Seychelles",
+			"gecko_id": "xt"
 	},
-	"bithumb_global": {
+	"bithumbglobal": {
 			"name": "Bithumb Global",
 			"url": "https://www.bithumb.global/",
-			"country": "Seychelles"
+			"country": "Seychelles",
+			"gecko_id": "bithumb_global"
 	},
 	"floatsv": {
 			"name": "Float SV",
 			"url": "https://www.floatsv.com/",
-			"country": "British Virgin Islands"
+			"country": "British Virgin Islands",
+			"gecko_id": "floatsv"
 	},
 	"velic": {
 			"name": "Velic",
 			"url": "https://www.velic.io/",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "velic"
 	},
 	"bitasset": {
 			"name": "BitAsset",
 			"url": "https://www.bitasset.com",
-			"country": "Hong Kong"
+			"country": "Hong Kong",
+			"gecko_id": "bitasset"
 	},
 	"mxc": {
 			"name": "MXC",
 			"url": "https://www.mxc.co/",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "mxc"
 	},
 	"shortex": {
 			"name": "Shortex",
 			"url": "https://shortex.net/",
-			"country": "Estonia"
+			"country": "Estonia",
+			"gecko_id": "shortex"
 	},
 	"ecxx": {
 			"name": "Ecxx",
 			"url": "https://www.ecxx.com",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "ecxx"
 	},
 	"cezex": {
 			"name": "Cezex",
 			"url": "https://cezex.io",
-			"country": "Philippines"
+			"country": "Philippines",
+			"gecko_id": "cezex"
 	},
 	"satoexchange": {
 			"name": "SatoExchange",
 			"url": "https://www.satoexchange.com/",
-			"country": "United States"
+			"country": "United States",
+			"gecko_id": "satoexchange"
 	},
 	"okcoin": {
 			"name": "OKCoin",
 			"url": "https://www.okcoin.com/",
-			"country": "China"
+			"country": "China",
+			"gecko_id": "okcoin"
 	},
 	"neblidex": {
 			"name": "Neblidex",
 			"url": "https://neblidex.xyz",
-			"country": null
+			"country": null,
+			"gecko_id": "neblidex"
 	},
 	"whitebit": {
 			"name": "Whitebit",
 			"url": "https://whitebit.com",
-			"country": "Estonia"
+			"country": "Estonia",
+			"gecko_id": "whitebit"
 	},
 	"birake": {
 			"name": "Birake",
 			"url": "https://birake.com",
-			"country": "Estonia"
+			"country": "Estonia",
+			"gecko_id": "birake"
 	},
 	"piexgo": {
 			"name": "Piexgo",
 			"url": "https://www.piexgo.com/",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "piexgo"
 	},
 	"dydx": {
 			"name": "dYdX",
 			"url": "https://trade.dydx.exchange",
-			"country": "United States"
+			"country": "United States",
+			"gecko_id": "dydx"
 	},
 	"btcnext": {
 			"name": "BTCNEXT",
 			"url": "https://my.btcnext.io",
-			"country": "South Korea"
+			"country": "South Korea",
+			"gecko_id": "btcnext"
 	},
-	"whale_ex": {
+	"whaleex": {
 			"name": "WhaleEx",
 			"url": "https://www.whaleex.com/",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "whale_ex"
 	},
 	"bitsdaq": {
 			"name": "Bitsdaq",
 			"url": "https://bitsdaq.com/",
-			"country": "Hong Kong"
+			"country": "Hong Kong",
+			"gecko_id": "bitsdaq"
 	},
-	"huobi_korea": {
+	"huobikorea": {
 			"name": "Huobi Korea",
 			"url": "https://www.huobi.co.kr/en-US/",
-			"country": "South Korea"
+			"country": "South Korea",
+			"gecko_id": "huobi_korea"
 	},
-	"stake_cube": {
+	"stakecube": {
 			"name": "StakeCube",
 			"url": "https://stakecube.net/exchange/",
-			"country": "Germany"
+			"country": "Germany",
+			"gecko_id": "stake_cube"
 	},
-	"gmo_japan": {
+	"gmojapan": {
 			"name": "GMO Japan",
 			"url": "https://coin.z.com/jp/",
-			"country": "Japan"
+			"country": "Japan",
+			"gecko_id": "gmo_japan"
 	},
-	"huobi_japan": {
+	"huobijapan": {
 			"name": "Huobi Japan",
 			"url": "https://www.huobi.co.jp/",
-			"country": "Japan"
+			"country": "Japan",
+			"gecko_id": "huobi_japan"
 	},
 	"boa": {
 			"name": "BOA Exchange",
 			"url": "https://www.boaexchange.com/",
-			"country": "Romania"
+			"country": "Romania",
+			"gecko_id": "boa"
 	},
 	"synthetix": {
 			"name": "Synthetix Exchange",
 			"url": "https://synthetix.exchange",
-			"country": "Australia"
+			"country": "Australia",
+			"gecko_id": "synthetix"
 	},
 	"tokpie": {
 			"name": "Tokpie",
 			"url": "https://tokpie.io/",
-			"country": "Hong Kong"
+			"country": "Hong Kong",
+			"gecko_id": "tokpie"
 	},
 	"coinfinit": {
 			"name": "Coinfinit",
 			"url": "https://www.coinfinit.com/",
-			"country": "South Korea"
+			"country": "South Korea",
+			"gecko_id": "coinfinit"
 	},
 	"eterbase": {
 			"name": "Eterbase",
 			"url": "https://eterbase.exchange",
-			"country": "Slovakia"
+			"country": "Slovakia",
+			"gecko_id": "eterbase"
 	},
 	"beaxy": {
 			"name": "Beaxy",
 			"url": "https://www.beaxy.com/",
-			"country": "Saint Kitts and Nevis"
+			"country": "Saint Kitts and Nevis",
+			"gecko_id": "beaxy"
 	},
 	"exnce": {
 			"name": "EXNCE",
 			"url": "https://exnce.com/",
-			"country": "Estonia"
+			"country": "Estonia",
+			"gecko_id": "exnce"
 	},
-	"bamboo_relay": {
+	"bamboorelay": {
 			"name": "Bamboo Relay",
 			"url": "https://bamboorelay.com/",
-			"country": "Australia"
+			"country": "Australia",
+			"gecko_id": "bamboo_relay"
 	},
-	"darb_finance": {
+	"darbfinance": {
 			"name": "Darb Finance",
 			"url": "https://darbfinance.com",
-			"country": "Estonia"
+			"country": "Estonia",
+			"gecko_id": "darb_finance"
 	},
 	"coinflex": {
 			"name": "CoinFLEX",
 			"url": "https://coinflex.com/",
-			"country": "Seychelles"
+			"country": "Seychelles",
+			"gecko_id": "coinflex"
 	},
-	"go_exchange": {
+	"goexchange": {
 			"name": "Go Exchange",
 			"url": "https://go.exchange/",
-			"country": "Malta"
+			"country": "Malta",
+			"gecko_id": "go_exchange"
 	},
 	"aex": {
 			"name": "AEX",
 			"url": "https://www.aex.plus/",
-			"country": "Seychelles"
+			"country": "Seychelles",
+			"gecko_id": "aex"
 	},
 	"bitci": {
 			"name": "Bitci",
 			"url": "https://www.bitci.com/",
-			"country": "Turkey"
+			"country": "Turkey",
+			"gecko_id": "bitci"
 	},
-	"ftx_spot": {
+	"ftxspot": {
 			"name": "FTX (Spot)",
 			"url": "https://ftx.com/",
-			"country": "Antigua and Barbuda"
+			"country": "Antigua and Barbuda",
+			"gecko_id": "ftx_spot"
 	},
-	"dove_wallet": {
+	"dovewallet": {
 			"name": "Dove Wallet",
 			"url": "https://dovewallet.com",
-			"country": "South Korea"
+			"country": "South Korea",
+			"gecko_id": "dove_wallet"
 	},
 	"ovex": {
 			"name": "Ovex",
 			"url": "https://www.ovex.io/",
-			"country": "South Africa"
+			"country": "South Africa",
+			"gecko_id": "ovex"
 	},
 	"bitoffer": {
 			"name": "Bitoffer",
 			"url": "https://www.bitoffer.com/en",
-			"country": "Hong Kong"
+			"country": "Hong Kong",
+			"gecko_id": "bitoffer"
 	},
 	"atomars": {
 			"name": "Atomars",
 			"url": "https://atomars.com",
-			"country": null
+			"country": null,
+			"gecko_id": "atomars"
 	},
 	"coinhe": {
 			"name": "CoinHe",
 			"url": "https://coinhe.io/",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "coinhe"
 	},
 	"bitsonic": {
 			"name": "Bitsonic",
 			"url": "https://bitsonic.co.kr",
-			"country": "South Korea"
+			"country": "South Korea",
+			"gecko_id": "bitsonic"
 	},
-	"okex_korea": {
+	"okexkorea": {
 			"name": "OKEx Korea",
 			"url": "https://okex.co.kr/",
-			"country": "South Korea"
+			"country": "South Korea",
+			"gecko_id": "okex_korea"
 	},
 	"btse": {
 			"name": "BTSE",
 			"url": "https://www.btse.com/en/home/",
-			"country": "United Arab Emirates"
+			"country": "United Arab Emirates",
+			"gecko_id": "btse"
 	},
 	"bitcoin": {
 			"name": "Bitcoin.com",
 			"url": "https://exchange.bitcoin.com/",
-			"country": "Bahamas"
+			"country": "Bahamas",
+			"gecko_id": "bitcoin"
 	},
 	"bihodl": {
 			"name": "BiHODL ",
 			"url": "https://www.bihodl.com/#/",
-			"country": "Singapore"
+			"country": "Singapore",
+			"gecko_id": "bihodl"
 	},
-	"binance_us": {
+	"binanceus": {
 			"name": "Binance US",
 			"url": "https://www.binance.us/en",
-			"country": "United States"
+			"country": "United States",
+			"gecko_id": "binance_us"
 	},
 	"kumex": {
 			"name": "Kumex",
 			"url": "https://www.kumex.com/",
-			"country": null
+			"country": null,
+			"gecko_id": "kumex"
 	},
 	"nash": {
 			"name": "Nash",
 			"url": "",
-			"country": null
+			"country": null,
+			"gecko_id": "nash"
 	}
 }

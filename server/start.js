@@ -22,7 +22,6 @@ require('./modules/sqlite_tables.js').create().then(function(){
 			return response.status(400).send('Wrong wallet id');
 		if (!validationUtils.isNonnegativeInteger(page))
 			return response.status(400).send('Wrong page');
-
 		explorer.redirections([id], function(redirected_ids){
 			explorer.getTransactionsFromWallets(redirected_ids, page, function(assocTxsFromWallet){
 				return response.send({txs: assocTxsFromWallet, redirected_id: redirected_ids[0], exchange: aa_handler.getCurrentExchangeByWalletId(id)});
@@ -70,6 +69,19 @@ require('./modules/sqlite_tables.js').create().then(function(){
 	})
 
 
+	app.get('/api/wallet-addresses/:id/:page', function(request, response){
+		const page = request.params.page ? Number(request.params.page) : 0;
+		const id = Number(request.params.id);
+		if (!validationUtils.isNonnegativeInteger(id))
+			return response.status(400).send('Wrong wallet id');
+		if (!validationUtils.isNonnegativeInteger(page))
+			return response.status(400).send('Wrong page');
+		explorer.getAddressesFromWallet(id, page, function(objAddresses){
+			return response.send(objAddresses);
+		});
+	});
+
+
 	app.get('/api/txid/:tx_id', function(request, response){
 		const tx_id = request.params.tx_id;
 		console.error(tx_id);
@@ -86,6 +98,17 @@ require('./modules/sqlite_tables.js').create().then(function(){
 		return response.send(arrLastRanking);
 		});
 	});
+
+	
+	app.get('/api/exchange-history/:exchange', function(request, response){
+		const exchange = request.params.exchange;
+		if(!validationUtils.isNonemptyString(exchange))
+			return response.status(400).send('Wrong exchange id');
+			exchanges.getExchangeHistory(exchange, function(history){
+				return response.send(history);
+			});
+	});
+	
 
 	app.get('/api/pools', function(request, response){
 		return response.send(aa_handler.getCurrentPools());

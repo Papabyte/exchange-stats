@@ -314,7 +314,9 @@ function downloadBlockAndParse(blockheight, handle){
 		encoding: null
 	}, function(error, response, body) {
 		if (error || response.statusCode !== 200){
-			return downloadBlockAndParse(blockheight, handle);
+			return setTimeout(function(){
+				downloadBlockAndParse(blockheight, handle);
+			}, 2000);
 		}
 		zlib.unzip(body, function(err, unZippedData) {
 			if (err) {

@@ -30,6 +30,7 @@ exports.create = function(){
 			wallet_id INTEGER,\n\
 			amount INTEGER NOT NULL)");
 		await db.query("CREATE INDEX IF NOT EXISTS fromByWalletId ON transactions_from(wallet_id,id) WHERE wallet_id IS NOT NULL");
+		await db.query("CREATE INDEX IF NOT EXISTS fromByIdAndWalletId ON transactions_from(id,wallet_id)");
 
 		await db.query("CREATE TABLE IF NOT EXISTS transactions_to (\n\
 			id INTEGER, \n\
@@ -40,6 +41,7 @@ exports.create = function(){
 			)");
 
 		await db.query("CREATE INDEX IF NOT EXISTS toByWalletId ON transactions_to(wallet_id,id)");
+		await db.query("CREATE INDEX IF NOT EXISTS toByIdAndWalletId ON transactions_to(id, wallet_id)");
 		await db.query("CREATE UNIQUE INDEX IF NOT EXISTS toById ON transactions_to(id,n)");
 		await db.query("CREATE INDEX IF NOT EXISTS toByAddressId ON transactions_to(address_id,wallet_id)");
 
@@ -65,6 +67,8 @@ exports.create = function(){
 			total_btc_wallet INTEGER,\n\
 			last_day_deposits INTEGER,\n\
 			last_day_withdrawals INTEGER,\n\
+			last_month_volume INTEGER,\n\
+			nb_addresses INTEGER,\n\
 			delivered_by_traded\n\
 			)");
 

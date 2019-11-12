@@ -53,7 +53,7 @@ function catchUpOperationsHistory(){
 			CASE WHEN mci IS NOT NULL THEN MAX(mci) \n\
 			ELSE 0 \n\
 			END max_mci\n\
-			from operations_history) AND aa_address=?", [conf.aa_address], function(rows){
+			FROM operations_history) AND aa_address=?", [conf.aa_address], function(rows){
 				async.eachOf(rows, function(row, index, cb) {
 
 				const objResponse = JSON.parse(row.response).responseVars;

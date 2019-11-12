@@ -14,11 +14,6 @@ async function getTransactionsFromWallets(arrIds, page, handle){
 		stats.getTotalTransactions(arrIds)
 	]);
 
-	/*
-		db.query("SELECT DISTINCT id FROM (SELECT id FROM transactions_to WHERE wallet_id IN("+ idsSqlFilter +") \n\
-		UNION SELECT id FROM transactions_from WHERE wallet_id IN("+ idsSqlFilter +"))s ORDER BY id DESC LIMIT ?,?",[page*ITEMS_PER_PAGE,ITEMS_PER_PAGE]),
-		stats.getTotalOnWallets(arrIds),
-*/
 	if (transactions_count == 0)
 		return handle(null);
 
@@ -30,10 +25,26 @@ async function getTransactionsFromWallets(arrIds, page, handle){
 	});
 }
 
+async function getAddressesFromWallet(id, page, handle){
+	var [addressesRows, addr_count] = await Promise.all([
+		db.query("SELECT address FROM btc_addresses WHERE wallet_id=? LIMIT ?,?",[id,page*ITEMS_PER_PAGE,ITEMS_PER_PAGE]),
+		stats.getTotalAddresses([id])
+	]);
+
+	return handle({addr_count: addr_count, addresses: addressesRows.map(function(row){return row.address})});
+}
+
+
 async function getTransactionFromTxId(tx_id, handle){
-	var idRows = await db.query("SELECT id from transactions WHERE tx_id=?",[tx_id]);
-	if (idRows[0])
-		getTransactionsFromInternalIds([idRows[0].id], handle);
+	const rows = await db.query("SELECT transactions.block_height, datetime(block_time, 'unixepoch') as time,transactions.tx_id, transactions_from.amount AS amount_from,transactions_to.amount AS amount_to,\n\
+	transactions_from.wallet_id AS from_id, transactions_to.wallet_id AS to_id,btc_addresses.address FROM transactions  \n\
+	INNER JOIN transactions_to USING(id) \n\
+	INNER JOIN processed_blocks USING(block_height) \n\
+	INNER JOIN btc_addresses ON btc_addresses.id=transactions_to.address_id \n\
+	LEFT JOIN transactions_from USING(id) \n\
+	WHERE transactions.tx_id =? ORDER BY transactions.id DESC",[tx_id]);
+	if (rows[0])
+	return handle(createTxsAssociativeArray(rows));
 	else
 		return handle(null);
 }
@@ -51,14 +62,16 @@ async function getTransactionsFromInternalIds(arrIds, handle){
 	const idsSqlFilter = arrIds.join(",");
 	console.error(idsSqlFilter);
 	const rows = await db.query("SELECT transactions.block_height, datetime(block_time, 'unixepoch') as time,transactions.tx_id, transactions_from.amount AS amount_from,transactions_to.amount AS amount_to,\n\
-	transactions_from.wallet_id AS from_id, transactions_to.wallet_id AS to_id,btc_addresses.address FROM transactions  \n\
-	INNER JOIN transactions_to USING(id) \n\
-	INNER JOIN processed_blocks USING(block_height) \n\
+	transactions_from.wallet_id AS from_id, transactions_to.wallet_id AS to_id,btc_addresses.address FROM transactions \n\
+	INNER JOIN transactions_to USING(id) INNER JOIN processed_blocks USING(block_height) \n\
 	INNER JOIN btc_addresses ON btc_addresses.id=transactions_to.address_id \n\
 	LEFT JOIN transactions_from USING(id) \n\
-	WHERE transactions.id IN (" +idsSqlFilter +") ORDER BY transactions.id DESC");
+	WHERE transactions.id IN (" +idsSqlFilter +") AND transactions_to.n < 11 ORDER BY transactions.id DESC");
+	return handle(createTxsAssociativeArray(rows));
+}
 
-	console.error(JSON.stringify(rows));
+function createTxsAssociativeArray(rows){
+
 	const assocTxsFromWallet = {};
 	rows.forEach(function(row){
 		if (!assocTxsFromWallet[row.tx_id]) {
@@ -79,7 +92,7 @@ async function getTransactionsFromInternalIds(arrIds, handle){
 			exchange: aa_handler.getCurrentExchangeByWalletId(row.to_id)
 		}) ;
 	});
-	return handle(assocTxsFromWallet);
+	return assocTxsFromWallet;
 }
 
 
@@ -104,3 +117,4 @@ exports.getTransactionsFromWallets = getTransactionsFromWallets;
 exports.redirections = redirections;
 exports.getTransactionFromTxId = getTransactionFromTxId;
 exports.getWalletIdFromAddress = getWalletIdFromAddress;
+exports.getAddressesFromWallet = getAddressesFromWallet;
