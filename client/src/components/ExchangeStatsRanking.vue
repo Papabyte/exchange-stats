@@ -30,17 +30,21 @@
 							<span v-b-tooltip.hover :title="$t('rankingTableColReportedVolumeTip')">{{data.label}}</span>
 						</template>
 
-						<template v-slot:head(nb_withdrawal_addresses)="data">
-							<span v-b-tooltip.hover :title="$t('rankingTableColNbWithdrawalAddressesTip')">{{data.label}}</span>
+						<template v-slot:head(last_month_volume)="data">
+							<span v-b-tooltip.hover :title="$t('rankingTableColMonthlyTip')">{{data.label}}</span>
 						</template>
 
-						<template v-slot:head(nb_deposit_addresses)="data">
-							<span v-b-tooltip.hover :title="$t('rankingTableColNbDepositAddressesTip')">{{data.label}}</span>
+						<template v-slot:head(nb_addresses)="data">
+							<span v-b-tooltip.hover :title="$t('rankingTableColNbAddressesTip')">{{data.label}}</span>
 						</template>
 
 						<template v-slot:head(last_day_deposits)="data">
 							<span v-b-tooltip.hover :title="$t('rankingTableColLastDayDepositsTip')">{{data.label}}</span>
 						</template>
+
+						<template v-slot:cell(last_month_volume)="data">
+								<BtcAmount v-if="data.item.last_month_volume" :amount="data.item.last_month_volume"/>
+							</template>
 
 						<template v-slot:cell(last_day_deposits)="data">
 							<BtcAmount v-if="data.item.last_day_deposits" :amount="data.item.last_day_deposits"/>
@@ -52,6 +56,16 @@
 
 						<template v-slot:cell(last_day_withdrawals)="data">
 							<BtcAmount v-if="data.item.last_day_withdrawals" :amount="data.item.last_day_withdrawals"/>
+						</template>
+
+						<template v-slot:head(trend)="data">
+							<span v-b-tooltip.hover :title="$t('rankingTableColTrendTip')">{{data.label}}</span>
+						</template>
+						
+						<template v-slot:cell(trend)="data">
+							<router-link :to="{name: 'exchangesStats', params: { exchange: data.item.exchange_id } }">
+							<exchange-trend v-if="data.item.trend" :data="data.item.trend"/>
+							</router-link>
 						</template>
 
 						<template v-slot:head(total_btc_wallet)="data">
@@ -88,11 +102,13 @@
 
 import BtcAmount from './commons/BtcAmount.vue';
 import EditWalletModal from './commons/EditWalletModal.vue';
+import ExchangeTrend from './commons/ExchangeTrend.vue';
 
 	export default {
 		components: {
 			BtcAmount,
-			EditWalletModal
+			EditWalletModal,
+			ExchangeTrend
 		},
 		data() {
 			return {
@@ -106,12 +122,14 @@ import EditWalletModal from './commons/EditWalletModal.vue';
 				fields: [
 					{ key: 'name', sortable: true, label: this.$t('rankingTableColName')},
 					{ key: 'reported_volume', sortable: true, label: this.$t('rankingTableColReportedVolume')},
-					{ key: 'nb_withdrawal_addresses', sortable: true, label: this.$t('rankingTableColNbWithdrawalAddresses')},
-					{ key: 'nb_deposit_addresses', sortable: true, label: this.$t('rankingTableColNbDepositAddresses')},
+					{ key: 'last_month_volume', sortable: true, label: this.$t('rankingTableColMonthlyVolume')},
+					{ key: 'nb_addresses', sortable: true, label: this.$t('rankingTableColNbAddresses')},
 					{ key: 'total_btc_wallet', sortable: true, label: this.$t('rankingTableColTotalBtcWallet')},
 					{ key: 'last_day_deposits', sortable: true, label: this.$t('rankingTableColLastDayDeposits')},
 					{ key: 'last_day_withdrawals', sortable: true, label: this.$t('rankingTableColLastDayWithdrawals') },
-					{ key: 'action', label: this.$t('rankingTableColAction')}
+					{ key: 'trend', label:this.$t('rankingTableColTrend')},
+					{ key: 'action', label: this.$t('rankingTableColAction')},
+
 				],
 				items: [
 				]
@@ -120,6 +138,10 @@ import EditWalletModal from './commons/EditWalletModal.vue';
 		created(){
 			this.axios.get('/api/ranking').then((response) => {
 				this.totalRows = response.data.length;
+				response.data.forEach(function(row){
+					if(row.trend)
+						row.trend = row.trend.split("@").map(function(value){return Number(value)});
+				});
 				this.items = response.data;
 			});
 		}

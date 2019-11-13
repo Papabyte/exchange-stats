@@ -9,15 +9,16 @@ export default new Router({
 
 	routes: [
 		{
-			name: 'exchangeStats',
+			name: 'stats',
 			path: '/',
 			component: lazyLoading('components/ExchangesStats'),
 			default: true,
 		},
 		{
 			name: 'exchangesStats',
-			path: '/stats',
-			component: lazyLoading('components/ExchangesStats')
+			path: '/stats/:exchange',
+			component: lazyLoading('components/ExchangesStats'),
+			props: true
 		},
 		{
 			name: 'explorerInputPaged',

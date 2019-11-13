@@ -28,6 +28,7 @@ function processNewRanking(){
 			var nb_withdrawal_addresses = null;
 			var nb_addresses = null;
 			var monthly_volume = null;
+			var trendString = null;
 
 			if (assocWalletIdsByExchange[key] && assocWalletIdsByExchange[key].length > 0){
 				var arrWalletIds = assocWalletIdsByExchange[key];
@@ -37,14 +38,17 @@ function processNewRanking(){
 				total_btc_wallet = await stats.getTotalOnWallets(arrWalletIds);
 				nb_deposit_addresses = await stats.getTotalDepositAddresses(arrWalletIds);
 				nb_withdrawal_addresses= await stats.getTotalWithdrawalAddresses(arrWalletIds);
-				monthly_volume = await createWeeklyHistoryForExchangeAndReturnMonthlyVolume(key, arrWalletIds);
+				const volumeAndTrendObj = await createWeeklyHistoryForExchangeAndReturnMonthlyVolume(key, arrWalletIds);
+				monthly_volume = volumeAndTrendObj.monthly_volume;
+				trendString = volumeAndTrendObj.trend.join('@');
 				nb_addresses = await stats.getTotalAddresses(arrWalletIds);
 			}
 			var objInfo = await api.getExchangeInfo(exchanges[key].gecko_id);
 
-			db.query("REPLACE INTO last_exchanges_ranking (exchange_id,last_month_volume,nb_addresses,total_btc_wallet,name,last_day_deposits, last_day_withdrawals, reported_volume,nb_deposit_addresses,nb_withdrawal_addresses) VALUES (?,?,?,?,?,?,?,?,?,?)", 
+			db.query("REPLACE INTO last_exchanges_ranking (exchange_id,trend,last_month_volume,nb_addresses,total_btc_wallet,name,last_day_deposits, last_day_withdrawals, reported_volume,nb_deposit_addresses,nb_withdrawal_addresses) VALUES (?,?,?,?,?,?,?,?,?,?,?)", 
 			[
 				key,
+				trendString,
 				monthly_volume,
 				nb_addresses,
 				total_btc_wallet, 
@@ -75,18 +79,23 @@ function createWeeklyHistoryForExchangeAndReturnMonthlyVolume(exchange, arrWalle
 
 		var lastHeight = await indexer.getLastProcessedHeight();
 		const block_period_day = 6*24;
-		const year_start_block = lastHeight - 365*6*24.7;
-		const month_start_block = lastHeight - 30*6*24.7;
+		const year_start_block = lastHeight - 365*6*24;
+		const month_start_block = lastHeight - 30*6*24;
+		const week_start_block = lastHeight - 7*6*24;
+		const trendArray = [];
 		var monthly_volume = 0;
 		var balance = await stats.getTotalOnWallets(arrWalletIds);
 		for (var i = lastHeight; i > year_start_block; i-= block_period_day){
 			console.log(exchange + " " + i);
-			var total_deposited = await stats.getTotalDepositedToWallets(arrWalletIds, i - block_period_day, i);
-			var total_withdrawn = await stats.getTotalWithdrawnFromWallets(arrWalletIds, i - block_period_day, i);
+			var total_deposited = await stats.getTotalDepositedToWallets(arrWalletIds, i - block_period_day -1, i -1);
+			var total_withdrawn = await stats.getTotalWithdrawnFromWallets(arrWalletIds, i - block_period_day -1, i -1);
 			balance -= await stats.getSumOutputsToWallets(arrWalletIds, i - block_period_day, i);;
 			balance += await stats.getSumInputsFromWallets(arrWalletIds, i - block_period_day, i);
-			if (month_start_block >= i)
+			if (month_start_block < i)
 				monthly_volume+= total_deposited + total_withdrawn;
+			if (week_start_block < i)
+				trendArray.push(total_deposited + total_withdrawn);
+
 			await db.query("INSERT INTO "+ tempTableName +" (time_start,time_end,week,total_deposited,total_withdrawn,balance) VALUES (\n\
 				(SELECT block_time FROM processed_blocks WHERE block_height=?),(SELECT block_time FROM processed_blocks WHERE block_height=?),?,?,?,?)",
 				[i - block_period_day,i,i,total_deposited,total_withdrawn,balance]);
@@ -101,7 +110,7 @@ function createWeeklyHistoryForExchangeAndReturnMonthlyVolume(exchange, arrWalle
 			conn.addQuery(arrQueries, "COMMIT");
 			async.series(arrQueries, function() {
 				conn.release();
-				return resolve(monthly_volume);
+				return resolve({monthly_volume: monthly_volume, trend: trendArray.reverse()});
 			});
 		});
 	})

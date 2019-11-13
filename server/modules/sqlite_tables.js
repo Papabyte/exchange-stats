@@ -69,6 +69,7 @@ exports.create = function(){
 			last_day_withdrawals INTEGER,\n\
 			last_month_volume INTEGER,\n\
 			nb_addresses INTEGER,\n\
+			trend TEXT,\n\
 			delivered_by_traded\n\
 			)");
 

@@ -4,7 +4,7 @@
 				<b-navbar-brand>{{conf.website_name}}</b-navbar-brand>
 
 			<b-navbar-nav>
-				<b-nav-item to="/stats" :class="{active: selected_item=='0'}">{{$t("navbarRanking")}}</b-nav-item>
+				<b-nav-item to="/" :class="{active: selected_item=='0'}">{{$t("navbarRanking")}}</b-nav-item>
 				<b-nav-item to="/explorer" :class="{active: selected_item=='1'}">{{$t("navbarExplorer")}}</b-nav-item>
 				<b-nav-item to="/crowdsourcing" :class="{active: selected_item=='2'}">{{$t("navbarCrowdsourcing")}}</b-nav-item>
 				<b-nav-item to="/faq" :class="{active: selected_item=='3'}">{{$t("navbarFaq")}}</b-nav-item>
@@ -18,7 +18,7 @@ const conf = require("../../conf.js");
 
 export default {
 	name: 'NavBar',
-  props: {
+	props: {
 		selected_item: {
 			type: String,
 			default: '0'
