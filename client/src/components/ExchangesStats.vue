@@ -1,9 +1,9 @@
 <template>
 	<div class="main">
 		<nav-bar selected_item='0' />
-		<b-container fluid>
+		<b-container class="mt-3">
 			<b-row>
-				<b-col offset-lg="1" lg="10" cols="12" class="py-3">
+				<b-col cols="12">
 					<b-alert v-if="welcomeMessageShown" @dismissed="$store.commit('setWasRankingWelcomeMessageClosed',true)" variant="info" show dismissible>
 						{{$t('rankingWelcomeMessage')}}
 					</b-alert>
