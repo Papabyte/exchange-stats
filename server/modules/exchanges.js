@@ -1,4 +1,5 @@
 const exchanges = require('../exchanges.json');
+const explorer = require('./explorer.js');
 const indexer = require('./indexer.js');
 const stats = require('./stats.js');
 const api = require('./coingecko_api.js');
@@ -31,10 +32,10 @@ function processNewRanking(){
 			var trendString = null;
 
 			if (assocWalletIdsByExchange[key] && assocWalletIdsByExchange[key].length > 0){
-				var arrWalletIds = assocWalletIdsByExchange[key];
+				var arrWalletIds = await explorer.getRedirections(assocWalletIdsByExchange[key]);
 				var lastHeight = await indexer.getLastProcessedHeight();
-				total_24h_deposits = await stats.getTotalDepositedToWallets(arrWalletIds, lastHeight - 10 * 6 * 24 , lastHeight);
-				total_24h_withdrawals = await stats.getTotalWithdrawnFromWallets(arrWalletIds, lastHeight - 10 * 6 * 24 , lastHeight);
+				total_24h_deposits = await stats.getTotalDepositedToWallets(arrWalletIds, lastHeight - 6 * 24 , lastHeight);
+				total_24h_withdrawals = await stats.getTotalWithdrawnFromWallets(arrWalletIds, lastHeight - 6 * 24 , lastHeight);
 				total_btc_wallet = await stats.getTotalOnWallets(arrWalletIds);
 				nb_deposit_addresses = await stats.getTotalDepositAddresses(arrWalletIds);
 				nb_withdrawal_addresses= await stats.getTotalWithdrawalAddresses(arrWalletIds);
@@ -78,6 +79,7 @@ function createWeeklyHistoryForExchangeAndReturnMonthlyVolume(exchange, arrWalle
 		balance INTEGER NOT NULL)");
 
 		var lastHeight = await indexer.getLastProcessedHeight();
+		const start_ts = Date.now();
 		const block_period_day = 6*24;
 		const year_start_block = lastHeight - 365*6*24;
 		const month_start_block = lastHeight - 30*6*24;
@@ -87,10 +89,10 @@ function createWeeklyHistoryForExchangeAndReturnMonthlyVolume(exchange, arrWalle
 		var balance = await stats.getTotalOnWallets(arrWalletIds);
 		for (var i = lastHeight; i > year_start_block; i-= block_period_day){
 			console.log(exchange + " " + i);
-			var total_deposited = await stats.getTotalDepositedToWallets(arrWalletIds, i - block_period_day -1, i -1);
-			var total_withdrawn = await stats.getTotalWithdrawnFromWallets(arrWalletIds, i - block_period_day -1, i -1);
-			balance -= await stats.getSumOutputsToWallets(arrWalletIds, i - block_period_day, i);;
-			balance += await stats.getSumInputsFromWallets(arrWalletIds, i - block_period_day, i);
+			var total_deposited = await stats.getTotalDepositedToWallets(arrWalletIds, i - block_period_day , i -1);
+			var total_withdrawn = await stats.getTotalWithdrawnFromWallets(arrWalletIds, i - block_period_day , i -1);
+			balance -= await stats.getSumOutputsToWallets(arrWalletIds, i - block_period_day + 1, i);;
+			balance += await stats.getSumInputsFromWallets(arrWalletIds, i - block_period_day + 1, i);
 			if (month_start_block < i)
 				monthly_volume+= total_deposited + total_withdrawn;
 			if (week_start_block < i)
@@ -107,6 +109,7 @@ function createWeeklyHistoryForExchangeAndReturnMonthlyVolume(exchange, arrWalle
 			conn.addQuery(arrQueries,"DROP TABLE IF EXISTS " + tableName);
 			console.log(tableName);
 			conn.addQuery(arrQueries,"ALTER TABLE " + tempTableName + " RENAME TO " + tableName);
+			conn.addQuery(arrQueries,"REPLACE INTO exchange_history_infos (exchange_id, wallets, processing_time) VALUES (?,?,?)", [exchange, arrWalletIds.join('@'), (Date.now() - start_ts)/1000]);
 			conn.addQuery(arrQueries, "COMMIT");
 			async.series(arrQueries, function() {
 				conn.release();
@@ -117,12 +120,12 @@ function createWeeklyHistoryForExchangeAndReturnMonthlyVolume(exchange, arrWalle
 }
 
 async function getExchangeHistory(exchange, handle){
-	var tableName = db.escape("history_" + exchange);
-	console.log(tableName);
-	var rows = await db.query("SELECT 1 FROM sqlite_master WHERE type='table' AND name="+tableName);
+	const tableName = db.escape("history_" + exchange);
+	const rows = await db.query("SELECT 1 FROM sqlite_master WHERE type='table' AND name="+tableName);
 	if (rows[0]){
-		var rows = await db.query("SELECT * FROM " + tableName);
-		return handle(rows);
+		const historyRows = await db.query("SELECT * FROM " + tableName);
+		const infoRows = await db.query("SELECT creation_date,wallets FROM exchange_history_infos WHERE exchange_id=?",[exchange]);
+		return handle({history: historyRows, info: infoRows[0]});
 	} else {
 		console.log("history " + tableName +" not found");
 		return handle(null);

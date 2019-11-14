@@ -21,6 +21,18 @@ export default new Router({
 			props: true
 		},
 		{
+			name: 'explorerAddress',
+			path: '/explorer/address/:address',
+			component: lazyLoading('components/Explorer'),
+			props: true
+		},
+		{
+			name: 'explorerAddressesPaged',
+			path: '/explorer/addresses/:wallet/:page',
+			component: lazyLoading('components/Explorer'),
+			props: true
+		},
+		{
 			name: 'explorerInputPaged',
 			path: '/explorer/:url_input/:page',
 			component: lazyLoading('components/Explorer'),

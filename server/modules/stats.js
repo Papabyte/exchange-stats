@@ -16,7 +16,7 @@ function getTotalDepositedToWallets(arrIds, from_block, to_block ){
 		var amount = 0;
 		for (var i=from_block; i<=to_block; i++){
 		const rows = await db.query("SELECT SUM(transactions_to.amount) AS amount FROM transactions INDEXED BY transactionsByBlockHeight INNER JOIN transactions_from  INDEXED BY fromByIdAndWalletId USING(id) \n\
-		INNER JOIN transactions_to INDEXED BY toByIdAndWalletId USING(id) WHERE transactions_to.wallet_id IN("+idsSqlFilter+") AND transactions_from.wallet_id NOT IN("+idsSqlFilter+") \n\
+		CROSS JOIN transactions_to INDEXED BY toByIdAndWalletId USING(id) WHERE transactions_to.wallet_id IN("+idsSqlFilter+") AND transactions_from.wallet_id NOT IN("+idsSqlFilter+") \n\
 		AND transactions.block_height =?",[i]);
 		amount+= (rows[0] && rows[0].amount ? rows[0].amount : 0);
 
@@ -50,7 +50,7 @@ function getSumOutputsToWallets(arrIds, from_block, to_block ){
 		var amount = 0;
 		for (var i=from_block; i<=to_block; i++){
 		const rows = await db.query("SELECT SUM(transactions_to.amount) AS amount FROM transactions INDEXED BY transactionsByBlockHeight \n\
-		INNER JOIN transactions_to INDEXED BY toByIdAndWalletId USING(id) WHERE transactions_to.wallet_id IN("+idsSqlFilter+") \n\
+		CROSS JOIN transactions_to INDEXED BY toByIdAndWalletId USING(id) WHERE transactions_to.wallet_id IN("+idsSqlFilter+") \n\
 		AND transactions.block_height =?",[i]);
 		amount+= (rows[0] && rows[0].amount ? rows[0].amount : 0);
 		}

@@ -129,6 +129,8 @@
 	"rankingGraphPageTitle" : "{exchange} history - {website_name}",
 	"rankingGraphDescription" : "1-year historical graph for {exchange} onchain activity.",
 	"rankingGraphTitle" : "{exchange} on-chain activity history",
+	"rankingGraphLegendTimespan" : "Daily timespans are 144 blocks series.",
+	"rankingGraphLegendWallets": "Generated on {creation_date} UTC from aggregation of wallets: ",
 	"explorerTitle" : "Wallet Explorer",
 	"explorerButtonGo": "Go",
 	"explorerOrBrowseExchanges" : "Or browse by exchange: ",

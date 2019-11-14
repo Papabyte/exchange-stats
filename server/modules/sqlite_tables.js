@@ -92,6 +92,14 @@ exports.create = function(){
 		await db.query("CREATE INDEX IF NOT EXISTS operationsHistoryByPair ON operations_history(pair)");
 		await db.query("CREATE INDEX IF NOT EXISTS operationsHistoryByOperationId ON operations_history(operation_id)");
 		await db.query("CREATE INDEX IF NOT EXISTS operationsHistoryByConcernedAddress ON operations_history(concerned_address)");
+
+
+		await db.query("CREATE TABLE IF NOT EXISTS exchange_history_infos (\n\
+			exchange_id VARCHAR(60) PRIMARY KEY, \n\
+			wallets TEXT NOT NULL, \n\
+			processing_time INTEGER NOT NULL,\n\
+			creation_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+
 		if (process.env.faster){
 		//	await db.query("PRAGMA journal_mode=MEMORY");
 			await db.query("PRAGMA synchronous = 0 ");

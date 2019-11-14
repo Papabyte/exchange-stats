@@ -10,17 +10,30 @@
 				<highcharts :options="chartOptions"></highcharts>
 			</b-col >
 		</b-row >
+		<b-row class="pl-3 mt-3" >
+			<div>{{$t('rankingGraphLegendTimespan')}}</div>
+		</b-row >
+		<b-row class="pl-3 mt-1" >
+			<div>{{$t('rankingGraphLegendWallets',{creation_date: creation_date})}} </div>
+		<div v-for="(wallet,index) in exchangeWallets" v-bind:key="index" >
+			<b-col >
+				<wallet-id :id="Number(wallet)"/>
+			</b-col>
+		</div>
+		</b-row >
 	</b-col >
 </template>
 
 <script>
 import {Chart} from 'highcharts-vue'
+import WalletId from './commons/WalletId.vue';
 
 const conf = require("../conf.js");
 
 export default {
 	components: {
-		highcharts: Chart 
+		highcharts: Chart,
+		WalletId
 	},
 	props: {
 		exchange: {
@@ -32,7 +45,9 @@ export default {
 		return {
 			chartOptions: {
 				series: []
-			}
+			},
+			exchangeWallets: [],
+			creation_date: ''
 		}
 	},
 	computed:{
@@ -43,7 +58,9 @@ export default {
 	created(){
 		this.chartOptions.title = {text: ''};
 		this.axios.get('/api/exchange-history/'+ this.exchange).then((response) => {
-			const data = response.data;
+			const data = response.data.history;
+			this.exchangeWallets = response.data.info.wallets.split('@');
+			this.creation_date = response.data.info.creation_date;
 			this.chartOptions.zoomType = 'x';	
 			this.chartOptions.xAxis = {
 				type: 'datetime',
@@ -59,7 +76,6 @@ export default {
 			this.chartOptions.series.push({
 				data: data.map(function(row){
 					return {
-						x: row.time_start*1000,
 						x: row.time_end*1000,
 						y: row.balance/100000000
 					}

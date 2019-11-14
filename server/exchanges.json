@@ -1808,5 +1808,11 @@
 			"url": "",
 			"country": null,
 			"gecko_id": "nash"
+	},
+	"bitmex": {
+		"name": "Bitmex",
+		"url": "https://www.bitmex.com/",
+		"country": null,
+		"gecko_id": "bitmex"
 	}
 }

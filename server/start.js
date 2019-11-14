@@ -14,7 +14,7 @@ require('./modules/sqlite_tables.js').create().then(function(){
 
 	const app = express()
 
-	app.get('/api/wallet/:id/:page', function(request, response){
+	app.get('/api/wallet/:id/:page', async function(request, response){
 		const id = Number(request.params.id);
 		const page = request.params.page ? Number(request.params.page) : 0;
 
@@ -22,10 +22,9 @@ require('./modules/sqlite_tables.js').create().then(function(){
 			return response.status(400).send('Wrong wallet id');
 		if (!validationUtils.isNonnegativeInteger(page))
 			return response.status(400).send('Wrong page');
-		explorer.redirections([id], function(redirected_ids){
-			explorer.getTransactionsFromWallets(redirected_ids, page, function(assocTxsFromWallet){
+		const redirected_ids = await explorer.getRedirections([id]);
+		explorer.getTransactionsFromWallets(redirected_ids, page, function(assocTxsFromWallet){
 				return response.send({txs: assocTxsFromWallet, redirected_id: redirected_ids[0], exchange: aa_handler.getCurrentExchangeByWalletId(id)});
-			});
 		})
 	});
 
@@ -45,7 +44,7 @@ require('./modules/sqlite_tables.js').create().then(function(){
 			return response.send(	exchanges.getExchangesList());
 	});
 
-	app.get('/api/exchange/:exchange/:page', function(request, response){
+	app.get('/api/exchange/:exchange/:page', async function(request, response){
 		const exchange = request.params.exchange;
 		const page = request.params.page ? Number(request.params.page) : 0;
 		if (!validationUtils.isNonnegativeInteger(page))
@@ -53,11 +52,10 @@ require('./modules/sqlite_tables.js').create().then(function(){
 		if(!validationUtils.isNonemptyString(exchange))
 			return response.status(400).send('Wrong exchange id');
 		const wallet_ids = exchanges.getExchangeWalletIds(exchange);
-		explorer.redirections(wallet_ids, function(redirected_ids){
-			explorer.getTransactionsFromWallets(redirected_ids, page, function(assocTxsFromWallet){
-				return response.send({txs: assocTxsFromWallet, wallet_ids: wallet_ids, redirected_ids: redirected_ids, name: exchanges.getExchangeName(exchange)});
-			});
-		})
+		const redirected_ids = await explorer.getRedirections(wallet_ids);
+		explorer.getTransactionsFromWallets(redirected_ids, page, function(assocTxsFromWallet){
+			return response.send({txs: assocTxsFromWallet, wallet_ids: wallet_ids, redirected_ids: redirected_ids, name: exchanges.getExchangeName(exchange)});
+		});
 	});
 
 	app.get('/api/exchange-wallets/:exchange/', function(request, response){
@@ -141,13 +139,12 @@ require('./modules/sqlite_tables.js').create().then(function(){
 		});
 	});
 
-	app.get('/api/redirection/:id', function(request, response){
+	app.get('/api/redirection/:id', async function(request, response){
 		const id = Number(request.params.id);
 		const address = request.params.id;
 		if (validationUtils.isNonnegativeInteger(id)){
-			return explorer.redirections([id], function(ids){
-				return response.send({redirected_id: ids[0]});
-			});
+			const redirected_ids = await explorer.getRedirections([id]);
+			return response.send({redirected_id: redirected_ids[0]});
 		} else if (validate(address)){
 			console.error("validate " + address);
 			explorer.getWalletIdFromAddress(address, function(wallet_id){

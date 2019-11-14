@@ -96,25 +96,25 @@ function createTxsAssociativeArray(rows){
 }
 
 
-async function redirections(arrIds, handle){
-	if (arrIds.length == 0)
-		return handle([]);
-		console.log("redirections");
-		console.log(arrIds);
-	const idsSqlFilter = arrIds.join(",");
-	const rows = await db.query("SELECT DISTINCT(redirection_id) FROM (SELECT \n\
-		CASE WHEN redirection IS NOT NULL THEN redirection \n\
-		ELSE id \n\
-		END redirection_id\n\
-	 FROM btc_wallets WHERE id IN (" +idsSqlFilter +"))s");
-	if (rows.length == 0){
-		return handle(arrIds);
-	} else {
-		return handle(rows.map(function(row){return row.redirection_id}));
-	}
+function getRedirections(arrIds){
+	return new Promise(async function(resolve){
+		if (arrIds.length == 0)
+			return resolve([]);
+		const idsSqlFilter = arrIds.join(",");
+		const rows = await db.query("SELECT DISTINCT(redirection_id) FROM (SELECT \n\
+			CASE WHEN redirection IS NOT NULL THEN redirection \n\
+			ELSE id \n\
+			END redirection_id\n\
+		FROM btc_wallets WHERE id IN (" +idsSqlFilter +"))s");
+		if (rows.length == 0){
+			return resolve(arrIds);
+		} else {
+			return resolve(rows.map(function(row){return row.redirection_id}));
+		}
+	});
 }
 exports.getTransactionsFromWallets = getTransactionsFromWallets;
-exports.redirections = redirections;
+exports.getRedirections = getRedirections;
 exports.getTransactionFromTxId = getTransactionFromTxId;
 exports.getWalletIdFromAddress = getWalletIdFromAddress;
 exports.getAddressesFromWallet = getAddressesFromWallet;
