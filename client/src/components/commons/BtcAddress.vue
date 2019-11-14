@@ -1,14 +1,14 @@
 <template>
-<div>
-	<div class="d-inline">
-		<span v-if="label">{{label}}</span><span class="address text-break">{{address}}</span>
+	<div>
+		<div class="d-inline">
+			<span v-if="label">{{label}}</span><span class="address text-break">{{address}}</span>
+		</div>
+		<div class="d-inline">
+				<b-link target="_blank" :href="'https://blockstream.info/address/'+address">
+				<v-icon name='external-link' class="custom-icon"/>
+			</b-link>
+		</div>
 	</div>
-	<div class="d-inline">
-			<b-link target="_blank" :href="'https://blockstream.info/address/'+address">
-			<v-icon name='external-link' class="custom-icon"/>
-		</b-link>
-	</div>
-</div>
 </template>
 
 <script>

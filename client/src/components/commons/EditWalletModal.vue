@@ -159,23 +159,24 @@ export default {
 	computed:{
 
 		getTitle:function(){
+			var title = "";
 			if (this.propExchange){
 				if (this.selectedWalletId && this.selectedExchange){
-					return (this.isRemoving ? this.$t('editModalRemoveXFromX', {exchange: this.assocExchanges[this.selectedExchange], wallet: this.selectedWalletId}): 
-					this.$t('editModalAddXToX', {exchange:this.assocExchanges[this.selectedExchange], wallet: this.isWalletId(this.selectedWalletId)? this.selectedWalletId : ""}));
+					title = this.isRemoving ? this.$t('editModalRemoveXFromX', {exchange: this.assocExchanges[this.selectedExchange], wallet: this.selectedWalletId}): 
+					this.$t('editModalAddXToX', {exchange:this.assocExchanges[this.selectedExchange], wallet: this.isWalletId(this.selectedWalletId)? this.selectedWalletId : ""});
 				}
 				else if (this.selectedExchange){
-					return (this.isRemoving ? this.$t('editModalRemoveFromX',{exchange:this.assocExchanges[this.selectedExchange]}):
-					this.$t('editModalAddToX',{exchange:this.assocExchanges[this.selectedExchange]}));
+					title = this.isRemoving ? this.$t('editModalRemoveFromX',{exchange:this.assocExchanges[this.selectedExchange]}):
+					this.$t('editModalAddToX',{exchange:this.assocExchanges[this.selectedExchange]});
 				}
 				else if (this.selectedWalletId){
-					return (this.isRemoving ? this.$t('editModalRemoveXFrom', {wallet: this.selectedWalletId}): 
-					this.$t('editModalAddXTo', {wallet: this.isWalletId(this.selectedWalletId) ? this.selectedWalletId : ""}));
+					title = this.isRemoving ? this.$t('editModalRemoveXFrom', {wallet: this.selectedWalletId}): 
+					this.$t('editModalAddXTo', {wallet: this.isWalletId(this.selectedWalletId) ? this.selectedWalletId : ""});
 				}
 			} else if (this.propWalletId){
-					return this.$t('editModalAddXToX', {exchange:this.assocExchanges[this.selectedExchange], wallet: this.isWalletId(this.selectedWalletId) ? this.selectedWalletId : ""});
-			 } else
-				 return "";
+				title = this.$t('editModalAddXToX', {exchange:this.assocExchanges[this.selectedExchange], wallet: this.isWalletId(this.selectedWalletId) ? this.selectedWalletId : ""});
+			}
+			return title;
 		},
 		validExchange() {
 			return !!this.assocExchanges[this.selectedExchange]
@@ -204,7 +205,7 @@ export default {
 			else
 				this.isCheckButtonActive = false;
 		},
-		isRemoving: function(){
+		isRemoving: function(){ // we watch isRemoving prop to keep it updated
 
 		},
 		selectedExchange: function(){
@@ -221,7 +222,7 @@ export default {
 	},
 	methods:{
 		isWalletId(wallet){
-				return (Number(wallet) && parseInt(wallet))
+			return (Number(wallet) && parseInt(wallet))
 		},
 		update_url_1(value){
 			this.url_1 = value;
@@ -304,27 +305,27 @@ export default {
 			});
 		},
 		handleOk(bvModalEvt){
-				bvModalEvt.preventDefault();
-				const base64url = require('base64url');
-				const data = {
-						exchange: this.selectedExchange,
-						pool_id: this.bestPoolId
-				};
+			bvModalEvt.preventDefault();
+			const base64url = require('base64url');
+			const data = {
+					exchange: this.selectedExchange,
+					pool_id: this.bestPoolId
+			};
 
-				if (this.url_1)
-					data.url_1 = this.url_1;
-				if (this.url_2)
-					data.url_2 = this.url_2;
+			if (this.url_1)
+				data.url_1 = this.url_1;
+			if (this.url_2)
+				data.url_2 = this.url_2;
 
-				if (this.isRemoving)
-					data.remove_wallet_id = this.selectedWalletId;
-				else
-					data.add_wallet_id = this.selectedWalletId;
+			if (this.isRemoving)
+				data.remove_wallet_id = this.selectedWalletId;
+			else
+				data.add_wallet_id = this.selectedWalletId;
 
-				const json_string = JSON.stringify(data);
-				const base64data = base64url(json_string);
-				this.link = (conf.testnet ? "byteball-tn" :"byteball")+":"+conf.aa_address+"?amount="
-					+this.stakeAmount+"&base64data="+base64data;
+			const json_string = JSON.stringify(data);
+			const base64data = base64url(json_string);
+			this.link = (conf.testnet ? "byteball-tn" :"byteball")+":"+conf.aa_address+"?amount="
+				+this.stakeAmount+"&base64data="+base64data;
 		}
 	}
 }

@@ -3,7 +3,7 @@
 		<nav-bar selected_item='1' />
 		<b-container fluid >
 					<b-col  offset-lg="3" lg="6" cols="12"  class="py-3">
-						<b-alert v-if="welcomeMessageShow" @dismissed="$store.commit('setWasExplorerWelcomeMessageClosed',true)" show dismissible>
+						<b-alert v-if="welcomeMessageShow" @dismissed="$store.commit('setWasExplorerWelcomeMessageClosed',true)" variant="welcome-message" show dismissible>
 						{{$t('explorerWelcomeMessage')}}
 						</b-alert>
 					</b-col>
@@ -13,7 +13,7 @@
 				</b-col>
 			</b-row >
 			<b-row v-if="!url_input" >
-				<b-col offset-lg="3" lg="6" cols="12"  class="py-3 main-col">
+				<b-col offset-lg="3" lg="6" cols="12"  class="py-3 main-block">
 					<div>
 						<b-form class="form-inline w-100 mt-5" @submit="onSubmit">
 							<b-form-input responsive
