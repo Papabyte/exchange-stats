@@ -1,5 +1,5 @@
 <template>
-	<div class="main">
+	<div class="main test">
 		<nav-bar selected_item='0' />
 		<b-container class="mt-3">
 			<b-row>

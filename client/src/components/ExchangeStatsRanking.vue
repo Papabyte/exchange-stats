@@ -82,12 +82,11 @@
                   <b-button-group class="mr-2">
                     <b-link v-if="data.item.total_btc_wallet || data.item.nb_withdrawal_addresses"
                             :to="'/explorer/'+ data.item.exchange_id">
-                      <b-button variant="primary" size="m" class="text-nowrap">
+                      <b-button variant="outline-primary" size="m" class="text-nowrap">
                         {{$t('rankingTableButtonExploreWallet')}}
-                        <v-icon name='eye' class="custom-icon"/>
                       </b-button>
                     </b-link>
-                    <b-dropdown right :text="$t('rankingTableButtonEdit')" variant="primary" size="m">
+                    <b-dropdown right :text="$t('rankingTableButtonEdit')" variant="outline-primary" size="m">
                       <b-dropdown-item
                         v-on:click="isRemoving=false;clicked_exchange=data.item.exchange_id;$bvModal.show('editWallet');">
                         {{$t('rankingTableButtonAddWallet')}}
