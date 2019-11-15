@@ -34,7 +34,7 @@ function getTotalWithdrawnFromWallets(arrIds, from_block, to_block ){
 		var amount = 0;
 		for (var i=from_block; i<=to_block; i++){
 		const rows = await db.query("SELECT SUM(transactions_to.amount) AS amount FROM transactions INNER JOIN transactions_from USING(id) \n\
-		CROSS JOIN transactions_to USING(id) WHERE transactions_to.wallet_id NOT IN("+idsSqlFilter+") AND transactions_from.wallet_id IN("+idsSqlFilter+") \n\
+		CROSS JOIN transactions_to USING(id) WHERE (transactions_to.wallet_id IS NULL OR transactions_to.wallet_id NOT IN("+idsSqlFilter+")) AND transactions_from.wallet_id IN("+idsSqlFilter+") \n\
 		AND transactions.block_height =?",[i]);
 		amount+= (rows[0] && rows[0].amount ? rows[0].amount : 0);
 	}

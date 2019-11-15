@@ -89,10 +89,11 @@ function createWeeklyHistoryForExchangeAndReturnMonthlyVolume(exchange, arrWalle
 		var balance = await stats.getTotalOnWallets(arrWalletIds);
 		for (var i = lastHeight; i > year_start_block; i-= block_period_day){
 			console.log(exchange + " " + i);
-			var total_deposited = await stats.getTotalDepositedToWallets(arrWalletIds, i - block_period_day , i -1);
-			var total_withdrawn = await stats.getTotalWithdrawnFromWallets(arrWalletIds, i - block_period_day , i -1);
-			balance -= await stats.getSumOutputsToWallets(arrWalletIds, i - block_period_day + 1, i);;
-			balance += await stats.getSumInputsFromWallets(arrWalletIds, i - block_period_day + 1, i);
+			var block_start = i - block_period_day + 1;
+			var total_deposited = await stats.getTotalDepositedToWallets(arrWalletIds, block_start, i );
+			var total_withdrawn = await stats.getTotalWithdrawnFromWallets(arrWalletIds, block_start , i );
+			balance -= total_deposited;
+			balance +=  total_withdrawn;
 			if (month_start_block < i)
 				monthly_volume+= total_deposited + total_withdrawn;
 			if (week_start_block < i)
@@ -100,7 +101,7 @@ function createWeeklyHistoryForExchangeAndReturnMonthlyVolume(exchange, arrWalle
 
 			await db.query("INSERT INTO "+ tempTableName +" (time_start,time_end,week,total_deposited,total_withdrawn,balance) VALUES (\n\
 				(SELECT block_time FROM processed_blocks WHERE block_height=?),(SELECT block_time FROM processed_blocks WHERE block_height=?),?,?,?,?)",
-				[i - block_period_day,i,i,total_deposited,total_withdrawn,balance]);
+				[block_start, i, i, total_deposited, total_withdrawn, balance]);
 		}
 		
 		db.takeConnectionFromPool(function(conn) {

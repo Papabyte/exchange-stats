@@ -57,11 +57,19 @@ export default {
 	},
 	created(){
 		this.chartOptions.title = {text: ''};
+		this.chartOptions.chart= {
+				type: 'line',
+				zoomType: 'x',
+				panning: true,
+				panKey: 'shift'
+		};
 		this.axios.get('/api/exchange-history/'+ this.exchange).then((response) => {
 			const data = response.data.history;
 			this.exchangeWallets = response.data.info.wallets.split('@');
 			this.creation_date = response.data.info.creation_date;
 			this.chartOptions.zoomType = 'x';	
+
+			
 			this.chartOptions.xAxis = {
 				type: 'datetime',
 				dateTimeLabelFormats: {
@@ -76,7 +84,7 @@ export default {
 			this.chartOptions.series.push({
 				data: data.map(function(row){
 					return {
-						x: row.time_end*1000,
+						x: row.time_start*1000,
 						y: row.balance/100000000
 					}
 				}),
@@ -85,7 +93,6 @@ export default {
 			this.chartOptions.series.push({
 				data: data.map(function(row){
 					return {
-						x: row.time_start*1000,
 						x: row.time_end*1000,
 						y: row.total_deposited/100000000
 					}
@@ -95,7 +102,6 @@ export default {
 			this.chartOptions.series.push({
 				data: data.map(function(row){
 					return {
-						x: row.time_start*1000,
 						x: row.time_end*1000,
 						y: row.total_withdrawn/100000000
 					}
