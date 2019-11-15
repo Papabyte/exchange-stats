@@ -1,15 +1,15 @@
 <template>
 	<div class="main test">
 		<nav-bar selected_item='0' />
-		<b-container class="mt-3">
-			<b-row>
-				<b-col cols="12">
-					<b-alert v-if="welcomeMessageShown" @dismissed="$store.commit('setWasRankingWelcomeMessageClosed',true)" variant="info" show dismissible>
-						{{$t('rankingWelcomeMessage')}}
-					</b-alert>
-				</b-col>
-			</b-row >
-		</b-container>
+
+		<section class="section">
+			<div class="container">
+				<b-notification v-if="welcomeMessageShown" type="is-info" aria-close-label="Close" @close="$store.commit('setWasRankingWelcomeMessageClosed',true)">
+					{{$t('rankingWelcomeMessage')}}
+				</b-notification>
+			</div>
+		</section>
+
 		<ranking-table />
 	</div>
 </template>
@@ -38,3 +38,9 @@ export default {
 }
 </script>
 
+<style scoped>
+	.section {
+		padding: 2rem 1.5rem;
+	}
+
+</style>

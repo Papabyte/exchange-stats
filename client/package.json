@@ -12,6 +12,7 @@
     "base64url": "^3.0.1",
     "bitcoin-address-validation": "^1.0.0",
     "bootstrap-vue": "^2.0.0-rc.19",
+    "buefy": "^0.8.6",
     "core-js": "^3.1.2",
     "is-url": "^1.2.4",
     "moment": "^2.24.0",

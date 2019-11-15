@@ -1,165 +1,161 @@
 <template>
-
-  <b-container class="mb-5">
-    <edit-wallet-modal :propExchange="clicked_exchange" :isRemoving="isRemoving"/>
-    <b-row>
-      <b-col>
-        <b-container class="my-3">
-          <b-row>
-            <b-col>
-              <h3>{{$t('rankingTitle')}}</h3>
-            </b-col>
-          </b-row>
-        </b-container>
-      </b-col>
-    </b-row>
-    <b-row>
-      <b-col>
-        <b-container class="main-block">
-          <b-row>
-            <b-col>
-              <b-pagination
-                v-model="currentPage"
-                :total-rows="totalRows"
-                :per-page="perPage"
-                size="l"
-                class="py-3 my-0"
-              ></b-pagination>
-            </b-col>
-          </b-row>
-
-          <b-row>
-            <b-col>
-              <b-table
-                :current-page="currentPage"
-                :per-page="perPage"
-                :items="items"
-                :fields="fields"
-                :sort-by.sync="sortBy"
-                :sort-desc.sync="sortDesc"
-                responsive
-                sort-icon-left
-              >
-                <template v-slot:head(reported_volume)="data">
-                  <span v-b-tooltip.hover :title="$t('rankingTableColReportedVolumeTip')">{{data.label}}</span>
-                </template>
-
-                <template v-slot:head(nb_withdrawal_addresses)="data">
-                  <span v-b-tooltip.hover :title="$t('rankingTableColNbWithdrawalAddressesTip')">{{data.label}}</span>
-                </template>
-
-                <template v-slot:head(nb_deposit_addresses)="data">
-                  <span v-b-tooltip.hover :title="$t('rankingTableColNbDepositAddressesTip')">{{data.label}}</span>
-                </template>
-
-                <template v-slot:head(last_day_deposits)="data">
-                  <span v-b-tooltip.hover :title="$t('rankingTableColLastDayDepositsTip')">{{data.label}}</span>
-                </template>
-
-                <template v-slot:cell(last_day_deposits)="data">
-                  <BtcAmount v-if="data.item.last_day_deposits" :amount="data.item.last_day_deposits"/>
-                </template>
-
-                <template v-slot:head(last_day_withdrawals)="data">
-                  <span v-b-tooltip.hover :title="$t('rankingTableColLastDayWithdrawalsTip')">{{data.label}}</span>
-                </template>
-
-                <template v-slot:cell(last_day_withdrawals)="data">
-                  <BtcAmount v-if="data.item.last_day_withdrawals" :amount="data.item.last_day_withdrawals"/>
-                </template>
-
-                <template v-slot:head(total_btc_wallet)="data">
-                  <span v-b-tooltip.hover :title="$t('rankingTableColTotalBtcWalletTip')">{{data.label}}</span>
-                </template>
-
-                <template v-slot:cell(total_btc_wallet)="data">
-                  <BtcAmount v-if="data.item.total_btc_wallet" :amount="data.item.total_btc_wallet"/>
-                </template>
-                <template v-slot:cell(reported_volume)="data">
-                  <BtcAmount :amount="data.item.reported_volume"/>
-                </template>
-                <template v-slot:cell(action)="data">
-                  <b-button-group class="mr-2">
-                    <b-link v-if="data.item.total_btc_wallet || data.item.nb_withdrawal_addresses"
-                            :to="'/explorer/'+ data.item.exchange_id">
-                      <b-button variant="outline-primary" size="m" class="text-nowrap">
-                        {{$t('rankingTableButtonExploreWallet')}}
-                      </b-button>
-                    </b-link>
-                    <b-dropdown right :text="$t('rankingTableButtonEdit')" variant="outline-primary" size="m">
-                      <b-dropdown-item
-                        v-on:click="isRemoving=false;clicked_exchange=data.item.exchange_id;$bvModal.show('editWallet');">
-                        {{$t('rankingTableButtonAddWallet')}}
-                      </b-dropdown-item>
-                      <b-dropdown-item v-if="data.item.total_btc_wallet || data.item.nb_withdrawal_addresses"
-                                       v-on:click="isRemoving=true;clicked_exchange=data.item.exchange_id;$bvModal.show('editWallet');">
-                        {{$t('rankingTableButtonRemoveWallet')}}
-                      </b-dropdown-item>
-                    </b-dropdown>
-                  </b-button-group>
-                </template>
-              </b-table>
-            </b-col>
-          </b-row>
-          <b-row>
-            <b-col>
-              <b-pagination
-                v-model="currentPage"
-                :total-rows="totalRows"
-                :per-page="perPage"
-                size="l"
-                class="p-3 my-0"
-              ></b-pagination>
-            </b-col>
-          </b-row>
-        </b-container>
-      </b-col>
-    </b-row>
-  </b-container>
-
-
-<!--  <b-container class="mb-5">-->
-
-<!--    <b-row>-->
+  <section class="section">
+<!--    <div class="container">-->
 <!--      <edit-wallet-modal :propExchange="clicked_exchange" :isRemoving="isRemoving"/>-->
-<!--      <b-col>-->
-<!--        <b-row>-->
-<!--          <b-col>-->
-<!--            <h3>{{$t('rankingTitle')}}</h3>-->
-<!--          </b-col>-->
-<!--          <b-col>-->
-<!--            <b-pagination-->
+<!--    </div>-->
+
+    <div class="container">
+      <h3 class="title is-3 mb-2">{{$t('rankingTitle')}}</h3>
+    </div>
+
+    <div class="container">
+      <div class="box">
+        <b-table
+                :data="data"
+                :loading="loading"
+                paginated
+                backend-pagination
+                :total="total"
+                :per-page="perPage"
+                @page-change="onPageChange"
+                aria-next-label="Next page"
+                aria-previous-label="Previous page"
+                aria-page-label="Page"
+                aria-current-label="Current page"
+                :default-sort-direction="defaultSortOrder"
+                :default-sort="[sortField, sortOrder]"
+               >
+
+          <b-table-column field="name" :label="this.$t('rankingTableColName')" sortable>
+            <template slot="header" slot-scope="{ column }">
+              {{ column.label }}
+            </template>
+            asd [  ]
+          </b-table-column>
+          <b-table-column field="reported_volume" :label="this.$t('rankingTableColReportedVolume')" sortable>
+            <template slot="header" slot-scope="{ column }">
+              {{ column.label }}
+            </template>
+          </b-table-column>
+          <b-table-column field="nb_withdrawal_addresses" :label="this.$t('rankingTableColNbWithdrawalAddresses')" sortable>
+            <template slot="header" slot-scope="{ column }">
+              {{ column.label }}
+            </template>
+          </b-table-column>
+          <b-table-column field="nb_deposit_addresses" :label="this.$t('rankingTableColNbDepositAddresses')" sortable>
+            <template slot="header" slot-scope="{ column }">
+              {{ column.label }}
+            </template>
+          </b-table-column>
+          <b-table-column field="total_btc_wallet" :label="this.$t('rankingTableColTotalBtcWallet')" sortable>
+            <template slot="header" slot-scope="{ column }">
+              {{ column.label }}
+            </template>
+          </b-table-column>
+          <b-table-column field="last_day_deposits" :label="this.$t('rankingTableColLastDayDeposits')" sortable>
+            <template slot="header" slot-scope="{ column }">
+              {{ column.label }}
+            </template>
+          </b-table-column>
+          <b-table-column field="last_day_withdrawals" :label="this.$t('rankingTableColLastDayWithdrawals')" sortable>
+            <template slot="header" slot-scope="{ column }">
+              {{ column.label }}
+            </template>
+          </b-table-column>
+          <b-table-column field="action" :label="this.$t('rankingTableColAction')" sortable>
+            <template slot="header" slot-scope="{ column }">
+              {{ column.label }}
+            </template>
+          </b-table-column>
+        </b-table>
+      </div>
+    </div>
+
+    <br>
+    <br>
+
+<!--    <b-container class="mb-5">-->
+<!--      <edit-wallet-modal :propExchange="clicked_exchange" :isRemoving="isRemoving"/>-->
+<!--      <b-table-->
+<!--              :current-page="currentPage"-->
+<!--              :per-page="perPage"-->
+<!--              :items="items"-->
+<!--              :fields="fields"-->
+<!--              :sort-by.sync="sortBy"-->
+<!--              :sort-desc.sync="sortDesc"-->
+<!--              responsive-->
+<!--              sort-icon-left-->
+<!--      >-->
+<!--        <template v-slot:head(reported_volume)="data">-->
+<!--          <span v-b-tooltip.hover :title="$t('rankingTableColReportedVolumeTip')">{{data.label}}</span>-->
+<!--        </template>-->
+
+<!--        <template v-slot:head(nb_withdrawal_addresses)="data">-->
+<!--          <span v-b-tooltip.hover :title="$t('rankingTableColNbWithdrawalAddressesTip')">{{data.label}}</span>-->
+<!--        </template>-->
+
+<!--        <template v-slot:head(nb_deposit_addresses)="data">-->
+<!--          <span v-b-tooltip.hover :title="$t('rankingTableColNbDepositAddressesTip')">{{data.label}}</span>-->
+<!--        </template>-->
+
+<!--        <template v-slot:head(last_day_deposits)="data">-->
+<!--          <span v-b-tooltip.hover :title="$t('rankingTableColLastDayDepositsTip')">{{data.label}}</span>-->
+<!--        </template>-->
+
+<!--        <template v-slot:cell(last_day_deposits)="data">-->
+<!--          <BtcAmount v-if="data.item.last_day_deposits" :amount="data.item.last_day_deposits"/>-->
+<!--        </template>-->
+
+<!--        <template v-slot:head(last_day_withdrawals)="data">-->
+<!--          <span v-b-tooltip.hover :title="$t('rankingTableColLastDayWithdrawalsTip')">{{data.label}}</span>-->
+<!--        </template>-->
+
+<!--        <template v-slot:cell(last_day_withdrawals)="data">-->
+<!--          <BtcAmount v-if="data.item.last_day_withdrawals" :amount="data.item.last_day_withdrawals"/>-->
+<!--        </template>-->
+
+<!--        <template v-slot:head(total_btc_wallet)="data">-->
+<!--          <span v-b-tooltip.hover :title="$t('rankingTableColTotalBtcWalletTip')">{{data.label}}</span>-->
+<!--        </template>-->
+
+<!--        <template v-slot:cell(total_btc_wallet)="data">-->
+<!--          <BtcAmount v-if="data.item.total_btc_wallet" :amount="data.item.total_btc_wallet"/>-->
+<!--        </template>-->
+<!--        <template v-slot:cell(reported_volume)="data">-->
+<!--          <BtcAmount :amount="data.item.reported_volume"/>-->
+<!--        </template>-->
+<!--        <template v-slot:cell(action)="data">-->
+<!--          <b-button-group class="mr-2">-->
+<!--            <b-link v-if="data.item.total_btc_wallet || data.item.nb_withdrawal_addresses"-->
+<!--                    :to="'/explorer/'+ data.item.exchange_id">-->
+<!--              <b-button variant="outline-primary" size="m" class="text-nowrap">-->
+<!--                {{$t('rankingTableButtonExploreWallet')}}-->
+<!--              </b-button>-->
+<!--            </b-link>-->
+<!--            <b-dropdown right :text="$t('rankingTableButtonEdit')" variant="outline-primary" size="m">-->
+<!--              <b-dropdown-item-->
+<!--                      v-on:click="isRemoving=false;clicked_exchange=data.item.exchange_id;$bvModal.show('editWallet');">-->
+<!--                {{$t('rankingTableButtonAddWallet')}}-->
+<!--              </b-dropdown-item>-->
+<!--              <b-dropdown-item v-if="data.item.total_btc_wallet || data.item.nb_withdrawal_addresses"-->
+<!--                               v-on:click="isRemoving=true;clicked_exchange=data.item.exchange_id;$bvModal.show('editWallet');">-->
+<!--                {{$t('rankingTableButtonRemoveWallet')}}-->
+<!--              </b-dropdown-item>-->
+<!--            </b-dropdown>-->
+<!--          </b-button-group>-->
+<!--        </template>-->
+<!--      </b-table>-->
+
+<!--      <b-pagination-->
 <!--              v-model="currentPage"-->
 <!--              :total-rows="totalRows"-->
 <!--              :per-page="perPage"-->
 <!--              size="l"-->
-<!--              class="p-4 my-0"-->
-<!--            ></b-pagination>-->
-<!--          </b-col>-->
-<!--        </b-row>-->
-<!--        <b-row>-->
-<!--          <b-col>-->
-<!--            -->
-<!--          </b-col>-->
-<!--        </b-row>-->
+<!--              class="p-3 my-0"-->
+<!--      ></b-pagination>-->
+<!--    </b-container>-->
+  </section>
 
-<!--        <b-row>-->
-<!--          <b-col>-->
-
-<!--          </b-col>-->
-<!--          <b-col>-->
-<!--            <b-pagination-->
-<!--              v-model="currentPage"-->
-<!--              :total-rows="totalRows"-->
-<!--              :per-page="perPage"-->
-<!--              size="l"-->
-<!--              class="p-4 my-0"-->
-<!--            ></b-pagination>-->
-<!--          </b-col>-->
-<!--        </b-row>-->
-<!--      </b-col>-->
-<!--    </b-row>-->
-<!--  </b-container>-->
 </template>
 
 <script>
@@ -168,51 +164,62 @@
 
   export default {
     components: {
-      BtcAmount,
-      EditWalletModal
+      // BtcAmount,
+      // EditWalletModal
     },
     data() {
       return {
-        isRemoving: false,
-        clicked_exchange: null,
-        currentPage: 1,
-        totalRows: 0,
-        perPage: 30,
-        sortBy: 'total_btc_wallet',
-        sortDesc: true,
-        fields: [
-          {key: 'name', sortable: true, label: this.$t('rankingTableColName')},
-          {key: 'reported_volume', sortable: true, label: this.$t('rankingTableColReportedVolume')},
-          {key: 'nb_withdrawal_addresses', sortable: true, label: this.$t('rankingTableColNbWithdrawalAddresses')},
-          {key: 'nb_deposit_addresses', sortable: true, label: this.$t('rankingTableColNbDepositAddresses')},
-          {key: 'total_btc_wallet', sortable: true, label: this.$t('rankingTableColTotalBtcWallet')},
-          {key: 'last_day_deposits', sortable: true, label: this.$t('rankingTableColLastDayDeposits')},
-          {key: 'last_day_withdrawals', sortable: true, label: this.$t('rankingTableColLastDayWithdrawals')},
-          {key: 'action', label: this.$t('rankingTableColAction')}
-        ],
-        items: []
+        // isRemoving: false,
+        // clicked_exchange: null,
+        // currentPage: 1,
+        // totalRows: 0,
+        // perPage: 30,
+        // sortBy: 'total_btc_wallet',
+        // sortDesc: true,
+        // fields: [
+        //   {key: 'name', sortable: true, label: this.$t('rankingTableColName')},
+        //   {key: 'reported_volume', sortable: true, label: this.$t('rankingTableColReportedVolume')},
+        //   {key: 'nb_withdrawal_addresses', sortable: true, label: this.$t('rankingTableColNbWithdrawalAddresses')},
+        //   {key: 'nb_deposit_addresses', sortable: true, label: this.$t('rankingTableColNbDepositAddresses')},
+        //   {key: 'total_btc_wallet', sortable: true, label: this.$t('rankingTableColTotalBtcWallet')},
+        //   {key: 'last_day_deposits', sortable: true, label: this.$t('rankingTableColLastDayDeposits')},
+        //   {key: 'last_day_withdrawals', sortable: true, label: this.$t('rankingTableColLastDayWithdrawals')},
+        //   {key: 'action', label: this.$t('rankingTableColAction')}
+        // ],
+        // items: [],
+        // new
+        data: [],
+        total: 0,
+        loading: false,
+        sortField: 'vote_count',
+        sortOrder: 'desc',
+        defaultSortOrder: 'desc',
+        page: 1,
+        perPage: 20,
       }
     },
-    created() {
-      this.axios.get('/api/ranking').then((response) => {
-        this.totalRows = response.data.length;
-        this.items = response.data;
-      });
+    methods: {
+      loadData() {
+        this.loading = true;
+        this.axios.get('/api/ranking').then((response) => {
+          this.total = response.data.length;
+          this.data = response.data;
+        });
+        this.loading = false;
+      },
+      onPageChange(page) {
+        this.page = page
+        this.loadData()
+      },
+    },
+    mounted() {
+      this.loadData()
     }
   }
 </script>
 
 <style scoped>
-  .main-block {
-    /*position: relative;*/
-    /*display: flex;*/
-    /*flex-direction: column;*/
-    /*min-width: 0;*/
-    /*word-wrap: break-word;*/
-    /*background-color: #fff;*/
-    /*background-clip: border-box;*/
-    border: 1px solid #e7eaf3;
-    border-radius: .25rem;
-    box-shadow: 0 0.5rem 1.2rem rgba(189,197,209,.2);
+  .mb-2 {
+    margin-bottom: 2rem;
   }
 </style>
