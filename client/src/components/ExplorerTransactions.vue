@@ -94,7 +94,7 @@
 			class="pl-4 pt-2 my-0"
 			></b-pagination> 
 					<div  class="w-100" v-for="(transaction,key,index) in transactions" v-bind:key="key">
-					<transaction v-if="progressive_display_level>index" :tx_id="key" :transaction="transaction" :no_border="index == (Object.keys(transactions).length-1)" :about_wallet_ids="redirected_ids"/>
+					<transaction v-if="progressive_display_level>index" :tx_id="key" :transaction="transaction" :no_border="index == (Object.keys(transactions).length-1)" :about_wallet_ids="redirected_ids" @expand="expand_tx"/>
 				</div>
 				</b-row>
 			</b-col>
@@ -267,7 +267,14 @@ export default {
 					this.updateTitleAndDescription();
 				});
 			}
-		}
+		},
+		expand_tx(tx_id){
+				this.axios.get('/api/txid/' + tx_id).then((response) => {
+
+					this.transactions[tx_id] = response.data.txs[tx_id];
+					console.log(response.data.txs);
+				});
+		},
 	}
 }
 

@@ -25,13 +25,19 @@
 				</div>
 			</b-col>
 			<b-col  cols="5" class="py-3 text-left">
-				<div  v-for="(t_out,index) in transaction.to" :key="index" class="py-2">
+				<div v-for="(t_out,index) in transaction.to" :key="index" class="py-2">
 					<wallet-id v-if="t_out.id" label="Wallet: " :id="t_out.id"/>
 					<span v-else>{{$t("explorerTransactionUnknownWallet")}}</span>
 					<span v-if="t_out.exchange"><Exchange :label="$t('explorerTransactionLabelExchange')" :id="t_out.exchange"/></span>
 					<btc-address v-if="t_out.address" :label="$t('explorerTransactionLabelAddress')" :address="t_out.address"/>
 					<btc-amount :label="$t('explorerTransactionLabelAmount')" :amount="t_out.amount" :isPositive="about_ids.indexOf(t_out.id)>-1"/>
 				</div>
+				<div v-if="transaction.is_expandable" class="py-2">
+				<b-button
+					variant="primary"
+					v-on:click="$emit('expand', tx_id)" 
+					size="s">Expand</b-button>
+					</div>
 			</b-col>
 		</b-row >
 	</div>
@@ -56,7 +62,8 @@ export default {
 	props: ['transaction','tx_id','no_border','about_wallet_ids'],
 	data() {
 		return {
-			about_ids: this.about_wallet_ids || []
+			about_ids: this.about_wallet_ids || [],
+			isExpandable: false
 		}
 	},
 	created() {

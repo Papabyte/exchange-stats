@@ -90,7 +90,7 @@ function getTotalOnWallets(arrIds){
 	})
 }
 
-function getTotalAddresses(arrIds){
+function getAddressesCount(arrIds){
 	return new Promise(async function(resolve){
 		if (arrIds.length ===0)
 			return resolve(0);
@@ -143,5 +143,5 @@ exports.getTotalWithdrawalAddresses = getTotalWithdrawalAddresses;
 exports.getSumOutputsToWallets = getSumOutputsToWallets;
 exports.getSumInputsFromWallets = getSumInputsFromWallets;
 exports.getTotalTransactions = getTotalTransactions;
-exports.getTotalAddresses = getTotalAddresses;
+exports.getAddressesCount = getAddressesCount;
 exports.clearCaches = clearCaches;

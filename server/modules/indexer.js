@@ -151,6 +151,7 @@ function getInputAddressesIdAndValueIn(inputs){
 	});
 }
 
+// used for coinbase transaction because input has no address
 function saveOnlyTransactionsTo(bFirstTreated, tx_id, height, outputs, value_out){
 	return new Promise(async function(resolve){
 		if (bFirstTreated){ // check if tx was already treadted when we resume catchup
@@ -219,7 +220,7 @@ function saveInputAddressesAndTransactions(bFirstTreated, objInputs, tx_id, heig
 			}
 			var outputAddressesSqlString = outputs.map(function(output){return output.address}).join("','");
 			conn.addQuery(arrQueries,"UPDATE btc_wallets SET txs_count=txs_count+1 \n\
-			WHERE id IN (SELECT DISTINCT(wallet_id) FROM btc_addresses WHERE address IN('"+outputAddressesSqlString+"') AND id NOT IN("+inputAddressesSqlString+"))");
+			WHERE id IN (SELECT DISTINCT(wallet_id) FROM btc_addresses WHERE address IN('"+outputAddressesSqlString+"') AND id NOT IN("+inputAddressesSqlString+"))");// input wallet tx count will be incremented when merging
 			conn.addQuery(arrQueries,"UPDATE btc_wallets SET balance=balance-? \n\
 			WHERE id=(SELECT wallet_id FROM btc_addresses WHERE id IN("+inputAddressesSqlString+") LIMIT 1)",[objInputs.value_in]);
 			conn.addQuery(arrQueries,"INSERT INTO transactions_from (id, wallet_id,amount) VALUES \n\
@@ -245,8 +246,6 @@ function mergeWallets(objInputs, block_height, block_time, tx_index){
 					WHERE btc_addresses.id IN("+inputAddressesSqlString+"))\n\
 					ORDER BY addr_count DESC,id ASC"); 
 				var arrQueries = [];
-
-
 				var wallet_ids_to_update = rows.splice(1).map(function(row){
 					if (row.addr_count === 0 || !row.id)
 						throw Error("0 addr count or null value selected " + inputAddressesSqlString);
@@ -266,6 +265,8 @@ function mergeWallets(objInputs, block_height, block_time, tx_index){
 					conn.addQuery(arrQueries, "UPDATE transactions_to SET wallet_id=? WHERE wallet_id IN("+wallet_ids_to_update_string+")",[rows[0].id]);
 					conn.addQuery(arrQueries, "UPDATE btc_addresses SET wallet_id=? WHERE wallet_id IN("+wallet_ids_to_update_string+")",[rows[0].id]);
 					conn.addQuery(arrQueries, "UPDATE transactions_from SET wallet_id=? WHERE wallet_id IN("+wallet_ids_to_update_string+")",[rows[0].id]);
+				} else {
+					conn.addQuery(arrQueries, "UPDATE btc_wallets SET txs_count=txs_count+1 WHERE id=?",[rows[0].id]);
 				}
 
 				conn.addQuery(arrQueries, "REPLACE INTO processed_blocks (block_height,tx_index,block_time) VALUES (?,?,?)",[block_height, tx_index, block_time]);

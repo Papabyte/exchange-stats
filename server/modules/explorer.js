@@ -2,14 +2,16 @@ const db = require('ocore/db.js');
 const aa_handler = require("./aa_handler.js");
 const stats = require("./stats.js");
 
-const ITEMS_PER_PAGE = 20;
+const TXS_PER_PAGE = 20;
+const ADDR_PER_PAGE = 100;
+const OUTPUTS_PER_TX = 10;
 
 async function getTransactionsFromWallets(arrIds, page, handle){
 	const idsSqlFilter = arrIds.join(",");
 	var [idRows, total_on_wallets, transactions_count] = await Promise.all([
 		db.query("SELECT DISTINCT id FROM \n\
 		(SELECT id FROM (SELECT id FROM transactions_to WHERE wallet_id IN("+ idsSqlFilter +") ORDER BY id DESC LIMIT 1000)s1 \n\
-		UNION SELECT id FROM (SELECT id FROM transactions_from WHERE wallet_id IN("+ idsSqlFilter +") ORDER BY id DESC LIMIT 5000)s2)s ORDER BY id DESC LIMIT ?,?",[page*ITEMS_PER_PAGE,ITEMS_PER_PAGE]),
+		UNION SELECT id FROM (SELECT id FROM transactions_from WHERE wallet_id IN("+ idsSqlFilter +") ORDER BY id DESC LIMIT 5000)s2)s ORDER BY id DESC LIMIT ?,?",[page*TXS_PER_PAGE,TXS_PER_PAGE]),
 		stats.getTotalOnWallets(arrIds),
 		stats.getTotalTransactions(arrIds)
 	]);
@@ -20,18 +22,19 @@ async function getTransactionsFromWallets(arrIds, page, handle){
 	idRows = idRows.map(function(row){
 		return row.id;
 	});
+	const addr_count = await stats.getAddressesCount(arrIds);
 	getTransactionsFromInternalIds(idRows, function(assocTxsFromWallet){
-		return handle({total_on_wallets: total_on_wallets,count_total: transactions_count, txs: assocTxsFromWallet});
+		return handle({per_page: TXS_PER_PAGE, addr_count: addr_count, total_on_wallets: total_on_wallets,count_total: transactions_count, txs: assocTxsFromWallet});
 	});
 }
 
 async function getAddressesFromWallet(id, page, handle){
 	var [addressesRows, addr_count] = await Promise.all([
-		db.query("SELECT address FROM btc_addresses WHERE wallet_id=? LIMIT ?,?",[id,page*ITEMS_PER_PAGE,ITEMS_PER_PAGE]),
-		stats.getTotalAddresses([id])
+		db.query("SELECT address FROM btc_addresses WHERE wallet_id=? LIMIT ?,?",[id,page*ADDR_PER_PAGE,ADDR_PER_PAGE]),
+		stats.getAddressesCount([id])
 	]);
 
-	return handle({addr_count: addr_count, addresses: addressesRows.map(function(row){return row.address})});
+	return handle({per_page: ADDR_PER_PAGE,addr_count: addr_count, addresses: addressesRows.map(function(row){return row.address})});
 }
 
 
@@ -62,11 +65,11 @@ async function getTransactionsFromInternalIds(arrIds, handle){
 	const idsSqlFilter = arrIds.join(",");
 	console.error(idsSqlFilter);
 	const rows = await db.query("SELECT transactions.block_height, datetime(block_time, 'unixepoch') as time,transactions.tx_id, transactions_from.amount AS amount_from,transactions_to.amount AS amount_to,\n\
-	transactions_from.wallet_id AS from_id, transactions_to.wallet_id AS to_id,btc_addresses.address FROM transactions \n\
+	transactions_from.wallet_id AS from_id, transactions_to.wallet_id AS to_id,btc_addresses.address,n FROM transactions \n\
 	INNER JOIN transactions_to USING(id) INNER JOIN processed_blocks USING(block_height) \n\
 	INNER JOIN btc_addresses ON btc_addresses.id=transactions_to.address_id \n\
 	LEFT JOIN transactions_from USING(id) \n\
-	WHERE transactions.id IN (" +idsSqlFilter +") AND transactions_to.n < 11 ORDER BY transactions.id DESC");
+	WHERE transactions.id IN (" +idsSqlFilter +") AND transactions_to.n <= ? ORDER BY transactions.id DESC",[OUTPUTS_PER_TX]);
 	return handle(createTxsAssociativeArray(rows));
 }
 
@@ -74,6 +77,8 @@ function createTxsAssociativeArray(rows){
 
 	const assocTxsFromWallet = {};
 	rows.forEach(function(row){
+		if (row.n === OUTPUTS_PER_TX)
+			return assocTxsFromWallet[row.tx_id].is_expandable = true;
 		if (!assocTxsFromWallet[row.tx_id]) {
 			assocTxsFromWallet[row.tx_id] = {}
 			assocTxsFromWallet[row.tx_id].to = [];

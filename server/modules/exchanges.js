@@ -42,7 +42,7 @@ function processNewRanking(){
 				const volumeAndTrendObj = await createWeeklyHistoryForExchangeAndReturnMonthlyVolume(key, arrWalletIds);
 				monthly_volume = volumeAndTrendObj.monthly_volume;
 				trendString = volumeAndTrendObj.trend.join('@');
-				nb_addresses = await stats.getTotalAddresses(arrWalletIds);
+				nb_addresses = await stats.getAddressesCount(arrWalletIds);
 			}
 			var objInfo = await api.getExchangeInfo(exchanges[key].gecko_id);
 
