@@ -20,17 +20,25 @@ export default new Router({
 			component: lazyLoading('components/ExchangesStats'),
 			props: true
 		},
-		{
-			name: 'explorerAddress',
-			path: '/explorer/address/:address',
-			component: lazyLoading('components/Explorer'),
-			props: true
-		},
+
 		{
 			name: 'explorerAddressesPaged',
-			path: '/explorer/addresses/:wallet/:page',
+			path: '/explorer/addresses/:url_input/:page',
 			component: lazyLoading('components/Explorer'),
-			props: true
+			props:  route => ({
+				url_input: route.params.url_input,
+				page: route.params.page,
+				show_addresses: true,
+			})
+		},
+		{
+			name: 'explorerAddresses',
+			path: '/explorer/addresses/:url_input',
+			component: lazyLoading('components/Explorer'),
+			props:  route => ({
+				url_input: route.params.url_input,
+				show_addresses: true,
+			})
 		},
 		{
 			name: 'explorerInputPaged',

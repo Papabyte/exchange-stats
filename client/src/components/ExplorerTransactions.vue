@@ -58,6 +58,13 @@
 						<b-row v-if="count_total">
 							{{$t("explorerTransactionsTotalTransactions")}}{{count_total}}
 						</b-row>
+
+						<b-row v-if="wallet_id">
+								<span class="pr-1">{{$t("explorerTransactionsAddressCount")}}</span>
+							<router-link :to="{name: 'explorerAddresses', params: { request_input: wallet_id} }">
+								{{addr_count}}
+							</router-link>
+						</b-row>
 					</b-col>
 					<b-col cols="2" v-if="exchange" class="float-right">
 						<b-button 
@@ -114,15 +121,15 @@ export default {
 			WalletId
 		},
 		props: {
-		request_input: {
-			type: String,
-			required: true
-		},
-		page: {
-			type: Number || String,
-			required: false,
-			default: 1
-		}
+			request_input: {
+				type: String,
+				required: true
+			},
+			page: {
+				type: Number || String,
+				required: false,
+				default: 1
+			}
 	},
 	data() {
 		return {
@@ -141,6 +148,7 @@ export default {
 			walletIdToEdit: null,
 			tx_id: null,
 			total_on_wallets: null,
+			addr_count: null,
 			progressive_display_level: 1,
 			timerId: null
 		}
@@ -196,6 +204,7 @@ export default {
 			this.walletIdToEdit = null;
 			this.total_on_wallets = null;
 			this.tx_id = null;
+			this.addr_count = null;
 
 			if (Number(this.request_input)) { // it's a wallet id
 				this.blockTitle = this.$t("explorerTransactionsTransactionsForWallet") + this.request_input;
@@ -207,6 +216,7 @@ export default {
 						this.count_total = response.data.txs.count_total;
 						this.redirected_ids = [response.data.redirected_id];
 						this.total_on_wallets = response.data.txs.total_on_wallets;
+						this.addr_count = response.data.txs.addr_count; 
 					} else {
 						this.failoverText = this.$t("explorerTransactionsNoTransactionsFound") + this.request_input;
 					}
