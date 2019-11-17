@@ -11,6 +11,7 @@ require('./modules/sqlite_tables.js').create().then(function(){
 	const indexer = require('./modules/indexer.js');
 	const explorer = require('./modules/explorer.js');
 	const exchanges = require('./modules/exchanges.js');
+	const social_networks = require('./modules/social_networks.js');
 
 	const app = express()
 

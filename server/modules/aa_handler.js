@@ -5,6 +5,7 @@ const async = require('async');
 const mutex = require('ocore/mutex.js');
 const network = require('ocore/network.js');
 const db = require('ocore/db.js');
+const social_networks = require('./social_networks.js');
 
 const exchanges = require('./exchanges.js')
 
@@ -13,7 +14,7 @@ var assocCurrentPoolsByExchange = {};
 
 var assocCurrentExchangeByWalletId = {};
 
-var currentOperations = [];
+var assocCurrentOperations = [];
 var assocCurrentOperationsByExchange = {};
 var assocStakedByKeyAndAddress = {};
 var assocProofsByKeyAndOutcome = {}
@@ -87,12 +88,23 @@ function catchUpOperationsHistory(){
 					paid_out = objResponse.amount;
 					concerned_address = objResponse.your_address;
 				}
-
 				if (operation_type){
 					var operation_id = objResponse.operation_id;
 					var pair = objResponse.pair;
 					db.query("INSERT "+db.getIgnore()+" INTO operations_history (operation_id, paid_in, paid_out, concerned_address, pair, operation_type, mci, aa_address, response, trigger_unit,timestamp) VALUES \n\
-					(?,?,?,?,?,?,?,?,?,?,?)",[operation_id, paid_in, paid_out, concerned_address, pair, operation_type, row.mci, row.aa_address, JSON.stringify(objResponse), row.trigger_unit, row.timestamp], cb);
+					(?,?,?,?,?,?,?,?,?,?,?)",[operation_id, paid_in, paid_out, concerned_address, pair, operation_type, row.mci, row.aa_address, JSON.stringify(objResponse), row.trigger_unit, row.timestamp],
+					function(result){
+						if (result.affectedRows === 1){
+							objResponse.exchange = exchanges.getExchangeName[objResponse.exchange];
+							social_networks.notify(
+								operation_type, 
+								assocCurrentOperations[operation_id], 
+								assocNicknamesByAddress[concerned_address] || concerned_address, 
+								objResponse
+							);
+						}
+						cb();
+					});
 				} else
 					cb();
 			}, unlock);
@@ -136,7 +148,7 @@ function indexOperations(objStateVars){
 	extractProofUrls(objStateVars);
 	
 	const operationKeys = extractOperationKeys(objStateVars);
-	const operations = [];
+	const assocOperations = {};
 	const assocOperationsByExchange = {};
 	const assocWalletIdsByExchange = {};
 	const assocExchangeByWalletId = {};
@@ -170,13 +182,13 @@ function indexOperations(objStateVars){
 		operation.staked_by_address = assocStakedByKeyAndAddress[key];
 		operation.url_proofs_by_outcome = assocProofsByKeyAndOutcome[key]
 
-		operations.push(operation);
+		assocOperations[key] = operation;
 		if(!assocOperationsByExchange[operation.exchange])
 			assocOperationsByExchange[operation.exchange] = [];
 		assocOperationsByExchange[operation.exchange].push(operation);
 	});
 
-	currentOperations = operations;
+	assocCurrentOperations = assocOperations;
 	assocCurrentExchangeByWalletId = assocExchangeByWalletId;
 	assocCurrentOperationsByExchange = assocOperationsByExchange;
 	exchanges.setWalletIdsByExchange(assocWalletIdsByExchange);;
@@ -277,7 +289,7 @@ function getCurrentPools(){
 }
 
 function getCurrentOperations(){
-	return currentOperations;
+	return Object.values(assocCurrentOperations);
 }
 
 function getCurrentOperationsForExchange(exchange){
@@ -293,7 +305,6 @@ function getBestPoolForExchange(exchange){
 		reward_amount: 0
 	};
 	for (var key in assocCurrentPoolsByExchange[exchange]){
-		console.log(assocCurrentPoolsByExchange[exchange][key]);
 		if (assocCurrentPoolsByExchange[exchange][key].reward_amount > bestPool.reward_amount)
 		bestPool = assocCurrentPoolsByExchange[exchange][key];
 	}
@@ -335,7 +346,6 @@ function getOperationHistory(id, handle){
 		return handle(
 			rows.map(function(row){
 				var objResponse = JSON.parse(row.response);
-				console.log(objResponse);
 				if (assocNicknamesByAddress[objResponse.your_address])
 					objResponse.nickname = assocNicknamesByAddress[objResponse.your_address];
 				return {operation_type: row.operation_type, response: objResponse, timestamp: row.timestamp};

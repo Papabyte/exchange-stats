@@ -4,7 +4,9 @@
 	"dependencies": {
 		"async": "^3.1.0",
 		"bitcoin-address-validation": "^1.0.0",
+		"discord.js": "^11.5.1",
 		"express": "^4.17.1",
-		"ocore": "git+https://github.com/byteball/ocore.git#rocks-and-formulas"
+		"ocore": "git+https://github.com/byteball/ocore.git#rocks-and-formulas",
+		"twitter": "^1.7.1"
 	}
 }
