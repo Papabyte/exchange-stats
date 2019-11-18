@@ -63,7 +63,7 @@ async function getWalletIdFromAddress(address, handle){
 
 async function getTransactionsFromInternalIds(arrIds, handle){
 	const idsSqlFilter = arrIds.join(",");
-	console.error(idsSqlFilter);
+	console.log(idsSqlFilter);
 	const rows = await db.query("SELECT transactions.block_height, datetime(block_time, 'unixepoch') as time,transactions.tx_id, transactions_from.amount AS amount_from,transactions_to.amount AS amount_to,\n\
 	transactions_from.wallet_id AS from_id, transactions_to.wallet_id AS to_id,btc_addresses.address,n FROM transactions \n\
 	INNER JOIN transactions_to USING(id) INNER JOIN processed_blocks USING(block_height) \n\

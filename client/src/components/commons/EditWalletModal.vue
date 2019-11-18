@@ -205,8 +205,9 @@ export default {
 			else
 				this.isCheckButtonActive = false;
 		},
-		isRemoving: function(){ // we watch isRemoving prop to keep it updated
-
+		isRemoving: function(){ 
+			if (this.propWalletId && this.assocExchanges[this.selectedExchange])// we have a wallet id as prop and exchange input is valid, let's go to check
+				this.check();
 		},
 		selectedExchange: function(){
 			if (this.propWalletId && this.assocExchanges[this.selectedExchange])// we have a wallet id as prop and exchange input is valid, let's go to check

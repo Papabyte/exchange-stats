@@ -2,7 +2,7 @@ const db = require('ocore/db.js');
 
 exports.create = function(){
 	return new Promise(async function(resolve){
-		console.error("will create tables if not exist");
+		console.log("will create tables if not exist");
 		await db.query("CREATE TABLE IF NOT EXISTS btc_addresses (\n\
 			id INTEGER PRIMARY KEY, \n\
 			address VARCHAR(70) UNIQUE, \n\
@@ -105,7 +105,7 @@ exports.create = function(){
 			await db.query("PRAGMA synchronous = 0 ");
 		//	await db.query("PRAGMA LOCKING_MODE = EXCLUSIVE");
 		}
-	console.error("all tables created");
+	console.log("all tables created");
 	resolve();
 	});
 

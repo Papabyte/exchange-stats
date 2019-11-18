@@ -39,7 +39,7 @@ function getLastHeightThenProcess(){
 function processToBlockHeight(to_block_height){
 	mutex.lockOrSkip(["process"], async function(unlock){
 		const rows = await db.query("SELECT MAX(block_height) as height,tx_index FROM fix_processed_blocks");
-		console.error("catchup from block " + rows[0].height + " tx index " + (rows[0].tx_index+1));
+		console.log("catchup from block " + rows[0].height + " tx index " + (rows[0].tx_index+1));
 		if (rows[0].height >= to_block_height)
 			return unlock();
 
@@ -48,7 +48,7 @@ function processToBlockHeight(to_block_height){
 			if (i % 1000 == 0){
 				if (process.env.vacuum){
 					await db.query("VACUUM");
-					console.error("db vaccumed");
+					console.log("db vaccumed");
 				}
 			}
 			nextBlock = await	downloadNextWhileProcessing(i, 0, nextBlock);
@@ -59,7 +59,7 @@ function processToBlockHeight(to_block_height){
 
 async function processBlock(objBlock, start_tx_index, handle){
 		var block_start_time = Date.now();
-		console.error("block " + objBlock.height + " txs in this block: " + objBlock.tx.length + " start_tx_index " + start_tx_index);
+		console.log("block " + objBlock.height + " txs in this block: " + objBlock.tx.length + " start_tx_index " + start_tx_index);
 		var fixes = [];
 		async.eachOfSeries(objBlock.tx,  function(tx, tx_index, callback){ //each tx from block is treated by this function
 			var inputs = [];
@@ -95,7 +95,7 @@ async function processBlock(objBlock, start_tx_index, handle){
 					conn.release();
 
 					lastBlockHeightProcessed = objBlock.height;
-					console.error("block " + objBlock.height + " processed in " + processingTime +'ms, ' + (processingTime/objBlock.tx.length).toFixed(4) + " ms per transaction");
+					console.log("block " + objBlock.height + " processed in " + processingTime +'ms, ' + (processingTime/objBlock.tx.length).toFixed(4) + " ms per transaction");
 					return handle();
 				});
 			});
@@ -158,7 +158,7 @@ function downloadNextWhileProcessing(blockheight, start_tx_index,  objBlock){
 }
 
 function downloadBlockAndParse(blockheight, handle){
-	console.error("will request block " + blockheight);
+	console.log("will request block " + blockheight);
 	request({
 		url: "http://5.39.78.212/"+blockheight+".gz",
 		encoding: null
@@ -171,7 +171,7 @@ function downloadBlockAndParse(blockheight, handle){
 				return downloadBlockAndParse(blockheight, handle);
 			} else{
 				var objBlock = JSON.parse(unZippedData);
-				console.error("block " + blockheight + " downloaded");
+				console.log("block " + blockheight + " downloaded");
 				handle(null, objBlock);
 			}
 		});
@@ -189,7 +189,7 @@ function getLastBlockHeight( handle){
 		try {
 			var objLastBlock = JSON.parse(body);
 		} catch (e) {
-			console.error(e);
+			console.log(e);
 			return handle(e);
 		}
 ;

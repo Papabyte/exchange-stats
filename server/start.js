@@ -1,8 +1,9 @@
 const express = require('express')
-//const ocore = require('./node_modules/ocore/');
+const rateLimit = require("express-rate-limit");
+const expressLogging = require('express-logging');
+const logger = require('logops');
 const validationUtils = require("ocore/validation_utils.js");
 const conf = require('ocore/conf.js');
-
 const validate = require('bitcoin-address-validation');
 
 require('./modules/sqlite_tables.js').create().then(function(){
@@ -12,9 +13,19 @@ require('./modules/sqlite_tables.js').create().then(function(){
 	const explorer = require('./modules/explorer.js');
 	const exchanges = require('./modules/exchanges.js');
 	const social_networks = require('./modules/social_networks.js');
-
 	const app = express()
 
+	const limiter = rateLimit({
+		windowMs: 5 * 60 * 1000, // 5 minutes
+		max: 500 // limit each IP to 300 requests per windowMs
+	});
+
+	app.set('trust proxy', 1);
+
+	app.use(limiter);
+	app.use(expressLogging(logger));
+
+	
 	app.get('/api/wallet/:id/:page', async function(request, response){
 		const id = Number(request.params.id);
 		const page = request.params.page ? Number(request.params.page) : 0;
@@ -83,7 +94,7 @@ require('./modules/sqlite_tables.js').create().then(function(){
 
 	app.get('/api/txid/:tx_id', function(request, response){
 		const tx_id = request.params.tx_id;
-		console.error(tx_id);
+		console.log(tx_id);
 		if (!validationUtils.isValidHexadecimal(tx_id, 64))
 			return response.status(400).send('Wrong tx id');
 		explorer.getTransactionFromTxId(tx_id, function(assocTxs){
@@ -147,9 +158,9 @@ require('./modules/sqlite_tables.js').create().then(function(){
 			const redirected_ids = await explorer.getRedirections([id]);
 			return response.send({redirected_id: redirected_ids[0]});
 		} else if (validate(address)){
-			console.error("validate " + address);
+			console.log("validate " + address);
 			explorer.getWalletIdFromAddress(address, function(wallet_id){
-				console.error("getWalletIdFromAddress " + wallet_id);
+				console.log("getWalletIdFromAddress " + wallet_id);
 				return response.send({redirected_id: wallet_id});
 			});
 		} else 			
