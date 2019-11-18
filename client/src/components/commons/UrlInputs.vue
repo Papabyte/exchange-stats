@@ -42,7 +42,7 @@ export default {
 			isInput2Valid: null
 		}
 	},
-		watch:{
+	watch:{
 		url_1: function(){
 			if (this.url_1.length >= maxLength){
 				this.text_error_1 = $t("urlInputsOversized", {max : maxLength});
@@ -67,6 +67,9 @@ export default {
 	},
 	created(){
 		this.isInput1Valid = this.requireOneUrl ? false : null;
+		this.$emit('url_1_update', this.url_1);
+		this.$emit('url_2_update', this.url_2);
+
 	},
 	methods: {
 		format(value, event) {

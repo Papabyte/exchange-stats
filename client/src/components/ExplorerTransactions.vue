@@ -69,7 +69,7 @@
 					<b-col cols="2" v-if="exchange" class="float-right">
 						<b-button 
 						variant="primary"
-						@click="isRemoving=false;$bvModal.show('editWallet');">
+						@click="isRemoving=false;walletIdToEdit=null;$bvModal.show('editWallet');">
 						{{$t('explorerTransactionsButtonAddWallet')}}
 						</b-button>
 					</b-col>
