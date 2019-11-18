@@ -43,18 +43,18 @@ export default {
 <style scoped>
 	.negative{
 		color: red;
-		font-size: 20px;
+		font-size: 14px;
 		font-weight: 600;
 	}
 
 	.positive{
 		color: green;
-		font-size: 20px;
+		font-size: 14px;
 		font-weight: 600;
 	}
 
 	.default{
-		font-size: 16px;
+		font-size: 12px;
 		font-weight: 500;
 	}
 </style>

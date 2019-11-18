@@ -1,5 +1,5 @@
 <template>
-	<div class="main test">
+	<div class="main">
 		<nav-bar selected_item='0' />
 
 		<section class="section">
