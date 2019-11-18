@@ -1,6 +1,6 @@
 var Twitter = require('twitter');
 const Discord = require('discord.js');
-
+const conf = require('ocore/conf.js');
 const discordChannels = process.env.testnet ? ["645454213643501589"] : [];
 
 var discordClient = null;
@@ -11,21 +11,33 @@ if (!process.env.testnet)
 	enableTwitter();
 
 function enableTwitter(){
+	if (!conf.consumer_key)
+		return console.log("twitter consumer_key missing in conf");
+	if (!conf.consumer_key)
+		return console.log("twitter consumer_secret missing in conf");
+	if (!conf.consumer_key)
+		return console.log("twitter access_token_key missing in conf");
+	if (!conf.consumer_key)
+		return console.log("twitter access_token_secret missing in conf");
 	twitterClient = new Twitter({
-		consumer_key: process.env.consumer_key,
-		consumer_secret: process.env.consumer_secret,
-		access_token_key: process.env.access_token_key,
-		access_token_secret: process.env.access_token_secret
+		consumer_key: conf.consumer_key,
+		consumer_secret: conf.consumer_secret,
+		access_token_key: conf.access_token_key,
+		access_token_secret: conf.access_token_secret
 	});
 }
 
 
 async function enableDiscord(){
+	if (!conf.discord_token)
+		return console.log("discord_token missing in conf");
 	discordClient = new Discord.Client();
-	await discordClient.login(process.env.discord_token);
+	await discordClient.login(conf.discord_token);
 }
 
 function sendToDiscord(text){
+	if (discordClient)
+		return console.log("discord client not initialized");
 	discordChannels.forEach(function(channel){
 		try {
 			discordClient.channels.get(channel).send(text);
@@ -37,7 +49,7 @@ function sendToDiscord(text){
 
 function sendTweet(text){
 	if (!twitterClient)
-		return;
+		return console.log("twitter client not initialized");;
 	twitterClient.post('statuses/update', {status: text}, function(error, tweet, response) {
 		console.log(error);
 		if (error) {

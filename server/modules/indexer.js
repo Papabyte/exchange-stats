@@ -1,6 +1,7 @@
 /*jslint node: true */
 "use strict";
 const db = require('ocore/db.js');
+const conf = require('ocore/conf.js');
 const request = require('request');
 const async = require('async');
 const mutex = require('ocore/mutex.js');
@@ -9,7 +10,10 @@ const stats = require("./stats.js");
 
 const confirmationsBeforeIndexing = 3;
 const activeRedirectionFromHeight = process.env.testnet && !process.env.full_indexation ? 9000 : 598000;
-const block_server_url = process.env.block_server;
+const block_server_url = conf.block_server;
+
+if (!block_server_url)
+	throw Error("block_server missing in conf");
 
 var lastBlockHeightProcessed;
 
