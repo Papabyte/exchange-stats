@@ -30,6 +30,7 @@ function processNewRanking(){
 			var nb_addresses = null;
 			var monthly_volume = null;
 			var trendString = null;
+			var objInfo = null;
 
 			if (assocWalletIdsByExchange[key] && assocWalletIdsByExchange[key].length > 0){
 				var arrWalletIds = await explorer.getRedirections(assocWalletIdsByExchange[key]);
@@ -44,7 +45,8 @@ function processNewRanking(){
 				trendString = volumeAndTrendObj.trend.join('@');
 				nb_addresses = await stats.getAddressesCount(arrWalletIds);
 			}
-		var objInfo = await api.getExchangeInfo(exchanges[key].gecko_id);
+			if (exchanges[key].gecko_id)
+				objInfo = await api.getExchangeInfo(exchanges[key].gecko_id);
 
 			db.query("REPLACE INTO last_exchanges_ranking (exchange_id,trend,last_month_volume,nb_addresses,total_btc_wallet,name,last_day_deposits, last_day_withdrawals, reported_volume,nb_deposit_addresses,nb_withdrawal_addresses) VALUES (?,?,?,?,?,?,?,?,?,?,?)", 
 			[

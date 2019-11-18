@@ -45,8 +45,6 @@
 			"name": "Bitstamp",
 			"url": "https://www.bitstamp.net/",
 			"country": "United Kingdom",
-			"start_wallets": [],
-			"current_wallets": [50, 22, 89],
 			"gecko_id": "bitstamp"
 	},
 	"bittrex": {
@@ -60,7 +58,6 @@
 			"name": "bleutrade",
 			"url": "https://bleutrade.com/exchange/",
 			"country": null,
-			"current_wallets": [8000],
 			"gecko_id": "bleutrade"
 	},
 	"bxthailand": {
@@ -1814,5 +1811,10 @@
 		"url": "https://www.bitmex.com/",
 		"country": null,
 		"gecko_id": "bitmex"
+	},
+	"cryptox": {
+		"name": "Cryptox",
+		"url": "https://www.cryptox.pl/",
+		"country": null
 	}
 }
