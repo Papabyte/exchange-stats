@@ -19,6 +19,8 @@ function processNewRanking(){
 			console.log("assocWalletIdsByExchange not set yet");
 			return setTimeout(processNewRanking, 1000); //wait that aa handler set assocWalletIdsByExchange
 		}
+		if (process.env.no_ranking_process)
+			return unlock();
 	
 		for (var key in exchanges){
 			var exchange = exchanges[key];
