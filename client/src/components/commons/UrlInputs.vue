@@ -1,32 +1,23 @@
 <template>
 	<div class="py-3">
-		<b-form-input 
-			:placeholder="requireOneUrl ? $t('urlInputsFirstHolder') : $t('urlInputsFirstHolderOptional')" 
-			:state="isInput1Valid" 
-			:formatter="format" 
-			v-model="url_1">
-		</b-form-input>
-		<span v-if="text_error_1" class="pt-3">{{text_error_1}}</span>
-		<b-form-input 
-		:placeholder="$t('urlInputsSecondHolder')"
-		:state="isInput2Valid" 
-		:formatter="format" 
-		v-model="url_2" ></b-form-input>
-		<span v-if="text_error_2" class="pt-3">{{text_error_2}}</span>
+		<url-input v-for="(url,index) in urls" :isRequired="index==0&&isAtLeastOneUrlRequired" :index="index" @url_updated="updateUrl" :key="index" />
+		<span @click="addUrlField"><v-icon v-if="urls.length < maxUrls" name='plus' class="plus-icon" /></span>
 	</div>
 </template>
 
 <script>
 
-const maxLength = 64;
+import UrlInput from '../commons/UrlInput.vue';
+
 const isUrl = require('is-url');
+const maxUrls = 5;
 
 export default {
 	components: {
-		
+		UrlInput
 	},
 	props: {
-		requireOneUrl: {
+		isAtLeastOneUrlRequired:{
 			type: Boolean,
 			required: false,
 			default:  false
@@ -34,50 +25,39 @@ export default {
 	},
 	data(){
 		return {
-			url_1: "",
-			url_2: "",
-			text_error_1: null,
-			text_error_2: null,
-			isInput1Valid: null,
-			isInput2Valid: null
+			urls: [null],
+			maxUrls: maxUrls
 		}
 	},
 	watch:{
-		url_1: function(){
-			if (this.url_1.length >= maxLength){
-				this.text_error_1 = $t("urlInputsOversized", {max : maxLength});
-			} else {
-				this.text_error_1 = null;
-			}
-			this.isInput1Valid = this.requireOneUrl ? isUrl(this.url_1) : (this.url_1 ? isUrl(this.url_1) : (isUrl(this.url_1) || null));
-			this.$emit('url_1_update', this.url_1);
-		},
-		url_2: function(){
-			if (this.url_2.length >= maxLength){
-				this.text_error_2 = $t("urlInputsOversized", {max : maxLength});
-			} else {
-				this.text_error_2 = null;
-			}
-			this.isInput2Valid = this.url_2 ? isUrl(this.url_2) : (isUrl(this.url_2) || null);
-			this.$emit('url_2_update', this.url_2);
-		},
-		requireOneUrl: function(){
 
-		}
 	},
 	created(){
-		this.isInput1Valid = this.requireOneUrl ? false : null;
-		this.$emit('url_1_update', this.url_1);
-		this.$emit('url_2_update', this.url_2);
 
 	},
 	methods: {
-		format(value, event) {
-			return value = value.slice(0, maxLength);
-		}	
+		updateUrl(value, index, status) {
+			this.urls[index] = value;
+			var bAreUrlsValid = true;
+			for (var i = 0; i < this.urls.length; i++){
+				if (this.urls[i] === false) // false when required url is wrong, null when url is wrong but not required
+					bAreUrlsValid = false;
+			}
+			this.$emit('urls_updated', this.urls, bAreUrlsValid);
+		},
+		addUrlField(){
+			this.urls.push(null);
+		}
 	}
 }
 </script>
 
 <style lang='scss' scoped>
+	.plus-icon {
+		height: 40px;
+	}
+
+.plus-icon:hover {
+    cursor: pointer;
+}
 </style>

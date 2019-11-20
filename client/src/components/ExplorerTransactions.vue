@@ -289,8 +289,7 @@ function isTxId(hex){
 	height: 20px;
 	width: 20px;
 	margin-left: -8px;
-		margin-top: -10px;
-
+	margin-top: -10px;
 }
 
 .button-xs{

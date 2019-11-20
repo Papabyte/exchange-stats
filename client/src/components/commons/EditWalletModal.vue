@@ -81,7 +81,7 @@
 				<div class="mt-4">
 					{{$t('editModalProofExplanation')}}
 				</div>
-				<UrlInputs :requireOneUrl="true" v-on:url_1_update="update_url_1" v-on:url_2_update="update_url_2"/>
+				<url-inputs  @urls_updated="urls_updated" :isAtLeastOneUrlRequired="true"/>
 			</b-row >
 
 		</b-container>
@@ -107,7 +107,6 @@ import ByteAmount from './ByteAmount.vue';
 import Exchange from './Exchange.vue';
 import UrlInputs from './UrlInputs.vue';
 import validate from 'bitcoin-address-validation';
-const isUrl = require('is-url');
 
 export default {	
 	components: {
@@ -144,8 +143,8 @@ export default {
 			rewardAmount: false,
 			stakeAmount: conf.challenge_min_stake_gb*conf.gb_to_bytes,
 			link: false,
-			url_1: null,
-			url_2: null,
+			urls: [],
+			bAreUrlsValid: false,
 			inputCoolDownTimer: null
 		}
 	},
@@ -179,7 +178,7 @@ export default {
 			return this.$store.state.exchangesById;
 		},
 		isOkDisabled(){
-			return !this.url_1 || !isUrl(this.url_1) || !this.isPoolAvailable;
+			return !this.bAreUrlsValid || !this.isPoolAvailable;
 		}
 	},
 	watch:{
@@ -214,14 +213,12 @@ export default {
 			this.selectedWalletId = this.propWalletId;
 	},
 	methods:{
+		urls_updated(urls, bAreUrlsValid){
+			this.urls = urls;
+			this.bAreUrlsValid= bAreUrlsValid;
+		},
 		isWalletId(wallet){
 			return (Number(wallet) && parseInt(wallet))
-		},
-		update_url_1(value){
-			this.url_1 = value;
-		},
-		update_url_2(value){
-			this.url_2 = value;
 		},
 		reset(){
 			this.isSpinnerActive = false;
@@ -311,10 +308,16 @@ export default {
 					pool_id: this.bestPoolId
 			};
 
-			if (this.url_1)
-				data.url_1 = this.url_1;
-			if (this.url_2)
-				data.url_2 = this.url_2;
+			if (this.urls[0])
+				data.url_1 = this.urls[0];
+			if (this.urls[1])
+				data.url_2 = this.urls[1];
+			if (this.urls[2])
+				data.url_3 = this.urls[2];
+			if (this.urls[3])
+				data.url_4 = this.urls[3];
+			if (this.urls[4])
+				data.url_5 = this.urls[4];
 
 			if (this.isRemoving)
 				data.remove_wallet_id = this.selectedWalletId;
