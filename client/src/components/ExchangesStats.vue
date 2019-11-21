@@ -1,16 +1,17 @@
 <template>
-	<div class="main test">
+	<div class="main">
 		<nav-bar selected_item='0' />
-		<b-container class="mt-3">
-			<b-row>
-				<b-col cols="12">
-					<b-alert v-if="welcomeMessageShown" @dismissed="$store.commit('setWasRankingWelcomeMessageClosed',true)" variant="info" show dismissible>
+			<b-container fluid>
+				<b-row>
+					<b-col offset-lg="1" lg="10" cols="12" class="py-3">
+						<b-alert v-if="welcomeMessageShown" @dismissed="$store.commit('setWasRankingWelcomeMessageClosed',true)" variant="welcome-message" show dismissible>
 						{{$t('rankingWelcomeMessage')}}
-					</b-alert>
-				</b-col>
-			</b-row >
-		</b-container>
-		<ranking-table />
+						</b-alert>
+					</b-col>
+				</b-row >
+			</b-container>
+		<exchange-graph v-if="exchange" :exchange="exchange"/>
+		<ranking-table v-else />
 	</div>
 </template>
 
@@ -18,13 +19,22 @@
 import NavBar from './commons/NavBar.vue'
 import RankingTable from './ExchangeStatsRanking.vue'
 import BtcAmount from './commons/BtcAmount.vue';
+import ExchangeGraph from './ExchangeStatsGraph.vue';
+
 const conf = require("../conf.js");
 
 export default {
 	name: 'ExchangesStats',
 	components: {
 		NavBar,
-		RankingTable
+		RankingTable,
+		ExchangeGraph
+	},
+	props: {
+		exchange: {
+			type: String,
+			required: false
+		}
 	},
 	computed:{
 		welcomeMessageShown(){

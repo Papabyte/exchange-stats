@@ -37,7 +37,11 @@
 				</div>
 				</b-col>
 			</b-row>
-			<b-row v-else  >
+
+			<b-row v-else-if="show_addresses">
+				<addresses :request_input="url_input" :page="Number(page)"/>
+			</b-row>
+			<b-row v-else >
 				<transactions :request_input="url_input" :page="Number(page)"/>
 			</b-row>
 		</b-container>
@@ -47,13 +51,15 @@
 <script>
 import NavBar from './commons/NavBar.vue'
 import Transactions from './ExplorerTransactions.vue'
+import Addresses from './ExplorerAddresses.vue'
 import Exchange from './commons/Exchange.vue';
 const conf = require('../conf.js');
 export default {
 	components: {
 		NavBar,
 		Transactions,
-		Exchange
+		Exchange,
+		Addresses
 	},
 	props: {
 		url_input: {
@@ -64,6 +70,11 @@ export default {
 			type: Number,
 			required: false,
 			default: 1
+		},
+		show_addresses:{
+			type: Boolean,
+			required: false,
+			default: false
 		}
 	},
 	data() {
@@ -84,6 +95,7 @@ export default {
 		}
 	},
 	created(){
+		console.log(this.show_addresses);
 		document.title = this.$t("explorerPageTitle", {website_name:conf.website_name});
 		document.getElementsByName('description')[0].setAttribute('content',this.$t("explorerMetaDescription"));
 	},
