@@ -8,6 +8,8 @@ function getExchangeInfo(exchange_id, try_count){
 		function call(){
 			if (!try_count)
 				try_count = 1;
+				console.log("getExchangeInfo " + exchange_id +" " + try_count);
+
 			if (try_count > 3)
 				return resolve(null);
 			request({
@@ -16,13 +18,13 @@ function getExchangeInfo(exchange_id, try_count){
 			function(error, response, body) {
 
 				if (error || response.statusCode !== 200){
-					console.error("coingecko request error " + error);
+					console.log("coingecko request error " + error);
 					return getExchangeInfo(exchange_id, try_count+1).then(resolve);
 				}
 				try {
 					var objInfo = JSON.parse(body);
 				} catch (e) {
-					console.error("coingecko parsing error " + e);
+					console.log("coingecko parsing error " + e);
 					return getExchangeInfo(exchange_id, try_count+1).then(resolve);
 				}
 				return resolve(objInfo);

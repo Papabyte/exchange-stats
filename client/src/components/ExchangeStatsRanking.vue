@@ -67,6 +67,15 @@
               <BtcAmount v-if="props.row.last_day_deposits" :amount="props.row.last_day_deposits"/>
             </b-table-column>
 
+            <b-table-column  field="trend" label="trend" sortable>
+              <template slot="header">
+                {{ columns[5].label }}
+              </template>
+              <router-link :to="{name: 'exchangesStats', params: { exchange: props.row.exchange_id } }">
+                <exchange-trend v-if="props.row.trend" :data="props.row.trend"/>
+              </router-link>
+            </b-table-column>
+
             <b-table-column field="last_day_withdrawals" label="last_day_withdrawals" sortable>
               <template slot="header">
                 {{ columns[6].label }}
@@ -115,10 +124,13 @@
 <script>
   import BtcAmount from './commons/BtcAmount.vue';
   import EditWalletModal from './commons/EditWalletModal.vue';
+  import ExchangeTrend from './commons/ExchangeTrend.vue';
+
   export default {
     components: {
       BtcAmount,
-      EditWalletModal
+      EditWalletModal,
+      ExchangeTrend
     },
     data() {
       return {
@@ -137,11 +149,12 @@
         columns: [
           {field: 'name', sortable: true, label: this.$t('rankingTableColName')},
           {field: 'reported_volume', sortable: true, label: this.$t('rankingTableColReportedVolume')},
-          {field: 'nb_withdrawal_addresses', sortable: true, label: this.$t('rankingTableColNbWithdrawalAddresses')},
-          {field: 'nb_deposit_addresses', sortable: true, label: this.$t('rankingTableColNbDepositAddresses')},
+          {field: 'last_month_volume', sortable: true, label: this.$t('rankingTableColMonthlyVolume')},
+          {field: 'nb_addresses', sortable: true, label: this.$t('rankingTableColNbAddresses')},
           {field: 'total_btc_wallet', sortable: true, label: this.$t('rankingTableColTotalBtcWallet')},
           {field: 'last_day_deposits', sortable: true, label: this.$t('rankingTableColLastDayDeposits')},
           {field: 'last_day_withdrawals', sortable: true, label: this.$t('rankingTableColLastDayWithdrawals')},
+          {field: 'trend', label:this.$t('rankingTableColTrend')},
           {field: 'action', label: this.$t('rankingTableColAction')}
         ],
       }
@@ -151,6 +164,10 @@
         this.loading = true;
         this.axios.get('/api/ranking').then((response) => {
           this.total = response.data.length;
+          response.data.forEach(function(row){
+            if(row.trend)
+              row.trend = row.trend.split("@").map(function(value){return Number(value)});
+          });
           this.data = response.data;
         });
         this.loading = false;
