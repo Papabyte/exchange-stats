@@ -74,14 +74,14 @@
 							<BtcAmount v-if="props.row.last_day_withdrawals" :amount="props.row.last_day_withdrawals"/>
 						</b-table-column>
 
-            <b-table-column field="trend" label="trend" sortable>
-              <template slot="header">
-                {{ columns[7].label }}
-              </template>
-              <router-link :to="{name: 'exchangesStats', params: { exchange: props.row.exchange_id } }">
-                <exchange-trend v-if="props.row.trend" :data="props.row.trend"/>
-              </router-link>
-            </b-table-column>
+						<b-table-column field="trend" label="trend" sortable>
+							<template slot="header">
+								{{ columns[7].label }}
+							</template>
+							<router-link :to="{name: 'exchangesStats', params: { exchange: props.row.exchange_id } }">
+								<exchange-trend v-if="props.row.trend" :data="props.row.trend"/>
+							</router-link>
+						</b-table-column>
 
 						<b-table-column field="action" label="action" sortable>
 							<template slot="header">
