@@ -9,8 +9,8 @@ exports.create = function(){
 			wallet_id INTEGER,\n\
 			balance INTEGER DEFAULT 0\n\
 			)");
-	//	await db.query("CREATE INDEX IF NOT EXISTS byWalletId ON btc_addresses(wallet_id) WHERE wallet_id IS NOT NULL");
-	await db.query("CREATE INDEX IF NOT EXISTS byWalletIdAndBalance ON btc_addresses(wallet_id,balance)");
+		await db.query("CREATE INDEX IF NOT EXISTS byWalletId ON btc_addresses(wallet_id) WHERE wallet_id IS NOT NULL");
+		//await db.query("CREATE INDEX IF NOT EXISTS byWalletIdAndBalance ON btc_addresses(wallet_id,balance)");
 
 		await db.query("CREATE TABLE IF NOT EXISTS btc_wallets (\n\
 			id INTEGER PRIMARY KEY AUTOINCREMENT,\n\
