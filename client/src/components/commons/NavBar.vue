@@ -7,7 +7,7 @@
         </template>
 
         <template slot="end">
-          <b-navbar-item tag="router-link" :to="{ path: '/stats' }" >{{$t("navbarRanking")}}</b-navbar-item>
+          <b-navbar-item tag="router-link" :to="{ path: '/' }" >{{$t("navbarRanking")}}</b-navbar-item>
           <b-navbar-item tag="router-link" :to="{ path: '/explorer' }">{{$t("navbarExplorer")}}</b-navbar-item>
           <b-navbar-item tag="router-link" :to="{ path: '/crowdsourcing' }">{{$t("navbarCrowdsourcing")}}</b-navbar-item>
           <b-navbar-item tag="router-link" :to="{ path: '/faq' }">{{$t("navbarFaq")}}</b-navbar-item>
@@ -23,6 +23,12 @@ const conf = require("../../conf.js");
 
 export default {
 	name: 'NavBar',
+	props: {
+		selected_item: {
+			type: String,
+			default: '0'
+		}
+	},
 	data(){
 		return {
 			conf: conf
@@ -32,8 +38,13 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
-  .router-link-active {
-    font-weight: 600;
+<style scoped>
+
+  .navbar {
+    box-shadow: 0 1px 10px rgba(151,164,175,.1)
   }
+	.router-link-active {
+		font-weight: 600;
+	}
+
 </style>

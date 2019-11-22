@@ -23,24 +23,15 @@
 			</b-row >
 
 			<b-row v-if="!propWalletId && !isRemoving">
-				<b-col cols="9" >
+				<b-col cols="12" >
 				<b-form-input
-					v-on:input="reset"
+					v-on:input="onWalletInputChanged"
 					type='text'
 					no-wheel
 					v-model="selectedWalletId"
 					:placeholder="$t('editModalHolderEnterIdOrAddress')"></b-form-input>
 				</b-col>
-				<b-col cols="2" >
-				<b-button
-					variant="primary"
-					v-if="!isSpinnerActive && isCheckButtonActive"
-					v-on:click="check" 
-					size="s">check</b-button>
-				<div v-if="isSpinnerActive" class="text-center w-100">
-					<b-spinner label="Spinning"></b-spinner>
-				</div>
-				</b-col>
+
 			</b-row >
 
 			<b-row v-if="!propWalletId && isRemoving">
@@ -82,11 +73,15 @@
 							<exchange :id="selectedExchange" noUrl />
 						</template>
   			</i18n>
+				</div>
+
+				<div v-else-if="isSpinnerActive" class="text-center w-100">
+					<b-spinner label="Spinning"></b-spinner>
+				</div>
 				<div class="mt-4">
 					{{$t('editModalProofExplanation')}}
 				</div>
-				<UrlInputs :requireOneUrl="true" v-on:url_1_update="update_url_1" v-on:url_2_update="update_url_2"/>
-				</div>
+				<url-inputs  @urls_updated="urls_updated" :isAtLeastOneUrlRequired="true"/>
 			</b-row >
 
 		</b-container>
@@ -112,7 +107,6 @@ import ByteAmount from './ByteAmount.vue';
 import Exchange from './Exchange.vue';
 import UrlInputs from './UrlInputs.vue';
 import validate from 'bitcoin-address-validation';
-const isUrl = require('is-url');
 
 export default {	
 	components: {
@@ -145,15 +139,14 @@ export default {
 			selectedExchange: null,
 			isOperationAllowed: false,
 			isSpinnerActive: false,
-			isOkDisabled: true,
 			isPoolAvailable: false,
 			rewardAmount: false,
-			isCheckButtonActive: false,
 			stakeAmount: conf.challenge_min_stake_gb*conf.gb_to_bytes,
 			link: false,
-			url_1: null,
-			url_2: null
-			}
+			urls: [],
+			bAreUrlsValid: false,
+			inputCoolDownTimer: null
+		}
 	},
 
 	computed:{
@@ -183,6 +176,9 @@ export default {
 		},
 		assocExchanges() {
 			return this.$store.state.exchangesById;
+		},
+		isOkDisabled(){
+			return !this.bAreUrlsValid || !this.isPoolAvailable;
 		}
 	},
 	watch:{
@@ -200,20 +196,16 @@ export default {
 			this.reset();
 		},
 		selectedWalletId: function(){
-			if (this.selectedWalletId)
-				this.isCheckButtonActive = validate(this.selectedWalletId.toString()) || this.isWalletId(this.selectedWalletId);
-			else
-				this.isCheckButtonActive = false;
-		},
-		isRemoving: function(){ // we watch isRemoving prop to keep it updated
+		//this.check()
 
+		},
+		isRemoving: function(){ 
+			if (this.propWalletId && this.assocExchanges[this.selectedExchange])// we have a wallet id as prop and exchange input is valid, let's go to check
+				this.check();
 		},
 		selectedExchange: function(){
 			if (this.propWalletId && this.assocExchanges[this.selectedExchange])// we have a wallet id as prop and exchange input is valid, let's go to check
 				this.check();
-		},
-		url_1: function(){
-			this.isOkDisabled = !isUrl(this.url_1) && this.isPoolAvailable;
 		}
 	},
 	created(){
@@ -221,20 +213,16 @@ export default {
 			this.selectedWalletId = this.propWalletId;
 	},
 	methods:{
+		urls_updated(urls, bAreUrlsValid){
+			this.urls = urls;
+			this.bAreUrlsValid= bAreUrlsValid;
+		},
 		isWalletId(wallet){
 			return (Number(wallet) && parseInt(wallet))
 		},
-		update_url_1(value){
-			this.url_1 = value;
-		},
-		update_url_2(value){
-			this.url_2 = value;
-		},
 		reset(){
 			this.isSpinnerActive = false;
-			this.isCheckButtonActive = false;
 			this.text_error = null;
-			this.isOkDisabled = true;
 			this.isPoolAvailable = false;
 			this.bestPoolId = false;
 			this.rewardAmount = 0;
@@ -248,15 +236,20 @@ export default {
 			this.selectedWalletId = arg;
 			this.check();
 		},
+		onWalletInputChanged(){
+			clearTimeout(this.inputCoolDownTimer);
+			if (this.selectedWalletId.length > 0)
+				this.inputCoolDownTimer = setTimeout(this.check, 1000);
+		},
 		check(){
 			this.text_error = null;
-			this.isOkDisabled = true;
 			this.bestPoolId = false;
 			this.rewardAmount = 0;
 			this.isSpinnerActive = true;
-			this.isCheckButtonActive = false;
+			this.isPoolAvailable = false;
+			this.bestPoolId = false;
 
-			this.axios.get('/api/redirection/'+this.selectedWalletId).then((response) => {
+			this.axios.get('/api/redirection/'+this.selectedWalletId).then((response,error) => {
 				this.selectedWalletId = response.data.redirected_id;
 				if (!this.selectedWalletId)
 					this.text_error = this.$t("editModalWalletNotFound");
@@ -290,7 +283,10 @@ export default {
 						}
 
 				});
-			});
+			}).catch((error) =>{
+				this.text_error = this.$t("editModalWalletNotFound");
+				this.isSpinnerActive = false;
+ 			});
 		},
 		getBestPool(){
 			this.axios.get('/api/pool/'+this.selectedExchange).then((response) => {
@@ -312,10 +308,16 @@ export default {
 					pool_id: this.bestPoolId
 			};
 
-			if (this.url_1)
-				data.url_1 = this.url_1;
-			if (this.url_2)
-				data.url_2 = this.url_2;
+			if (this.urls[0])
+				data.url_1 = this.urls[0];
+			if (this.urls[1])
+				data.url_2 = this.urls[1];
+			if (this.urls[2])
+				data.url_3 = this.urls[2];
+			if (this.urls[3])
+				data.url_4 = this.urls[3];
+			if (this.urls[4])
+				data.url_5 = this.urls[4];
 
 			if (this.isRemoving)
 				data.remove_wallet_id = this.selectedWalletId;
@@ -327,7 +329,10 @@ export default {
 			this.link = (conf.testnet ? "byteball-tn" :"byteball")+":"+conf.aa_address+"?amount="
 				+this.stakeAmount+"&base64data="+base64data;
 		}
-	}
+	},
+	beforeDestroy(){
+		clearTimeout(this.inputCoolDownTimer);
+	},
 }
 </script>
 
