@@ -1,7 +1,11 @@
 <template>
-	<div class="py-3">
-		<url-input v-for="(url,index) in urls" :isRequired="index==0&&isAtLeastOneUrlRequired" :index="index" @url_updated="updateUrl" :key="index" />
-		<span @click="addUrlField"><v-icon v-if="urls.length < maxUrls" name='plus' class="plus-icon" /></span>
+	<div class="columns">
+		<div class="column">
+			<url-input v-for="(url,index) in urls" :isRequired="index==0&&isAtLeastOneUrlRequired" :index="index" @url_updated="updateUrl" :key="index" />
+		</div>
+		<div class="column is-1">
+			<span @click="addUrlField"><v-icon v-if="urls.length < maxUrls" name='plus' class="plus-icon" /></span>
+		</div>
 	</div>
 </template>
 
@@ -54,7 +58,7 @@ export default {
 
 <style lang='scss' scoped>
 	.plus-icon {
-		height: 40px;
+		height: 30px;
 	}
 
 .plus-icon:hover {

@@ -1,11 +1,11 @@
 <template>
-	<div>
-		<b-form-input 
-			:placeholder="index == 0 ? (isRequired ? $t('urlInputsFirstHolder') : $t('urlInputsFirstHolderOptional')) : $t('urlInputsNextHolder')" 
-			:state="isUrlValid" 
-			:formatter="format" 
-			v-model="url">
-		</b-form-input>
+	<div class="row">
+		<b-input
+				:placeholder="index == 0 ? (isRequired ? $t('urlInputsFirstHolder') : $t('urlInputsFirstHolderOptional')) : $t('urlInputsNextHolder')"
+				:state="isUrlValid"
+				:formatter="format"
+				v-model="url"
+		/>
 		<span v-if="text_error" class="pt-3">{{text_error}}</span>
 	</div>
 </template>
@@ -17,7 +17,7 @@ const isUrl = require('is-url');
 
 export default {
 	components: {
-		
+
 	},
 	props: {
 		isRequired: {

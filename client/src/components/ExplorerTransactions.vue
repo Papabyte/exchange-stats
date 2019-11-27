@@ -1,6 +1,6 @@
 <template>
 	<div class="box">
-		<edit-wallet-modal :propExchange="exchange || walletOwner" :propWalletId="walletIdToEdit" :isRemoving="isRemoving"/>
+<!--		<edit-wallet-modal :propExchange="exchange || walletOwner" :propWalletId="walletIdToEdit" :isRemoving="isRemoving"/>-->
 		<b-row v-if="blockTitle">
 			<b-col offset-lg="1" lg="10" cols="12" class="py-3">
 				<h3 class="text-center">{{blockTitle}}</h3>
@@ -18,23 +18,26 @@
 						<b-row class="text-center" v-if="walletOwner">
 							<span class="pr-2">{{$t("explorerTransactionsBelongsTo")}}</span>
 							<Exchange :id="walletOwner"/>
-							<b-button
-									v-if="wallet_id"
-									type="is-warning"
-									@click="isRemoving=true;walletIdToEdit=wallet_id;$bvModal.show('editWallet');"
-									class="ml-2 button-xs"
-									v-b-tooltip.hover
-									:title="$t('explorerTransactionsButtonRemoveFromExchangeTip')"
-							>
+							<span class="test3">
+								<b-button
+										v-if="wallet_id"
+										type="is-warning"
+										@click="isRemoving=true;walletIdToEdit=wallet_id;$bvModal.show('editWallet');"
+										class="ml-2 button-xs"
+										v-b-tooltip.hover
+										:title="$t('explorerTransactionsButtonRemoveFromExchangeTip')"
+								>
 								<v-icon name='x' class="x-icon"/>
 							</b-button>
+							</span>
 						</b-row>
 
 						<b-row v-if="wallet_id&&!walletOwner">
-
-							<b-button type="is-warning" @click="isRemoving=false;$bvModal.show('editWallet');">
+							<span class="test1">
+								<b-button type="is-warning" @click="editWallet(null)">
 								{{$t("explorerTransactionsButtonAddToExchange")}}
 							</b-button>
+							</span>
 						</b-row>
 
 						<b-row v-if="exchangeWallets">
@@ -43,14 +46,16 @@
 								<div v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
 									<b-col>
 										<wallet-id :id="Number(wallet)"/>
-										<b-button
-												type="is-warning"
-												@click="isRemoving=true;walletIdToEdit=Number(wallet);$bvModal.show('editWallet');"
-												v-b-tooltip.hover
-												:title="$t('explorerTransactionsButtonRemoveFromExchangeTip')"
-												class="ml-2 button-xs">
+										<span class="test2">
+											<b-button
+													type="is-warning"
+													@click="isRemoving=true;walletIdToEdit=Number(wallet);$bvModal.show('editWallet');"
+													v-b-tooltip.hover
+													:title="$t('explorerTransactionsButtonRemoveFromExchangeTip')"
+													class="ml-2 button-xs">
 											<v-icon name='x' class="x-icon"/>
 										</b-button>
+										</span>
 									</b-col>
 								</div>
 							</b-row>
@@ -71,7 +76,7 @@
 							</router-link>
 						</b-row>
 					</b-col>
-					<b-col cols="2" v-if="exchange" class="float-right">
+					<b-col cols="2" v-if="exchange" class="float-right test4">
 						<b-button
 								type="is-warning"
 								@click="isRemoving=false;walletIdToEdit=null;$bvModal.show('editWallet');">
@@ -135,13 +140,14 @@
 	import Exchange from './commons/Exchange.vue';
 	import BtcAmount from './commons/BtcAmount.vue';
 	import WalletId from './commons/WalletId.vue';
+	import { ModalProgrammatic } from 'buefy'
 
 	const conf = require("../conf.js");
 
 	export default {
 		components: {
 			Transaction,
-			EditWalletModal,
+			// EditWalletModal,
 			Exchange,
 			BtcAmount,
 			WalletId
@@ -196,6 +202,15 @@
 			clearInterval(this.timerId);
 		},
 		methods: {
+			editWallet(num) {
+				let walletIdToEdit = num
+				ModalProgrammatic.open({
+					parent: this,
+					component: EditWalletModal,
+					hasModalCard: true,
+					props: {walletIdToEdit, isRemoving: false},
+				})
+			},
 			updateTitleAndDescription() {
 				if (this.wallet_id) {
 					document.title = this.$t("explorerTransactionsPageTitleWalletId", {
