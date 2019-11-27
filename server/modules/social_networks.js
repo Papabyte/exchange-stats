@@ -87,7 +87,7 @@ function notify(operation_type, operation, author, objAaResponse){
 }
 
 function displayInGb(amount){
-	return (amount/1000000000).toPrecision(4)+ " GB";
+	return (amount/1000000000).toPrecision(4) + " GB";
 }
 
 

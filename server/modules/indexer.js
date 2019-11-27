@@ -95,7 +95,7 @@ async function processBlock(objBlock, start_tx_index, handle){
 			if (inputs.length == 0){ // coinbase
 			//it looks eachOfSeries doesn't work serially anymore with async function, so we wrap in anonymous function
 				(async function(){
-					await saveOnlyTransactionsTo(firstTxTreated, tx.txid, objBlock.height, outputs, value_out);
+					await saveCoinbaseTransaction(firstTxTreated, tx.txid, objBlock.height, outputs, value_out);
 					await db.query("REPLACE INTO processed_blocks (block_height,tx_index,block_time) VALUES (?,?,?)",[objBlock.height, tx_index, objBlock.time]);
 					callback();
 				})();
@@ -107,7 +107,7 @@ async function processBlock(objBlock, start_tx_index, handle){
 				const objInputs = await getInputAddressesIdAndValueIn(inputs);
 				if (value_out > objInputs.value_in)
 					throw Error("value_out > objInputs.value_in " + tx.txid + " out:" + value_out+ " in:" + objInputs.value_in);
-				await saveInputAddressesAndTransactions(firstTxTreated, objInputs, tx.txid, objBlock.height , outputs, tx_index);
+				await saveTransaction(firstTxTreated, objInputs, tx.txid, objBlock.height , outputs, tx_index);
 				firstTxTreated = false;
 				await mergeWallets(objInputs, objBlock.height,objBlock.time, tx_index);// we merge these input addresses in the wallet id that has already the most addresses and set up redirections
 				callback();
@@ -155,7 +155,7 @@ function getInputAddressesIdAndValueIn(inputs){
 }
 
 // used for coinbase transaction because input has no address
-function saveOnlyTransactionsTo(bFirstTreated, tx_id, height, outputs, value_out){
+function saveCoinbaseTransaction(bFirstTreated, tx_id, height, outputs, value_out){
 	return new Promise(async function(resolve){
 		if (bFirstTreated){ // check if tx was already treadted when we resume catchup
 			const results = await db.query("SELECT 1 FROM transactions WHERE tx_id=?",[tx_id]);
@@ -190,7 +190,7 @@ function saveOnlyTransactionsTo(bFirstTreated, tx_id, height, outputs, value_out
 	});
 }
 
-function saveInputAddressesAndTransactions(bFirstTreated, objInputs, tx_id, height, outputs, tx_index){
+function saveTransaction(bFirstTreated, objInputs, tx_id, height, outputs, tx_index){
 	return new Promise(async function(resolve){
 		if (bFirstTreated){ // check if tx was already treadted when we resume catchup
 			const results = await db.query("SELECT 1 FROM transactions WHERE tx_id=?",[tx_id]);
@@ -267,11 +267,6 @@ function mergeWallets(objInputs, block_height, block_time, tx_index){
 					conn.addQuery(arrQueries, "UPDATE btc_wallets SET addr_count=addr_count+(SELECT SUM(addr_count) FROM btc_wallets WHERE id IN("+wallet_ids_to_update_string+")),\n\
 					balance=balance+(SELECT SUM(balance) FROM btc_wallets WHERE id IN("+wallet_ids_to_update_string+")),\n\
 					txs_count=txs_count+(SELECT SUM(txs_count)+1 FROM btc_wallets WHERE id IN("+wallet_ids_to_update_string+")) WHERE id=?",[rows[0].id]);
-/*
-					conn.addQuery(arrQueries, "UPDATE btc_wallets SET txs_count=txs_count-\n\
-					(SELECT COUNT(DISTINCT transactions_to.wallet_id) FROM transactions_to \n\
-					GROUP BY id HAVING (wallet_id IN (" + wallet_ids_to_update_string + ") AND wallet_id=? ) )\n\
-					WHERE id=?",[rows[0].id,rows[0].id]);*/
 
 					if (block_height >= activeRedirectionFromHeight) {
 						conn.addQuery(arrQueries, "UPDATE btc_wallets SET addr_count=0,balance=0,txs_count=0,redirection=? WHERE id IN("+wallet_ids_to_update_string+") OR redirection IN("+wallet_ids_to_update_string+")",[rows[0].id]);
@@ -283,7 +278,6 @@ function mergeWallets(objInputs, block_height, block_time, tx_index){
 					conn.addQuery(arrQueries, "UPDATE transactions_from SET wallet_id=? WHERE wallet_id IN("+wallet_ids_to_update_string+")",[rows[0].id]);
 					if (rows[0].addr < accurateTxsCountUpTo)
 						conn.addQuery(arrQueries, "UPDATE btc_wallets SET txs_count=(SELECT COUNT(DISTINCT id) AS count FROM (SELECT id FROM transactions_to WHERE wallet_id=? UNION SELECT id FROM transactions_from WHERE wallet_id=?)s) WHERE id=?",[rows[0].id,rows[0].id,rows[0].id]);
-
 
 				} else {
 					conn.addQuery(arrQueries, "UPDATE btc_wallets SET txs_count=txs_count+1 WHERE id=?",[rows[0].id]);

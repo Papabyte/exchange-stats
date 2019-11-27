@@ -10,7 +10,7 @@ const db = require('ocore/db.js');
 var assocWalletIdsByExchange = null;
 
 processNewRanking();
-setInterval(processNewRanking, 60*60*1000);
+setInterval(processNewRanking, 3*60*60*1000);
 
 function processNewRanking(){
 	mutex.lockOrSkip(["processNewRanking"], async function(unlock){
@@ -96,8 +96,8 @@ function createWeeklyHistoryForExchangeAndReturnMonthlyVolume(exchange, arrWalle
 			var block_start = i - block_period_day + 1;
 			var total_deposited = await stats.getTotalDepositedToWallets(arrWalletIds, block_start, i );
 			var total_withdrawn = await stats.getTotalWithdrawnFromWallets(arrWalletIds, block_start , i );
-			balance -= total_deposited;
-			balance +=  total_withdrawn;
+			balance -= await stats.getSumOutputsToWallets(arrWalletIds, block_start, i );
+			balance += await stats.getSumInputsFromWallets(arrWalletIds, block_start, i );
 			if (month_start_block < i)
 				monthly_volume+= total_deposited + total_withdrawn;
 			if (week_start_block < i)

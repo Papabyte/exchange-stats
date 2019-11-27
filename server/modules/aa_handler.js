@@ -9,12 +9,13 @@ const social_networks = require('./social_networks.js');
 
 const exchanges = require('./exchanges.js')
 
-var currentPools = [];
+var assocCurrentPoolsById = {};
 var assocCurrentPoolsByExchange = {};
+var currentActivePools = [];
 
 var assocCurrentExchangeByWalletId = {};
 
-var assocCurrentOperations = [];
+var assocCurrentOperations = {};
 var assocCurrentOperationsByExchange = {};
 var assocStakedByKeyAndAddress = {};
 var assocProofsByKeyAndOutcome = {}
@@ -116,28 +117,29 @@ function catchUpOperationsHistory(){
 function indexRewardPools(objStateVars){
 
 	const poolKeys = extractPoolKeys(objStateVars);
-	const pools = [];
-
+	const assocPoolsById = {};
+	const activePools = [];
 	var assocPoolsByExchange = {};
 	poolKeys.forEach(function(poolKey){
-		if(objStateVars[poolKey+'_number_of_rewards'] > 0){
 			const pool = {};
 			pool.number_rewards = objStateVars[poolKey+'_number_of_rewards'];
 			pool.pool_id = poolKey.split('_')[1];
-
+			pool.sponsor = objStateVars[poolKey+'_sponsor']
 			pool.reward_amount = objStateVars[poolKey+'_reward_amount'];
 			if (objStateVars[poolKey+'_exchange'] != undefined)
 				pool.exchange = objStateVars[poolKey+'_exchange'];
 			else
 				pool.exchange = 'any';
-			pools.push(pool);
+			assocPoolsById[pool.pool_id] = pool;
+			if(objStateVars[poolKey+'_number_of_rewards'] > 0)
+				activePools.push(pool);
 			if (!assocPoolsByExchange[pool.exchange])
 				assocPoolsByExchange[pool.exchange] = [];
 			assocPoolsByExchange[pool.exchange].push(pool);
-		}
+		
 	});
-
-	currentPools = pools;
+	currentActivePools = activePools;
+	assocCurrentPoolsById = assocPoolsById;
 	assocCurrentPoolsByExchange = assocPoolsByExchange;
 }
 
@@ -178,6 +180,7 @@ function indexOperations(objStateVars){
 		operation.staked_on_opposite = Number(objStateVars[key + "_total_staked_on_" + (outcome == "in" ? "out" :"in") ]);
 		operation.countdown_start= objStateVars[key + "_countdown_start"];
 		operation.total_staked = Number(objStateVars[key + "_total_staked"]);
+		operation.pool_id = Number(objStateVars[key + "_pool_id"]);
 		operation.key = key;
 		operation.staked_by_address = assocStakedByKeyAndAddress[key];
 		operation.url_proofs_by_outcome = assocProofsByKeyAndOutcome[key]
@@ -285,7 +288,7 @@ function getNicknameForAddress(address){
 }
 
 function getCurrentPools(){
-	return currentPools;
+	return currentActivePools;
 }
 
 function getCurrentOperations(){
@@ -310,7 +313,6 @@ function getBestPoolForExchange(exchange){
 	}
 
 	for (var key in assocCurrentPoolsByExchange["any"]){
-		console.log(assocCurrentPoolsByExchange["any"][key]);
 		if (assocCurrentPoolsByExchange["any"][key].reward_amount > bestPool.reward_amount)
 		bestPool = assocCurrentPoolsByExchange["any"][key];
 	}
@@ -392,6 +394,26 @@ function getDonatorsRanking(handle){
 	});
 }
 
+function getContributorsGreeting(handle){
+	db.query("SELECT operation_id,timestamp,response FROM operations_history WHERE operation_type='commit' ORDER BY mci DESC LIMIT 50", function(rows){
+		var arrGreetings = [];
+		for (var i = 0; i < rows.length; i++){
+			var objResponse = rows[i].response ? JSON.parse(rows[i].response) : null;
+			var objOperation = assocCurrentOperations[rows[i].operation_id];
+			if (objResponse && objOperation && objResponse.committed_outcome == objOperation.initial_outcome){
+				var sponsorAddress = assocCurrentPoolsById[objOperation.pool_id] ? assocCurrentPoolsById[objOperation.pool_id].sponsor : null;
+				arrGreetings.push({
+					author:assocNicknamesByAddress[objResponse.paid_out_address] || objResponse.paid_out_address,
+					exchange: objOperation.exchange, 
+					outcome: objOperation.initial_outcome, 
+					sponsor: assocNicknamesByAddress[sponsorAddress] || sponsorAddress
+				});
+			}
+		}
+		handle(arrGreetings);
+	});
+}
+
 exports.getCurrentPools = getCurrentPools;
 exports.getCurrentOperations = getCurrentOperations;
 exports.getCurrentOperationsForExchange = getCurrentOperationsForExchange;
@@ -402,3 +424,4 @@ exports.getOperationHistory = getOperationHistory;
 exports.getContributorsRanking = getContributorsRanking;
 exports.getDonatorsRanking = getDonatorsRanking;
 exports.getNicknameForAddress = getNicknameForAddress;
+exports.getContributorsGreeting = getContributorsGreeting;
