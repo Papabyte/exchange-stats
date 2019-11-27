@@ -80,7 +80,9 @@
 									<b-dropdown-item aria-role="listitem" @click="editWallet(props.row.exchange_id)">
 										{{$t('rankingTableButtonAddWallet')}}
 									</b-dropdown-item>
-									<b-dropdown-item aria-role="listitem" v-if="props.row.total_btc_wallet || props.row.nb_withdrawal_addresses" @click="removeWallet(props.row.exchange_id)">
+									<b-dropdown-item aria-role="listitem"
+																	 v-if="props.row.total_btc_wallet || props.row.nb_withdrawal_addresses"
+																	 @click="removeWallet(props.row.exchange_id)">
 										{{$t('rankingTableButtonRemoveWallet')}}
 									</b-dropdown-item>
 								</b-dropdown>
@@ -106,17 +108,17 @@
 </template>
 
 <script>
-	import BtcAmount from './commons/BtcAmount.vue';
-	import EditWalletModal from './commons/EditWalletModal.vue';
-	import ExchangeTrend from './commons/ExchangeTrend.vue';
+	import BtcAmount from './commons/BtcAmount.vue'
+	import EditWalletModal from './commons/EditWalletModal.vue'
+	import ExchangeTrend from './commons/ExchangeTrend.vue'
 	import { ModalProgrammatic } from 'buefy'
 
 	export default {
 		components: {
 			BtcAmount,
-			ExchangeTrend
+			ExchangeTrend,
 		},
-		data() {
+		data () {
 			return {
 				data: [],
 				isRemoving: false,
@@ -130,56 +132,56 @@
 				currentPage: 1,
 				perPage: 20,
 				loading: false,
-				isVisible: true
+				isVisible: true,
 			}
 		},
 		methods: {
 			onResize () {
 				this.isVisible = window.innerWidth > 1216
 			},
-			loadData() {
-				this.loading = true;
+			loadData () {
+				this.loading = true
 
 				this.axios.get('/api/ranking').then((response) => {
-					this.total = response.data.length;
+					this.total = response.data.length
 					response.data.forEach(function (row) {
 						if (row.trend)
-							row.trend = row.trend.split("@").map(function (value) {
+							row.trend = row.trend.split('@').map(function (value) {
 								return Number(value)
-							});
-					});
-					this.data = response.data;
-				});
+							})
+					})
+					this.data = response.data
+				})
 
-				this.loading = false;
+				this.loading = false
 			},
-			editWallet(clicked_exchange) {
+			editWallet (clicked_exchange) {
 				let propExchange = clicked_exchange
 				ModalProgrammatic.open({
 					parent: this,
 					component: EditWalletModal,
 					hasModalCard: true,
-					props: {propExchange, isRemoving: false,},
+					props: { propExchange, isRemoving: false },
 				})
 			},
-			removeWallet(clicked_exchange) {
+			removeWallet (clicked_exchange) {
 				let propExchange = clicked_exchange
 				ModalProgrammatic.open({
 					parent: this,
 					component: EditWalletModal,
 					hasModalCard: true,
-					props: {propExchange, isRemoving: true},
+					props: { propExchange, isRemoving: true },
 				})
 			},
-			onPageChange(page) {
+			onPageChange (page) {
 				this.page = page
 				this.loadData()
 			},
-			toggle(row) {
+			toggle (row) {
 				this.$refs.table.toggleDetails(row)
-			}
+			},
 		},
-		mounted() {
+		mounted () {
 			this.loadData()
 			this.onResize()
 			window.addEventListener('resize', this.onResize, { passive: true })
@@ -204,8 +206,10 @@
 		@media screen and (max-width: 768px) {
 			justify-content: flex-end;
 		}
+
 		a {
 			margin-right: 10px;
+
 			&:hover {
 				text-decoration: none;
 			}
