@@ -30,7 +30,7 @@
 				<div v-if="validExchange || isForAny" >
 					<i18n v-if="!isForAny" path="donateModalDonateAmountFor" tag="label" id="donate-amount">
 						<template #amount>
-							<byte-amount :amount="Math.round(nb_reward*amount*1000000)"/> 
+							<byte-amount :amount="Math.round(nb_reward*amount*gb_to_bytes)"/> 
 						</template>
 						<template #exchange>
 							<exchange :id="exchange" /> 
@@ -38,7 +38,7 @@
 					</i18n>
 					<i18n v-else path="donateModalDonateAmountForAny" tag="label" id="donate-amount">
 						<template #amount>
-							<byte-amount :amount="Math.round(nb_reward*amount*1000000)"/> 
+							<byte-amount :amount="Math.round(nb_reward*amount*gb_to_bytes)"/> 
 						</template>
 					</i18n>	
 				</div>
