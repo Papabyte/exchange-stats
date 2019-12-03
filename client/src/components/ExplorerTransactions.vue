@@ -1,21 +1,20 @@
 <template>
-	<div class="box">
+	<div class="section">
+
+		<div class="container" v-if="blockTitle">
+			<h3 class="title is-3 mb-2">{{ blockTitle }}</h3>
+		</div>
 		<!--		<edit-wallet-modal :propExchange="exchange || walletOwner" :propWalletId="walletIdToEdit" :isRemoving="isRemoving"/>-->
-		<b-row v-if="blockTitle">
-			<b-col offset-lg="1" lg="10" cols="12" class="py-3">
-				<h3 class="text-center">{{blockTitle}}</h3>
-			</b-col>
-		</b-row>
 
-		<b-col offset-lg="1" lg="10" cols="12" class="py-3">
+		<div class="container">
 			<div v-if="!isSpinnerActive">
-				<b-row>
-					<b-col cols="10">
-						<b-row class="text-center" v-if="failoverText">
+				<div>
+					<div>
+						<div class="text-center" v-if="failoverText">
 							{{failoverText}}
-						</b-row>
+						</div>
 
-						<b-row class="text-center" v-if="walletOwner">
+						<div class="text-center" v-if="walletOwner">
 							<span class="pr-2">{{$t('explorerTransactionsBelongsTo')}}</span>
 							<Exchange :id="walletOwner"/>
 							<span class="test3">
@@ -30,21 +29,21 @@
 								<v-icon name='x' class="x-icon"/>
 							</b-button>
 							</span>
-						</b-row>
+						</div>
 
-						<b-row v-if="wallet_id&&!walletOwner">
+						<div v-if="wallet_id&&!walletOwner">
 							<span class="test1">
 								<b-button type="is-warning" @click="editWallet(null)">
 								{{$t('explorerTransactionsButtonAddToExchange')}}
 							</b-button>
 							</span>
-						</b-row>
+						</div>
 
-						<b-row v-if="exchangeWallets">
+						<div v-if="exchangeWallets">
 							{{$t('explorerTransactionsWalletsForExchange')}}
-							<b-row class="pl-3" align-h="start">
+							<div class="pl-3" align-h="start">
 								<div v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
-									<b-col>
+									<div>
 										<wallet-id :id="Number(wallet)"/>
 										<span class="test2">
 											<b-button
@@ -56,45 +55,45 @@
 											<v-icon name='x' class="x-icon"/>
 										</b-button>
 										</span>
-									</b-col>
+									</div>
 								</div>
-							</b-row>
-						</b-row>
+							</div>
+						</div>
 
-						<b-row class="text-center" v-if="total_on_wallets">
+						<div class="text-center" v-if="total_on_wallets">
 							<span class="pr-1">{{$t('explorerTransactionsTotalOnWallet')}}</span>
 							<btc-amount :amount="total_on_wallets"/>
-						</b-row>
+						</div>
 
-						<b-row v-if="count_total">
+						<div v-if="count_total">
 							{{$t('explorerTransactionsTotalTransactions')}}{{count_total}}
-						</b-row>
-						<b-row v-if="wallet_id">
+						</div>
+						<div v-if="wallet_id">
 							<span class="pr-1">{{$t('explorerTransactionsAddressCount')}}</span>
 							<router-link :to="{name: 'explorerAddresses', params: { request_input: wallet_id} }">
 								{{addr_count}}
 							</router-link>
-						</b-row>
-					</b-col>
-					<b-col cols="2" v-if="exchange" class="float-right test4">
+						</div>
+					</div>
+					<div cols="2" v-if="exchange" class="float-right test4">
 						<b-button
 								type="is-warning"
 								@click="isRemoving=false;walletIdToEdit=null;$bvModal.show('editWallet');">
 							{{$t('explorerTransactionsButtonAddWallet')}}
 						</b-button>
-					</b-col>
-				</b-row>
+					</div>
+				</div>
 			</div>
-			<b-row v-else>
+			<div v-else>
 				<div class="text-center w-100">
 					<b-spinner label="Spinning"></b-spinner>
 				</div>
-			</b-row>
-		</b-col>
+			</div>
+		</div>
 
-		<b-row v-if="!isSpinnerActive && transactions">
-			<b-col offset-lg="1" lg="10" cols="12" class="py-3 main-block">
-				<b-row class="text-center">
+		<div v-if="!isSpinnerActive && transactions">
+			<div offset-lg="1" lg="10" cols="12" class="py-3 main-block">
+				<div class="text-center">
 					<b-pagination
 							v-model="currentPage"
 							:total-rows="count_total"
@@ -107,13 +106,13 @@
 						<transaction v-if="progressive_display_level>index" :tx_id="key" :transaction="transaction"
 												 :no_border="index == (Object.keys(transactions).length-1)" :about_wallet_ids="redirected_ids"/>
 					</div>
-				</b-row>
-			</b-col>
-		</b-row>
+				</div>
+			</div>
+		</div>
 
 		<div v-if="!isSpinnerActive && transactions">
-			<b-col offset-lg="1" lg="10" cols="12" class="py-3 main-block">
-				<b-row class="text-center">
+			<div offset-lg="1" lg="10" cols="12" class="py-3 main-block">
+				<div class="text-center">
 					<b-pagination
 							v-model="currentPage"
 							:total-rows="count_total"
@@ -127,8 +126,8 @@
 												 :no_border="index == (Object.keys(transactions).length-1)" :about_wallet_ids="redirected_ids"
 												 @expand="expand_tx"/>
 					</div>
-				</b-row>
-			</b-col>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
