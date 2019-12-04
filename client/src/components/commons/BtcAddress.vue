@@ -1,39 +1,51 @@
 <template>
-	<div>
-		<div class="d-inline">
-			<span v-if="label">{{label}}</span><span class="address text-break">{{address}}</span>
-		</div>
-		<div class="d-inline">
-				<b-link target="_blank" :href="'https://blockstream.info/address/'+address">
+	<div class="notification">
+		<div v-if="label" class="title is-6 is-marginless">{{label}}</div>
+		<div class="row">
+			<span>{{address}}</span>
+			<b-link target="_blank" :href="'https://blockstream.info/address/'+address" class="ml-05">
 				<v-icon name='external-link' class="custom-icon"/>
 			</b-link>
 		</div>
+
+		<!--		<span >{{label}}</span>-->
+		<!--		<div class="row">-->
+		<!--			<span>{{tx_id}}</span>-->
+		<!--			<b-link target="_blank" :href="'https://blockstream.info/address/'+address" class="ml-1">-->
+		<!--				<v-icon name='external-link' class="link-icon"/>-->
+		<!--			</b-link>-->
+		<!--		</div>-->
 	</div>
 </template>
 
 <script>
 
-export default {
-	props: {
-		label: {
-			type: String,
-			required: false
+	export default {
+		props: {
+			label: {
+				type: String,
+				required: false,
+			},
+			address: {
+				type: String,
+				required: false,
+			},
 		},
-		address: {
-			type: String,
-			required: false
-		}
 	}
-}
 </script>
 
-<style scoped>
-.custom-icon {
-	height: 20px;
-}
+<style lang="scss" scoped>
+	.row {
+		display: flex;
+		align-items: center;
+	}
 
-.address {
-	color: gray;
-	font-weight: 600;
-}
+	.custom-icon {
+		height: 20px;
+	}
+
+	.address {
+		color: gray;
+		font-weight: 600;
+	}
 </style>

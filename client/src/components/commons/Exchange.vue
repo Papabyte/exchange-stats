@@ -3,14 +3,19 @@
 		{{exchangeName}}
 	</span>
 	<span v-else>
-		<span v-if="label"> 
+		<div v-if="label" class="title is-6 mb-05">
 			{{label}}
-		</span>
-		<span class="exchange-link">
-			<b-link :to="'/explorer/'+id" >
-			<v-icon v-if="showIcon" name='trending-up' class="exchange-icon"/>
-			{{exchangeName}}
-			</b-link>
+		</div>
+		<span class="wallet-link">
+			<b-button
+					size="is-medium"
+					type="is-warning"
+					tag="router-link"
+					:to="'/explorer/'+id"
+			>
+				<v-icon v-if="showIcon" name='trending-up' class="exchange-icon"/>
+				{{exchangeName}}
+			</b-button>
 		</span>
 	</span>
 </template>
@@ -54,14 +59,16 @@ export default {
 	color: darkorange;
 	font-weight: 600;
 }
+.wallet-link {
+	a > span {
+		display: flex;
+		align-items: center;
+	}
+}
 
 .exchange-icon{
-	height: 20px;
-	padding: auto;
-	margin-right: -3px;
-	margin-bottom: 10px;
-	color: black;
-
+	height: 20px !important;
+	margin-right: 5px !important;
 }
 
 </style>

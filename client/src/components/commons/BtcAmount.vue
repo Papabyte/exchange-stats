@@ -1,8 +1,8 @@
 <template>
-	<div>
-		<span v-if="label"> {{label}}</span>
+	<span>
+		<div v-if="label" class="title is-6 mb-05">{{label}}</div>
 		<span v-bind:class="amountClass">{{(amount/100000000).toPrecision(6)/1}} BTC </span>
-	</div>
+	</span>
 </template>
 
 <script>

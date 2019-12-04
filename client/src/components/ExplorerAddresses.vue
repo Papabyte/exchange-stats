@@ -1,40 +1,42 @@
 <template>
-	<b-container fluid>
-		<b-row>
-			<b-col offset-lg="1" lg="10" cols="12" class="py-3">
-				<h3 class="text-center">{{$t('explorerAddressesAddressesInWallet',{wallet: request_input})}}</h3>
-			</b-col>
-		</b-row >
-		<b-row v-if="count_total">
-			<b-col offset-lg="1" lg="10" cols="12" class="py-3">
-				{{$t("explorerAddressesCountInWallet",{count:count_total})}} <wallet-id :id="Number(request_input)"/>
-			</b-col>
-		</b-row>
-		<b-row v-if="!isSpinnerActive">
-			<b-col offset-lg="1" lg="10" cols="12" class="py-3 main-block">
-				<b-row  class="text-center mb-5">
-					<b-pagination
-						v-model="currentPage"
-						:total-rows="count_total"
-						per-page="100"
-						@change="onPageChanged"
-						size="l"
-						class="pl-4 pt-2 my-0"
-						></b-pagination> 
-				</b-row>
-				<b-row  class="text-center mb-3">
-					<b-col cols="6">Address</b-col>
-					<b-col cols="6">View on</b-col>
-				</b-row>
-				<b-row  class="text-left" v-for="(address,index) in addresses" v-bind:key="index">
-					<b-col cols="6">{{address}}</b-col>
-					<b-col cols="2 text-break"><a :href="'https://blockstream.info/address/' + address">blockstream.info</a></b-col>
-					<b-col cols="2 text-break"><a :href="'https://www.blockchain.com/btc/address/' + address">blockchain.com</a></b-col>
-					<b-col cols="2 text-break"><a :href="'https://www.walletexplorer.com/?q=' + address">walletexplorer.com</a></b-col>
-				</b-row>
-			</b-col>
-		</b-row>
-	</b-container>
+	<div>
+		<h3 class="title is-3 mb-2">{{$t('explorerAddressesAddressesInWallet',{wallet: request_input})}}</h3>
+		<div class="box">
+			<div v-if="count_total" class="d-flex ai-center">
+				<h5 class="title is-5 d-inline-block is-marginless mr-05">{{$t("explorerAddressesCountInWallet",{count:count_total})}}</h5> <wallet-id :id="Number(request_input)"/>
+			</div>
+		</div>
+
+		<div class="box" v-if="!isSpinnerActive">
+			<b-pagination
+					v-model="currentPage"
+					:total-rows="count_total"
+					per-page="100"
+					@change="onPageChanged"
+			></b-pagination>
+
+			<div class="notification columns transaction-headers is-paddingless is-marginless">
+				<div class="column is-6">
+					<span class="title is-6">Address:</span>
+				</div>
+				<div class="column is-6">
+					<span class="title is-6">View on:</span>
+				</div>
+			</div>
+			<div class="addr-list" v-for="(address,index) in addresses" v-bind:key="index">
+				<div class="columns" >
+					<div class="column">{{address}}</div>
+					<div class="column">
+						<div class="columns">
+							<div class="column"><a :href="'https://blockstream.info/address/' + address">blockstream.info</a></div>
+							<div class="column"><a :href="'https://www.blockchain.com/btc/address/' + address">blockchain.com</a></div>
+							<div class="column"><a :href="'https://www.walletexplorer.com/?q=' + address">walletexplorer.com</a></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script>
@@ -101,6 +103,17 @@ export default {
 
 </script>
 
-<style>
-
+<style lang="scss" scoped>
+	.transaction-headers{
+		background-color: gainsboro
+	}
+	.notification {
+		margin-bottom: 1rem !important;
+	}
+	.addr-list {
+		margin-bottom: 1rem;
+		border-radius: 4px;
+		padding: 1rem;
+		background: whitesmoke;
+	}
 </style>

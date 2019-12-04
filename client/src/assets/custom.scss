@@ -39,12 +39,39 @@ body {
 	box-shadow: 0 1px 10px rgba(151, 164, 175, .1)
 }
 
+.pn-75 {
+	padding: 0.75rem;
+}
+
+.mr-05 {
+	margin-right: 0.5rem !important;
+}
+.mb-05 {
+	margin-bottom: 0.5rem !important;
+}
+.mb-1 {
+	margin-bottom: 2rem !important;
+}
 .mb-2 {
-	margin-bottom: 2rem;
+	margin-bottom: 2rem !important;
+}
+.mt-1 {
+	margin-top: 1rem;
+}
+
+.ml-1 {
+	margin-left: 1rem !important;
+}
+.ml-05 {
+	margin-left: 0.5rem !important;
+}
+
+.lh-25 {
+	line-height: 25px !important;
 }
 
 .mn-1 {
-	margin: 1rem;
+	margin: 1rem !important;
 }
 
 .modal-close {
@@ -52,9 +79,45 @@ body {
 }
 
 .row {
+	width: 100%;
+	display: block;
 	margin-bottom: 1rem;
+	&:last-child {
+		margin-bottom: 0;
+	}
 }
 
+.notification {
+	height: 100%;
+}
+
+.is-unknown {
+	cursor: default;
+	&:focus,
+	&:active {
+		background-color: #ffdd57;
+		box-shadow: none;
+	}
+}
 .f-end {
 	justify-content: flex-end;
+}
+.f-around {
+	justify-content: space-around;
+}
+
+.f-between {
+	justify-content: space-between;
+}
+.fw-w {
+	flex-wrap: wrap;
+}
+.d-flex {
+	display: flex !important;
+}
+.d-inline-block {
+	display: inline-block !important;
+}
+.ai-center {
+	align-items: center;
 }

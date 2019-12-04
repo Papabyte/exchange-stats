@@ -30,9 +30,9 @@
 					<div class="container" v-if="arrExchanges">
 						<h6 class="title is-6 mb-2">{{$t('explorerOrBrowseExchanges')}}</h6>
 
-						<b-button type="is-light" v-for="(exchange,index) in arrExchanges" v-bind:key="index">
-							<exchange :showIcon="false" :id="exchange.id"/>
-						</b-button>
+						<span class="exchange-wrapper" >
+							<exchange v-for="(exchange,index) in arrExchanges" v-bind:key="index" :showIcon="false" :id="exchange.id"/>
+						</span>
 					</div>
 				</div>
 			</div>
@@ -112,7 +112,13 @@
 		padding: 2rem 1.5rem;
 	}
 
-	.mb-2 {
-		margin-bottom: 2rem;
+	.exchange-wrapper {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: flex-start;
+		margin: -0.75rem;
+		& > span {
+			margin: 0.75rem;
+		}
 	}
 </style>
