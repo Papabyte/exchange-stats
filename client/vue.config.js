@@ -1,6 +1,6 @@
 module.exports = {
 	devServer: {
-		proxy: process.env.local_server ? 'http://127.0.0.1:1245/' : 'http://91.121.57.43/',
+		proxy: process.env.local_server ? 'http://127.0.0.1:1245/' : 'https://counterstats.org/',
 	},
 	configureWebpack: {
 
