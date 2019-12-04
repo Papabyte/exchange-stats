@@ -59,6 +59,8 @@ function sendTweet(text){
 }
 
 function notify(operation_type, operation, author, objAaResponse){
+	if (!operation)
+		return console.log("cannot notify, no operation");
 
 	if (operation_type == "initial_stake"){
 		if (operation.initial_outcome == 'in')

@@ -3,7 +3,7 @@
 exports.bServeAsHub = false;
 exports.bLight = true;
 
-exports.api_port = process.env.testnet ? 1245 : 5000;
+exports.api_port = 1245;
 
 exports.hub = process.env.testnet ? 'obyte.org/bb-test' : 'obyte.org/bb';
 

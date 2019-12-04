@@ -6,104 +6,109 @@
 		<view-url-proofs-modal :operationItem="clicked_item"/>
 		<commit-operation-modal :operationItem="clicked_item"/>
 		<operation-history-modal :operationItem="clicked_item"/>
-		<b-pagination
-			v-model="currentPage"
-			:total-rows="totalRows"
-			per-page="10"
-			align="fill"
-			size="l"
-			class="p-4 my-0"
-			></b-pagination> 
-		<b-table 
-			:current-page="currentPage"
-			per-page="10"
-			:items="operations"
-			:fields="fields"
-			:sort-by.sync="sortBy"
-			:sort-desc.sync="sortDesc"
-			responsive
-			sort-icon-left>	
-				<template v-slot:cell(operation)="data">			
-					<i18n v-if="data.item.initial_outcome=='in'" tag="span" path="crowdSourcingOperationsAddXToX" id="action">
-						<template #wallet>
-							<wallet-id :id="data.item.wallet_id"/>
-						</template>
-						<template #exchange>
-							<exchange :id="data.item.exchange"/>
-						</template>
-					</i18n>
-					<i18n v-else tag="span" path="crowdSourcingOperationsRemoveXFromX" id="action">
-						<template #wallet>
-							<wallet-id :id="data.item.wallet_id"/>
-						</template>
-						<template #exchange>
-							<exchange :id="data.item.exchange"/>
-						</template>
-					</i18n>
-				</template>
+		<b-row>
+			<contributors-greeting />
+		</b-row>
+		<b-row>
+			<b-pagination
+				v-model="currentPage"
+				:total-rows="totalRows"
+				per-page="10"
+				align="fill"
+				size="l"
+				class="p-4 my-0"
+				></b-pagination> 
+			<b-table 
+				:current-page="currentPage"
+				per-page="10"
+				:items="operations"
+				:fields="fields"
+				:sort-by.sync="sortBy"
+				:sort-desc.sync="sortDesc"
+				responsive
+				sort-icon-left>	
+					<template v-slot:cell(operation)="data">			
+						<i18n v-if="data.item.initial_outcome=='in'" tag="span" path="crowdSourcingOperationsAddXToX" id="action">
+							<template #wallet>
+								<wallet-id :id="data.item.wallet_id"/>
+							</template>
+							<template #exchange>
+								<exchange :id="data.item.exchange"/>
+							</template>
+						</i18n>
+						<i18n v-else tag="span" path="crowdSourcingOperationsRemoveXFromX" id="action">
+							<template #wallet>
+								<wallet-id :id="data.item.wallet_id"/>
+							</template>
+							<template #exchange>
+								<exchange :id="data.item.exchange"/>
+							</template>
+						</i18n>
+					</template>
 
-				<template v-slot:head(outcome_yes_or_no)="data">
-					<span v-b-tooltip.hover :title="$t('crowdSourcingOperationsTableColOutcomeTip')">{{data.label}}</span>
-				</template>
-				<template v-slot:head(staked_on_outcome)="data">
-					<span v-b-tooltip.hover :title="$t('crowdSourcingOperationsTableColStakedOnOutcomeTip')">{{data.label}}</span>
-				</template>
-				<template v-slot:head(total_staked)="data">
-					<span v-b-tooltip.hover :title="$t('crowdSourcingOperationsTableColTotalStakedTip')">{{data.label}}</span>
-				</template>
-				<template v-slot:cell(staked_on_outcome)="data">
-					<byte-amount :amount="data.item.staked_on_outcome" />
-				</template>
-				<template v-slot:cell(total_staked)="data">
-					<byte-amount :amount="data.item.total_staked" />
-				</template>
-				<template v-slot:cell(action)="data">
-					<b-button-group class="mr-2">
-						<b-button 
-							variant="primary" 
-							v-if="data.item.status == 'onreview' && !data.item.is_commitable " 
-							v-on:click="clicked_item=data.item;$bvModal.show('contestOperation');"
-							v-b-tooltip.hover :title="$t('crowdSourcingOperationsButtonContestTip')"
-							class="mr-2" 
-							size="s">
-							{{$t("crowdSourcingOperationsButtonContest")}}
-						</b-button>
-						<b-button 
-							variant="primary" 
-							v-if="data.item.status == 'onreview' && data.item.is_commitable"
-							v-on:click="clicked_item=data.item;$bvModal.show('commitOperation');"
-							v-b-tooltip.hover :title="$t('crowdSourcingOperationsButtonCommitTip')"
-							class="mr-2" 
-							size="s">
-							{{$t("crowdSourcingOperationsButtonCommit")}}
-						</b-button>
-						<b-button 
-							variant="primary" 
-							v-if="data.item.status == 'committed' && data.item.claimAddresses.length>0" 
-							v-on:click="clicked_item=data.item;$bvModal.show('claimGain');"
-							v-b-tooltip.hover :title="$t('crowdSourcingOperationsButtonClaimTip')"
-							class="mr-2 text-nowrap"
-							size="s" >
-							{{$t("crowdSourcingOperationsButtonClaim")}}
-						</b-button>
-						<b-dropdown right :text="$t('crowdSourcingOperationsButtonView')" variant="primary" size="m" >
-							<b-dropdown-item 
-								variant="primary"
-								v-on:click="clicked_item=data.item;$bvModal.show('viewUrlProofs');"
+					<template v-slot:head(outcome_yes_or_no)="data">
+						<span v-b-tooltip.hover :title="$t('crowdSourcingOperationsTableColOutcomeTip')">{{data.label}}</span>
+					</template>
+					<template v-slot:head(staked_on_outcome)="data">
+						<span v-b-tooltip.hover :title="$t('crowdSourcingOperationsTableColStakedOnOutcomeTip')">{{data.label}}</span>
+					</template>
+					<template v-slot:head(total_staked)="data">
+						<span v-b-tooltip.hover :title="$t('crowdSourcingOperationsTableColTotalStakedTip')">{{data.label}}</span>
+					</template>
+					<template v-slot:cell(staked_on_outcome)="data">
+						<byte-amount :amount="data.item.staked_on_outcome" />
+					</template>
+					<template v-slot:cell(total_staked)="data">
+						<byte-amount :amount="data.item.total_staked" />
+					</template>
+					<template v-slot:cell(action)="data">
+						<b-button-group class="mr-2">
+							<b-button 
+								variant="primary" 
+								v-if="data.item.status == 'onreview' && !data.item.is_commitable " 
+								v-on:click="clicked_item=data.item;$bvModal.show('contestOperation');"
+								v-b-tooltip.hover :title="$t('crowdSourcingOperationsButtonContestTip')"
 								class="mr-2" 
 								size="s">
-								{{$t("crowdSourcingOperationsButtonViewProofs")}}
-							</b-dropdown-item>
-							<b-dropdown-item
+								{{$t("crowdSourcingOperationsButtonContest")}}
+							</b-button>
+							<b-button 
 								variant="primary" 
-								v-on:click="clicked_item=data.item;$bvModal.show('operationHistory');"  
-								class="mr-2" size="s" >
-								{{$t("crowdSourcingOperationsButtonHistory")}}
-							</b-dropdown-item>
-						</b-dropdown>
-					</b-button-group>
-				</template>
-			</b-table>
+								v-if="data.item.status == 'onreview' && data.item.is_commitable"
+								v-on:click="clicked_item=data.item;$bvModal.show('commitOperation');"
+								v-b-tooltip.hover :title="$t('crowdSourcingOperationsButtonCommitTip')"
+								class="mr-2" 
+								size="s">
+								{{$t("crowdSourcingOperationsButtonCommit")}}
+							</b-button>
+							<b-button 
+								variant="primary" 
+								v-if="data.item.status == 'committed' && data.item.claimAddresses.length>0" 
+								v-on:click="clicked_item=data.item;$bvModal.show('claimGain');"
+								v-b-tooltip.hover :title="$t('crowdSourcingOperationsButtonClaimTip')"
+								class="mr-2 text-nowrap"
+								size="s" >
+								{{$t("crowdSourcingOperationsButtonClaim")}}
+							</b-button>
+							<b-dropdown right :text="$t('crowdSourcingOperationsButtonView')" variant="primary" size="m" >
+								<b-dropdown-item 
+									variant="primary"
+									v-on:click="clicked_item=data.item;$bvModal.show('viewUrlProofs');"
+									class="mr-2" 
+									size="s">
+									{{$t("crowdSourcingOperationsButtonViewProofs")}}
+								</b-dropdown-item>
+								<b-dropdown-item
+									variant="primary" 
+									v-on:click="clicked_item=data.item;$bvModal.show('operationHistory');"  
+									class="mr-2" size="s" >
+									{{$t("crowdSourcingOperationsButtonHistory")}}
+								</b-dropdown-item>
+							</b-dropdown>
+						</b-button-group>
+					</template>
+				</b-table>
+			</b-row>
 		</b-row>
 </template>
 
@@ -115,6 +120,7 @@ import ClaimGainModal from './commons/ClaimGainModal.vue';
 import CommitOperationModal from './commons/CommitModal.vue';
 import ViewUrlProofsModal from './commons/ViewUrlProofsModal.vue';
 import OperationHistoryModal from './commons/OperationHistoryModal.vue';
+import ContributorsGreeting from './commons/ContributorsGreeting.vue';
 
 import Exchange from './commons/Exchange.vue';
 import WalletId from './commons/WalletId.vue';
@@ -129,7 +135,8 @@ import moment from 'moment/src/moment'
 			Exchange,
 			WalletId,
 			CommitOperationModal,
-			OperationHistoryModal
+			OperationHistoryModal,
+			ContributorsGreeting
 		},
 		data() {
 			return {
