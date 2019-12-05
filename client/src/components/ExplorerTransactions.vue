@@ -96,8 +96,9 @@
 				</div>
 			</div>
 			<div v-else class="box">
-				<div class="text-center w-100">
-					<b-spinner label="Spinning"></b-spinner>
+				<div class="container">
+					<b-loading label="Spinning" :is-full-page="true" :active.sync="isSpinnerActive"
+										 :can-cancel="true"></b-loading>
 				</div>
 			</div>
 		</div>
@@ -105,23 +106,24 @@
 			<br>
 		</div>
 		<div v-if="!isSpinnerActive && transactions" class="box">
+			<div class="row mb-2">
+				<b-pagination
+						:total="count_total"
+						:current.sync="currentPage"
+						:per-page="perPage"
+						range-before="3"
+						range-after="3"
+						@change="onPageChanged"
+						aria-next-label="Next page"
+						aria-previous-label="Previous page"
+						aria-page-label="Page"
+						aria-current-label="Current page">
+				</b-pagination>
+			</div>
 			<div class="container" v-for="(transaction,key,index) in transactions" v-bind:key="key">
 				<transaction v-if="progressive_display_level>index" :tx_id="key" :transaction="transaction"
-										 :no_border="index == (Object.keys(transactions).length-1)" :about_wallet_ids="redirected_ids"/>
+										 :no_border="index == (Object.keys(transactions).length-1)" :about_wallet_ids="redirected_ids" @expand="expand_tx"/>
 			</div>
-			<!--			<div class="py-3 main-block">-->
-			<!--				<div class="text-center">-->
-			<!--					<b-pagination-->
-			<!--							v-model="currentPage"-->
-			<!--							:total-rows="count_total"-->
-			<!--							per-page="20"-->
-			<!--							@change="onPageChanged"-->
-			<!--							size="l"-->
-			<!--							class="pl-4 pt-2 my-0"-->
-			<!--					></b-pagination>-->
-			<!--					-->
-			<!--				</div>-->
-			<!--			</div>-->
 		</div>
 	</div>
 </template>
@@ -176,6 +178,7 @@
 				addr_count: null,
 				progressive_display_level: 1,
 				timerId: null,
+				perPage: 20
 			}
 		},
 		watch: {
@@ -317,11 +320,8 @@
 				}
 			},
 			expand_tx (tx_id) {
-				console.log('@@')
 				this.axios.get('/api/txid/' + tx_id).then((response) => {
-
 					this.transactions[tx_id] = response.data.txs[tx_id]
-					console.log(response.data.txs)
 				})
 			},
 		},

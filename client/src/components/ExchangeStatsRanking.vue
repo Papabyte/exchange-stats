@@ -3,9 +3,8 @@
 		<div class="container">
 			<h3 class="title is-3 mb-2">{{$t('rankingTitle')}}</h3>
 		</div>
-
 		<div class="container">
-			<div class="box">
+			<div v-if="!isLoading" class="box">
 				<b-table
 						:data="data"
 						ref="table"
@@ -14,7 +13,7 @@
 						:detail-key="data.name"
 						:show-detail-icon="!isVisible"
 						:paginated="isPaginated"
-						:loading="loading"
+						:loading="isLoading"
 						:per-page="perPage"
 						:current-page.sync="currentPage"
 						:pagination-simple="isPaginationSimple"
@@ -102,6 +101,10 @@
 					</template>
 				</b-table>
 			</div>
+			<div v-else class="box">
+				<b-loading label="Spinning" :is-full-page="true" :active.sync="isLoading"
+									 :can-cancel="true"></b-loading>
+			</div>
 		</div>
 	</section>
 
@@ -131,7 +134,7 @@
 				sortIconSize: 'is-small',
 				currentPage: 1,
 				perPage: 20,
-				loading: false,
+				isLoading: false,
 				isVisible: true,
 			}
 		},
@@ -140,7 +143,7 @@
 				this.isVisible = window.innerWidth > 1216
 			},
 			loadData () {
-				this.loading = true
+				this.isLoading = true
 
 				this.axios.get('/api/ranking').then((response) => {
 					this.total = response.data.length
@@ -153,7 +156,7 @@
 					this.data = response.data
 				})
 
-				this.loading = false
+				this.isLoading = false
 			},
 			editWallet (clicked_exchange) {
 				let propExchange = clicked_exchange

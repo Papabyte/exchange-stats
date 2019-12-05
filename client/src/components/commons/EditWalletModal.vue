@@ -75,7 +75,7 @@
 						</i18n>
 					</div>
 
-					<div v-else-if="isSpinnerActive" class="text-center w-100">
+					<div v-else-if="isSpinnerActive" class="container">
 						<b-loading label="Spinning" :is-full-page="false" :active.sync="isSpinnerActive"
 											 :can-cancel="true"></b-loading>
 					</div>

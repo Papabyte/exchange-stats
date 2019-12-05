@@ -40,13 +40,6 @@
 								{{$t("explorerTransactionUnknownWallet")}}
 							</div>
 
-<!--							<b-button-->
-<!--									size="is-medium"-->
-<!--									type="is-warning"-->
-<!--									icon-left="wallet"-->
-<!--							>-->
-<!--								{{$t("explorerTransactionUnknownWallet")}}-->
-<!--							</b-button>-->
 						</span>
 					</div>
 					<div class="column is-4" v-if="t_out.exchange">
@@ -103,9 +96,9 @@ export default {
 	},
 	methods: {
 		loadMore (tx_id) {
-			this.tx_id = tx_id
-			console.log('!! expand', this.tx_id)
-			this.$emit('expand', this.tx_id)
+			// this.tx_id = tx_id
+			// console.log('!! expand', tx_id)
+			this.$emit('expand', tx_id)
 		}
 	}
 }

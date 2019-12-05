@@ -8,12 +8,21 @@
 		</div>
 
 		<div class="box" v-if="!isSpinnerActive">
-			<b-pagination
-					v-model="currentPage"
-					:total-rows="count_total"
-					per-page="100"
-					@change="onPageChanged"
-			></b-pagination>
+
+			<div class="row mb-2">
+				<b-pagination
+						:total="count_total"
+						:current.sync="currentPage"
+						:per-page="perPage"
+						range-before="3"
+						range-after="3"
+						@change="onPageChanged"
+						aria-next-label="Next page"
+						aria-previous-label="Previous page"
+						aria-page-label="Page"
+						aria-current-label="Current page">
+				</b-pagination>
+			</div>
 
 			<div class="notification columns transaction-headers is-paddingless is-marginless">
 				<div class="column is-6">
@@ -34,6 +43,12 @@
 						</div>
 					</div>
 				</div>
+			</div>
+		</div>
+		<div v-else class="box">
+			<div class="container">
+				<b-loading label="Spinning" :is-full-page="true" :active.sync="isSpinnerActive"
+									 :can-cancel="true"></b-loading>
 			</div>
 		</div>
 	</div>
@@ -62,7 +77,8 @@ export default {
 	data() {
 		return {
 			addresses: [],
-			isSpinnerActive: true
+			isSpinnerActive: true,
+			perPage: 100
 		}
 	},
 	watch: {
