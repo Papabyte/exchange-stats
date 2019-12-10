@@ -30,7 +30,7 @@ server {
 
 	location  / {
 		root /home/counterstats-user/counterstats/client/dist/;
-		try_files $uri $uri/ @rewrites;
+		try_files $uri /index.html;
 }
 
 ```

@@ -194,7 +194,7 @@ function indexOperations(objStateVars){
 	assocCurrentOperations = assocOperations;
 	assocCurrentExchangeByWalletId = assocExchangeByWalletId;
 	assocCurrentOperationsByExchange = assocOperationsByExchange;
-	exchanges.setWalletIdsByExchange(assocWalletIdsByExchange);;
+	exchanges.setWalletIdsByExchange(assocWalletIdsByExchange);
 
 }
 
@@ -308,13 +308,13 @@ function getBestPoolForExchange(exchange){
 		reward_amount: 0
 	};
 	for (var key in assocCurrentPoolsByExchange[exchange]){
-		if (assocCurrentPoolsByExchange[exchange][key].reward_amount > bestPool.reward_amount)
-		bestPool = assocCurrentPoolsByExchange[exchange][key];
+		if (assocCurrentPoolsByExchange[exchange][key].number_rewards > 0 && assocCurrentPoolsByExchange[exchange][key].reward_amount > bestPool.reward_amount)
+			bestPool = assocCurrentPoolsByExchange[exchange][key];
 	}
-
+	
 	for (var key in assocCurrentPoolsByExchange["any"]){
-		if (assocCurrentPoolsByExchange["any"][key].reward_amount > bestPool.reward_amount)
-		bestPool = assocCurrentPoolsByExchange["any"][key];
+		if (assocCurrentPoolsByExchange["any"][key].number_rewards > 0 && assocCurrentPoolsByExchange["any"][key].reward_amount > bestPool.reward_amount)
+			bestPool = assocCurrentPoolsByExchange["any"][key];
 	}
 	return bestPool;
 }
