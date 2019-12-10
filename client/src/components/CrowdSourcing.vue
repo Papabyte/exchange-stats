@@ -1,41 +1,67 @@
 <template>
-	<div>
+	<div class="main">
 		<nav-bar selected_item='2'/>
-		<b-container fluid >
-				<b-row>
-					<b-col offset-lg="2" lg="8" cols="12" class="py-3">
-						<b-alert v-if="welcomeMessageShow" @dismissed="$store.commit('setWasCrowdSourcingWelcomeMessageClosed',true)" variant="welcome-message" show dismissible>
-						{{$t('crowdSourcingWelcomeMessage')}}
-						</b-alert>
-					</b-col>
-				</b-row >
-			<b-row >
-				<b-col offset-lg="2" lg="8"  cols="12" class="py-3">
-					<h3 class="text-center">{{$t("crowdSourcingCurrentOperations")}}</h3>
-						<current-operations />
-				</b-col>
-			</b-row >
-						<b-row >
-				<b-col offset-lg="2" lg="8"  cols="12" class="py-3">
-					<h3 class="text-center">{{$t("crowdSourcingRanking")}}</h3>
-						<rankings />
-				</b-col>
-			</b-row >
-			<b-row >
-				<b-col offset-lg="2" lg="8"  cols="12" class="py-3">
-					<b-row >
-						<b-col lg="6"  cols="12" class="pr-lg-5 py-3">
-							<h3 class="text-center">{{$t("crowdSourcingCurrentRewards")}}</h3>
-								<current-pools />
-						</b-col>
-						<b-col lg="6"  cols="12" class="pl-lg-5 ml-auto py-3">
-							<h3 class="text-center">{{$t("crowdSourcingLastTransactions")}}</h3>
-							<last-transactions />
-						</b-col>
-					</b-row >
-				</b-col>
-			</b-row >
-		</b-container>
+
+		<section class="section">
+			<div class="container">
+				<b-notification v-if="welcomeMessageShow" type="is-info" aria-close-label="Close" @close="$store.commit('setWasCrowdSourcingWelcomeMessageClosed',true)">
+					{{$t('crowdSourcingWelcomeMessage')}}
+				</b-notification>
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="container">
+				<h3 class="title is-3 mb-2">{{$t('crowdSourcingCurrentOperations')}}</h3>
+			</div>
+			<current-operations />
+		</section>
+
+		<section class="section">
+			<div class="container">
+				<h3 class="title is-3 mb-2">{{$t('crowdSourcingRanking')}}</h3>
+			</div>
+			<div class="container box">
+				<rankings />
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="container">
+				<div class="columns">
+					<div class="column">
+						<div class="container">
+							<h3 class="title is-3 mb-2">{{$t('crowdSourcingCurrentRewards')}}</h3>
+						</div>
+						<current-pools />
+					</div>
+					<div class="column">
+						<div class="container">
+							<h3 class="title is-3 mb-2">{{$t('crowdSourcingLastTransactions')}}</h3>
+						</div>
+						<last-transactions />
+					</div>
+				</div>
+			</div>
+		</section>
+
+<!--		<b-container fluid >-->
+
+<!--			<b-row >-->
+<!--				<b-col offset-lg="2" lg="8"  cols="12" class="py-3">-->
+<!--					<b-row >-->
+<!--						<b-col lg="6"  cols="12" class="pr-lg-5 py-3">-->
+<!--							<h3 class="text-center">{{$t("crowdSourcingCurrentRewards")}}</h3>-->
+<!--								<current-pools />-->
+<!--						</b-col>-->
+<!--						<b-col lg="6"  cols="12" class="pl-lg-5 ml-auto py-3">-->
+<!--							<h3 class="text-center">{{$t("crowdSourcingLastTransactions")}}</h3>-->
+<!--							<last-transactions />-->
+<!--						</b-col>-->
+<!--					</b-row >-->
+<!--				</b-col>-->
+<!--			</b-row >-->
+<!--		</b-container>-->
 	</div>
 </template>
 
