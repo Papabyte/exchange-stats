@@ -30,7 +30,8 @@
 					{{props.row.successes}}
 				</b-table-column>
 				<b-table-column field="income" :label="$t('crowdSourcingContributorsTableColIncome')" sortable>
-					<byte-amount :isNegative="props.row.income<0" :isPositive="props.row.income>0" :amount="props.row.income || 0"/>
+					<byte-amount :isNegative="props.row.income<0" :isPositive="props.row.income>0"
+											 :amount="props.row.income || 0"/>
 				</b-table-column>
 			</template>
 		</b-table>
@@ -39,45 +40,45 @@
 
 <script>
 
-	const conf = require("../conf.js");
-	import ByteAmount from './commons/ByteAmount.vue';
-	import User from './commons/User.vue';
+	const conf = require('../conf.js')
+	import ByteAmount from './commons/ByteAmount.vue'
+	import User from './commons/User.vue'
 
 	export default {
 		components: {
 			ByteAmount,
-			User
+			User,
 		},
-		data() {
+		data () {
 			return {
-				isTestnet : conf.testnet,
+				isTestnet: conf.testnet,
 				isSpinnerActive: true,
-				currentPage:1,
-				totalRows:0,
+				currentPage: 1,
+				totalRows: 0,
 				sortBy: 'initiatives',
 				defaultSortDirection: 'desc',
-				items: []
+				items: [],
 			}
 		},
-		created(){
-			this.getData();
-			this.timerId = setInterval(this.getData, 60000);
+		created () {
+			this.getData()
+			this.timerId = setInterval(this.getData, 60000)
 		},
-		beforeDestroy(){
-			clearInterval(this.timerId);
+		beforeDestroy () {
+			clearInterval(this.timerId)
 		},
-		methods:{
-			getData(){
+		methods: {
+			getData () {
 				this.axios.get('/api/contributors-ranking/').then((response) => {
-					this.items = response.data;
-					this.totalRows = this.items.length;
-					this.isSpinnerActive= false
-				});
-			}
-		}
+					this.items = response.data
+					this.totalRows = this.items.length
+					this.isSpinnerActive = false
+				})
+			},
+		},
 	}
 </script>
 
-<style >
+<style>
 
 </style>

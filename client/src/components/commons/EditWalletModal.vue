@@ -103,7 +103,7 @@
 		</section>
 		<footer class="modal-card-foot f-end">
 			<button class="button" type="button" @click="$parent.close()">Close</button>
-			<button class="button is-primary" :disabled="isOkDisabled" @ok="handleOk">Ok</button>
+			<button class="button is-primary" :disabled="isOkDisabled" @click="handleOk">Ok</button>
 		</footer>
 	</div>
 </template>

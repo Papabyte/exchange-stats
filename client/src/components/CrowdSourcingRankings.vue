@@ -1,10 +1,9 @@
 <template>
 	<div class="container">
-		<set-nickname-modal/>
 		<b-button
 				class="is-pulled-right"
 				type="is-warning"
-				v-on:click="$bvModal.show('setNickname');">
+				@click="setNickname()">
 			{{$t('crowdsourcingRankingButtonSetNickname')}}
 		</b-button>
 
@@ -25,12 +24,13 @@
 	import ContributorsRanking from './CrowdSourcingRankingContributors.vue'
 	import DonatorsRanking from './CrowdSourcingRankingDonators.vue'
 	import SetNicknameModal from './commons/SetNicknameModal.vue'
+	import { ModalProgrammatic } from 'buefy'
 
 	export default {
 		components: {
 			ContributorsRanking,
 			DonatorsRanking,
-			SetNicknameModal,
+			// SetNicknameModal,
 		},
 		data () {
 			return {}
@@ -40,7 +40,15 @@
 		},
 		beforeDestroy () {
 		},
-		methods: {},
+		methods: {
+			setNickname () {
+				ModalProgrammatic.open({
+					parent: this,
+					component: SetNicknameModal,
+					hasModalCard: true
+				})
+			},
+		},
 	}
 </script>
 

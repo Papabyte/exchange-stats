@@ -122,7 +122,8 @@
 			</div>
 			<div class="container" v-for="(transaction,key,index) in transactions" v-bind:key="key">
 				<transaction v-if="progressive_display_level>index" :tx_id="key" :transaction="transaction"
-										 :no_border="index == (Object.keys(transactions).length-1)" :about_wallet_ids="redirected_ids" @expand="expand_tx"/>
+										 :no_border="index == (Object.keys(transactions).length-1)" :about_wallet_ids="redirected_ids"
+										 @expand="expand_tx"/>
 			</div>
 		</div>
 	</div>
@@ -178,7 +179,7 @@
 				addr_count: null,
 				progressive_display_level: 1,
 				timerId: null,
-				perPage: 20
+				perPage: 20,
 			}
 		},
 		watch: {
@@ -197,6 +198,52 @@
 		beforeDestroy () {
 			clearInterval(this.timerId)
 		},
+		metaInfo () {
+			if (this.exchangeName) {
+				return {
+					title: this.$t('explorerTransactionsPageExchange', {
+						exchange: this.exchangeName,
+						website_name: conf.website_name,
+					}),
+					meta: [
+						{ name: 'description', content: this.$t('explorerTransactionsMetaDescriptionExchange', { exchange: this.exchangeName })}
+					]
+				}
+			} else if (this.tx_id) {
+				return {
+					title: this.$t('explorerTransactionsPageTitleTxId', {
+						tx_id: this.tx_id,
+						website_name: conf.website_name,
+					}),
+					meta: [
+						{ name: 'description', content: this.$t('explorerTransactionsMetaDescriptionTxId', { tx_id: this.tx_id })}
+					]
+				}
+			} else if (this.wallet_id) {
+				return {
+					title: this.$t('explorerTransactionsPageTitleWalletId', {
+						wallet_id: this.wallet_id,
+						website_name: conf.website_name,
+					}),
+					meta: [
+						{ name: 'description', content: this.$t('explorerTransactionsMetaDescriptionWalletId', { wallet_id: this.wallet_id })}
+					]
+				}
+			} else if (this.wallet_id && this.walletOwner) {
+				return {
+					title: this.$t('explorerTransactionsPageTitleWalletId', {
+						wallet_id: this.wallet_id,
+						website_name: conf.website_name,
+					}),
+					meta: [
+						{ name: 'description', content: this.$t('explorerTransactionsMetaDescriptionWalletIdWithOwner', {
+								wallet_id: this.wallet_id,
+								exchange: this.walletOwner,
+							})}
+					]
+				}
+			}
+		},
 		methods: {
 			editWallet (num) {
 				let walletIdToEdit = num
@@ -206,35 +253,6 @@
 					hasModalCard: true,
 					props: { walletIdToEdit, isRemoving: false },
 				})
-			},
-			updateTitleAndDescription () {
-				if (this.wallet_id) {
-					document.title = this.$t('explorerTransactionsPageTitleWalletId', {
-						wallet_id: this.wallet_id,
-						website_name: conf.website_name,
-					})
-
-					if (this.walletOwner)
-						var description = this.$t('explorerTransactionsMetaDescriptionWalletIdWithOwner', {
-							wallet_id: this.wallet_id,
-							exchange: this.walletOwner,
-						})
-					else
-						var description = this.$t('explorerTransactionsMetaDescriptionWalletId', { wallet_id: this.wallet_id })
-				} else if (this.tx_id) {
-					document.title = this.$t('explorerTransactionsPageTitleTxId', {
-						tx_id: this.tx_id,
-						website_name: conf.website_name,
-					})
-					var description = this.$t('explorerTransactionsMetaDescriptionTxId', { tx_id: this.tx_id })
-				} else if (this.exchangeName) {
-					document.title = this.$t('explorerTransactionsPageExchange', {
-						exchange: this.exchangeName,
-						website_name: conf.website_name,
-					})
-					var description = this.$t('explorerTransactionsMetaDescriptionExchange', { exchange: this.exchangeName })
-				}
-				document.getElementsByName('description')[0].setAttribute('content', description)
 			},
 			onPageChanged (value) {
 				this.$router.push({ name: 'explorerInputPaged', params: { url_input: this.request_input, page: value } })
@@ -274,7 +292,6 @@
 						this.walletIdToEdit = this.wallet_id
 						this.walletOwner = response.data.exchange
 						this.isSpinnerActive = false
-						this.updateTitleAndDescription()
 					})
 				} else if (isTxId(this.request_input)) { // it's a tx id
 					this.blockTitle = 'Transaction ' + this.request_input
@@ -288,7 +305,6 @@
 							this.failoverText = this.$t('explorerTransactionsTransactionsNotFound',
 								{ transaction: this.request_input })
 						}
-						this.updateTitleAndDescription()
 					})
 
 				} else if (validate(this.request_input)) { // it's a BTC address
@@ -315,7 +331,6 @@
 						this.exchange = this.request_input
 						this.exchangeName = response.data.name
 						this.isSpinnerActive = false
-						this.updateTitleAndDescription()
 					})
 				}
 			},

@@ -15,14 +15,16 @@
 			<div class="column is-3">
 				<div class="columns">
 					<div class="column">
-						<wallet-id v-if="transaction.from && transaction.from.id" :label="$t('explorerTransactionLabelWallet')" :id="transaction.from.id"/>
+						<wallet-id v-if="transaction.from && transaction.from.id" :label="$t('explorerTransactionLabelWallet')"
+											 :id="transaction.from.id"/>
 					</div>
 					<div class="column" v-if="transaction.from.exchange">
 						<Exchange :label="$t('explorerTransactionLabelExchange')" :id="transaction.from.exchange"/>
 					</div>
 				</div>
 				<div class="mt-1">
-					<btc-amount v-if="transaction.from && transaction.from.amount" :label="$t('explorerTransactionLabelAmount')" :amount="transaction.from.amount" :isNegative="about_ids.indexOf(transaction.from.id)>-1"/>
+					<btc-amount v-if="transaction.from && transaction.from.amount" :label="$t('explorerTransactionLabelAmount')"
+											:amount="transaction.from.amount" :isNegative="about_ids.indexOf(transaction.from.id)>-1"/>
 				</div>
 			</div>
 			<div class="column is-1">
@@ -37,7 +39,7 @@
 						<span v-else>
 
 							<div class="button is-warning is-unknown">
-								{{$t("explorerTransactionUnknownWallet")}}
+								{{$t('explorerTransactionUnknownWallet')}}
 							</div>
 
 						</span>
@@ -46,12 +48,14 @@
 						<Exchange :label="$t('explorerTransactionLabelExchange')" :id="t_out.exchange"/>
 					</div>
 					<div class="column is-4">
-						<btc-amount :label="$t('explorerTransactionLabelAmount')" :amount="t_out.amount" :isPositive="about_ids.indexOf(t_out.id)>-1"/>
+						<btc-amount :label="$t('explorerTransactionLabelAmount')" :amount="t_out.amount"
+												:isPositive="about_ids.indexOf(t_out.id)>-1"/>
 					</div>
 					<div class="row pn-75">
 						<div class="columns">
 							<div class="column">
-								<btc-address v-if="t_out.address" :label="$t('explorerTransactionLabelAddress')" :address="t_out.address"/>
+								<btc-address v-if="t_out.address" :label="$t('explorerTransactionLabelAddress')"
+														 :address="t_out.address"/>
 							</div>
 						</div>
 					</div>
@@ -65,72 +69,71 @@
 					>
 						Expand
 					</b-button>
-					</div>
+				</div>
 			</div>
-		</div >
+		</div>
 	</div>
 </template>
 
 <script>
-//commons
-import BtcAmount from './commons/BtcAmount.vue';
-import WalletId from './commons/WalletId.vue';
-import TxId from './commons/TxId.vue';
-import BtcAddress from './commons/BtcAddress.vue';
-import Exchange from './commons/Exchange.vue';
+	//commons
+	import BtcAmount from './commons/BtcAmount.vue'
+	import WalletId from './commons/WalletId.vue'
+	import TxId from './commons/TxId.vue'
+	import BtcAddress from './commons/BtcAddress.vue'
+	import Exchange from './commons/Exchange.vue'
 
-export default {
-	components: {
-		BtcAmount,
-		WalletId,
-		TxId,
-		BtcAddress,
-		Exchange
-	},
-	props: ['transaction','tx_id','no_border','about_wallet_ids'],
-	data() {
-		return {
-			about_ids: this.about_wallet_ids || [],
-			isExpandable: false
-		}
-	},
-	methods: {
-		loadMore (tx_id) {
-			// this.tx_id = tx_id
-			// console.log('!! expand', tx_id)
-			this.$emit('expand', tx_id)
-		}
+	export default {
+		components: {
+			BtcAmount,
+			WalletId,
+			TxId,
+			BtcAddress,
+			Exchange,
+		},
+		props: ['transaction', 'tx_id', 'no_border', 'about_wallet_ids'],
+		data () {
+			return {
+				about_ids: this.about_wallet_ids || [],
+				isExpandable: false,
+			}
+		},
+		methods: {
+			loadMore (tx_id) {
+				this.$emit('expand', tx_id)
+			},
+		},
 	}
-}
 </script>
 
 <style lang="scss" scoped>
-.bordered{
-	/*border-bottom: 2px solid gainsboro;*/
-}
+	.bordered {
+		/*border-bottom: 2px solid gainsboro;*/
+	}
 
-.destination {
-	.columns {
-		border-top: 1px dashed gainsboro;
-		&:first-child {
-			border-top: 0
+	.destination {
+		.columns {
+			border-top: 1px dashed gainsboro;
+
+			&:first-child {
+				border-top: 0
+			}
 		}
 	}
-}
 
-.custom-icon {
-	height: 50px;
-	padding: auto;
-}
+	.custom-icon {
+		height: 50px;
+		padding: auto;
+	}
 
-.centered {
-	display: flex;
-	/*align-items: center;*/
-	justify-content: center;
-	height: 100%;
-}
+	.centered {
+		display: flex;
+		/*align-items: center;*/
+		justify-content: center;
+		height: 100%;
+	}
 
-.transaction-headers{
-	background-color: gainsboro
-}
+	.transaction-headers {
+		background-color: gainsboro
+	}
 </style>
