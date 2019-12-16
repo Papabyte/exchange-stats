@@ -30,7 +30,6 @@
 		components: {
 			ContributorsRanking,
 			DonatorsRanking,
-			// SetNicknameModal,
 		},
 		data () {
 			return {}
@@ -47,7 +46,7 @@
 					component: SetNicknameModal,
 					hasModalCard: true
 				})
-			},
+			}
 		},
 	}
 </script>

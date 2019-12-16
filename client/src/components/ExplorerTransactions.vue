@@ -6,7 +6,7 @@
 		</div>
 		<!--		<edit-wallet-modal :propExchange="exchange || walletOwner" :propWalletId="walletIdToEdit" :isRemoving="isRemoving"/>-->
 
-		<div class="container">
+		<div class="container test">
 			<div v-if="!isSpinnerActive" class="box">
 
 				<div class="text-center" v-if="failoverText">
@@ -38,7 +38,7 @@
 							size="is-medium"
 							type="is-warning"
 							icon-left="plus"
-							@click="editWallet(null)">
+							@click="addWallet(walletIdToEdit)">
 						{{$t('explorerTransactionsButtonAddToExchange')}}
 					</b-button>
 				</div>
@@ -245,13 +245,13 @@
 			}
 		},
 		methods: {
-			editWallet (num) {
-				let walletIdToEdit = num
+			addWallet (walletIdToEdit) {
+				let propWalletId = walletIdToEdit
 				ModalProgrammatic.open({
 					parent: this,
 					component: EditWalletModal,
 					hasModalCard: true,
-					props: { walletIdToEdit, isRemoving: false },
+					props: {propWalletId, isRemoving: false },
 				})
 			},
 			onPageChanged (value) {

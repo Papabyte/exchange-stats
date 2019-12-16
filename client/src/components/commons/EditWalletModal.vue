@@ -1,5 +1,5 @@
 <template>
-	<div class="modal-card">
+	<div class="modal-card add-wallet">
 		<header class="modal-card-head">
 			<p class="modal-card-title">{{ this.getTitle }}</p>
 			<button class="delete" aria-label="close" @click="$parent.close()"></button>
@@ -7,15 +7,24 @@
 		<section class="modal-card-body">
 			<div class="container" v-if="!link">
 
-				<div v-if="!propExchange">
-					<label for="input-with-list">{{$t('editModalSelectExchange')}}</label>
-					<b-form-input
-							v-on:input="reset"
-							:state="validExchange"
-							list="input-list"
-							v-model="selectedExchange"
-							id="input-with-list"
-					></b-form-input>
+				<div class="row" v-if="!propExchange">
+					<b-field :label="$t('editModalSelectExchange')">
+						<b-autocomplete
+								v-model="key"
+								@input="option => selectedExchange = option"
+								:keep-first="false"
+								:open-on-focus="true"
+								:data="filteredDataObj"
+								field="key">
+							<template slot-scope="props">
+								<b>{{ props.option.value }}</b>
+								<br>
+								<small>
+									{{ props.option.key }}
+								</small>
+							</template>
+						</b-autocomplete>
+					</b-field>
 				</div>
 
 				<div class="row" v-if="!propWalletId && !isRemoving">
@@ -29,8 +38,18 @@
 				</div>
 
 				<div class="row" v-if="!propWalletId && isRemoving">
+					<div class="block" >
+						<b-radio type="is-danger"
+										 name="name"
+										 native-value="Silver">
+							{{ isRemoving }} / {{ !propWalletId }}
+						</b-radio>
+						<b-radio v-for="wallet_id in wallet_choices" :key="wallet_id" :native-value="wallet_id"  :name="wallet_id" type="is-danger" @change="onRadioSelected">
+							{{wallet_id}}
+						</b-radio>
+					</div>
 					<b-form-group label="Select wallet to be removed">
-						<b-form-radio v-for="wallet_id in wallet_choices" name="some-radios" :value="wallet_id" :key="wallet_id"
+												<b-form-radio v-for="wallet_id in wallet_choices" name="some-radios" :value="wallet_id" :key="wallet_id"
 													@change="onRadioSelected">{{wallet_id}}
 						</b-form-radio>
 					</b-form-group>
@@ -153,14 +172,13 @@
 				urls: [],
 				bAreUrlsValid: false,
 				inputCoolDownTimer: null,
+				key: '',
+				selected: null,
 			}
 		},
 		created () {
 			this.selectedExchange = this.propExchange
 			this.selectedWalletId = this.propWalletId
-		},
-		mounted () {
-			console.log('mounted', this)
 		},
 		methods: {
 			urls_updated (urls, bAreUrlsValid) {
@@ -177,10 +195,13 @@
 				this.isPoolAvailable = false
 				this.bestPoolId = false
 				this.rewardAmount = 0
-				if (!this.selectedWalletId && this.selectedExchange && this.isRemoving) {
-					this.axios.get('/api/exchange-wallets/' + this.selectedExchange).then((response) => {
-						this.wallet_choices = response.data
-					})
+				console.log('this')
+				if (!this.selectedWalletId && this.selectedExchange && this.isRemoving){
+					console.log('!@!', !this.selectedWalletId, this.selectedExchange, this.isRemoving)
+					this.axios.get('/api/exchange-wallets/'+this.selectedExchange).then((response) => {
+						this.wallet_choices = response.data;
+						console.log('@!@', this.wallet_choices)
+					});
 				}
 			},
 			onRadioSelected (arg) {
@@ -287,7 +308,14 @@
 			},
 		},
 		computed: {
-			getTitle () {
+			filteredDataObj () {
+				const data = this.assocExchanges
+				const options = Object.entries(data).map(([key, value]) => ({ key, value }))
+				return options.filter((option) => {
+					return option.key.toString().toLowerCase().indexOf(this.key.toLowerCase()) >= 0
+				})
+			},
+			getTitle: function () {
 				let title = ''
 				if (this.propExchange) {
 					if (this.selectedWalletId && this.selectedExchange) {
@@ -330,16 +358,13 @@
 				this.selectedWalletId = this.propWalletId
 				this.reset()
 			},
-			propWalletId: function () {
-				this.selectedExchange = this.propExchange
-				this.selectedWalletId = this.propWalletId
+			propWalletId:function(){
+				this.selectedExchange = this.propExchange;
+				this.selectedWalletId = this.propWalletId;
 
-				if (this.propExchange) {
-					console.log('!')
-					// we have an exchange and wallet id as prop, let's go to check directly
+				if (this.propExchange) // we have an exchange and wallet id as prop, let's go to check directly
 					this.check()
-				}
-				this.reset()
+				this.reset();
 			},
 			selectedWalletId: function () {
 				//this.check()
@@ -360,6 +385,8 @@
 	}
 </script>
 
-<style lang='scss' scoped>
-
+<style lang='scss'>
+	.add-wallet .dropdown-content {
+		max-height: 100px !important;
+	}
 </style>

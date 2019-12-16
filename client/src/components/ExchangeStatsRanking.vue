@@ -82,7 +82,7 @@
 									<b-dropdown-item aria-role="listitem"
 																	 v-if="props.row.total_btc_wallet || props.row.nb_withdrawal_addresses"
 																	 @click="removeWallet(props.row.exchange_id)">
-										{{$t('rankingTableButtonRemoveWallet')}}
+										{{$t('rankingTableButtonRemoveWallet')}} - {{ props.row.exchange_id }}
 									</b-dropdown-item>
 								</b-dropdown>
 							</b-button-group>

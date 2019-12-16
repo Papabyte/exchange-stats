@@ -1,11 +1,9 @@
 <template>
 	<div class="container box">
-		<DonateRewardModal/>
 		<b-button
 				class="is-pulled-right"
 				type="is-warning"
-				v-b-modal.donateReward
-				v-on:click="$bvModal.show('donateReward');">
+				@click="donateReward()">
 			{{$t('crowdSourcingPoolsButtonDonate')}}
 		</b-button>
 
@@ -48,11 +46,13 @@
 
 	import ByteAmount from './commons/ByteAmount.vue'
 	import DonateRewardModal from './commons/DonateRewardModal.vue'
+	import { ModalProgrammatic } from 'buefy'
+	import SetNicknameModal from './commons/SetNicknameModal'
 
 	export default {
 		components: {
 			ByteAmount,
-			DonateRewardModal,
+			// DonateRewardModal,
 		},
 		data () {
 			return {
@@ -81,6 +81,13 @@
 					this.isSpinnerActive = false
 				})
 			},
+			donateReward () {
+				ModalProgrammatic.open({
+					parent: this,
+					component: DonateRewardModal,
+					hasModalCard: true
+				})
+			}
 		},
 	}
 </script>

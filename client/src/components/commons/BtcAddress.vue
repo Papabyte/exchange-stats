@@ -7,14 +7,6 @@
 				<v-icon name='external-link' class="custom-icon"/>
 			</b-link>
 		</div>
-
-		<!--		<span >{{label}}</span>-->
-		<!--		<div class="row">-->
-		<!--			<span>{{tx_id}}</span>-->
-		<!--			<b-link target="_blank" :href="'https://blockstream.info/address/'+address" class="ml-1">-->
-		<!--				<v-icon name='external-link' class="link-icon"/>-->
-		<!--			</b-link>-->
-		<!--		</div>-->
 	</div>
 </template>
 
