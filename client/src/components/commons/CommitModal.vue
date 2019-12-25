@@ -1,24 +1,29 @@
 <template>
-	<b-modal id="commitOperation" :title="getTitle"  :hide-footer="true" >
-		<b-container fluid >
-			<b-row class="pt-3">
+	<div class="modal-card add-wallet">
+		<header class="modal-card-head">
+			<p class="modal-card-title">{{ this.getTitle }}</p>
+			<button class="delete" aria-label="close" @click="$parent.close()"></button>
+		</header>
+		<section class="modal-card-body">
+			<div class="container">
 				{{$t("commitModalLinkHeader")}}
-			</b-row >
-		<b-row class="pt-3">
-			<span class="text-break">
+			</div>
+			<div class="container">
 				<a :href="link">{{link}}</a>
-			</span>
-			</b-row >
-			<b-row class="py-3">
+			</div>
+			<div class="container">
 				{{$t("commitModalLinkFooter")}}
-			</b-row >
-		</b-container>
-	</b-modal>
+			</div>
+		</section>
+		<footer class="modal-card-foot f-end">
+			<button class="button" type="button" @click="$parent.close()">Close</button>
+		</footer>
+	</div>
 </template>
 
 <script>
 const conf = require("../../conf.js");
-export default {	
+export default {
 	props: {
 		operationItem: {
 			type: Object,
@@ -44,6 +49,9 @@ export default {
 			this.operation_item = this.operationItem;
 			this.createLink();
 		}
+	},
+	created () {
+		this.createLink();
 	},
 	methods:{
 		createLink(address){

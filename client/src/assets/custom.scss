@@ -58,7 +58,9 @@ body {
 .mt-1 {
 	margin-top: 1rem;
 }
-
+.mt-2 {
+	margin-top: 2rem !important;
+}
 .ml-1 {
 	margin-left: 1rem !important;
 }
@@ -120,4 +122,26 @@ body {
 }
 .ai-center {
 	align-items: center;
+}
+
+.d-grid {
+	display: grid;
+}
+.d-grid-2-row {
+	grid-template-rows: 1fr 1fr;
+}
+.d-grid-3-row {
+	grid-template-rows: 1fr 1fr 1fr;
+}
+.d-grid-4-row {
+	grid-template-rows: 1fr 1fr 1fr 1fr;
+}
+.d-grid-2-col {
+	grid-template-columns: 1fr 1fr;
+}
+.d-grid-3-col {
+	grid-template-columns: 1fr 1fr 1fr;
+}
+.d-grid-4-col {
+	grid-template-columns: 1fr 1fr 1fr 1fr;
 }

@@ -7,7 +7,7 @@
 		<section class="modal-card-body">
 			<div class="container" v-if="!link">
 
-				<div class="row" v-if="!propExchange">
+				<div class="row" v-if="!propExchange && !isRemoving">
 					<b-field :label="$t('editModalSelectExchange')">
 						<b-autocomplete
 								v-model="key"
@@ -38,21 +38,16 @@
 				</div>
 
 				<div class="row" v-if="!propWalletId && isRemoving">
-					<div class="block" >
-						<b-radio type="is-danger"
-										 name="name"
-										 native-value="Silver">
-							{{ isRemoving }} / {{ !propWalletId }}
-						</b-radio>
-						<b-radio v-for="wallet_id in wallet_choices" :key="wallet_id" :native-value="wallet_id"  :name="wallet_id" type="is-danger" @change="onRadioSelected">
-							{{wallet_id}}
-						</b-radio>
+					<strong class="d-flex mb-05">Select wallet to be removed</strong>
+					<div class="d-grid d-grid-4-col is-marginless">
+						<b-loading :is-full-page="false" :active.sync="isSpinnerActive" :can-cancel="true"></b-loading>
+						<div class="field" v-for="wallet_id in wallet_choices" :key="wallet_id">
+							<b-radio :native-value="wallet_id" name="some-radios" type="is-danger" @input="onRadioSelected">
+								{{wallet_id}}
+							</b-radio>
+						</div>
 					</div>
-					<b-form-group label="Select wallet to be removed">
-												<b-form-radio v-for="wallet_id in wallet_choices" name="some-radios" :value="wallet_id" :key="wallet_id"
-													@change="onRadioSelected">{{wallet_id}}
-						</b-form-radio>
-					</b-form-group>
+
 				</div>
 
 				<div class="row">
@@ -173,12 +168,15 @@
 				bAreUrlsValid: false,
 				inputCoolDownTimer: null,
 				key: '',
-				selected: null,
 			}
 		},
 		created () {
-			this.selectedExchange = this.propExchange
-			this.selectedWalletId = this.propWalletId
+			if (this.propExchange) {
+				this.selectedExchange = this.propExchange
+			}
+			if (this.propWalletId) {
+				this.selectedWalletId = this.propWalletId
+			}
 		},
 		methods: {
 			urls_updated (urls, bAreUrlsValid) {
@@ -195,13 +193,10 @@
 				this.isPoolAvailable = false
 				this.bestPoolId = false
 				this.rewardAmount = 0
-				console.log('this')
-				if (!this.selectedWalletId && this.selectedExchange && this.isRemoving){
-					console.log('!@!', !this.selectedWalletId, this.selectedExchange, this.isRemoving)
-					this.axios.get('/api/exchange-wallets/'+this.selectedExchange).then((response) => {
-						this.wallet_choices = response.data;
-						console.log('@!@', this.wallet_choices)
-					});
+				if (!this.selectedWalletId && this.selectedExchange && this.isRemoving) {
+					this.axios.get('/api/exchange-wallets/' + this.selectedExchange).then((response) => {
+						this.wallet_choices = response.data
+					})
 				}
 			},
 			onRadioSelected (arg) {
@@ -267,6 +262,7 @@
 			},
 			getBestPool () {
 				this.axios.get('/api/pool/' + this.selectedExchange).then((response) => {
+					this.isSpinnerActive = true
 					if (response.data.pool_id) {
 						this.bestPoolId = response.data.pool_id
 						this.rewardAmount = Number(response.data.reward_amount)
@@ -358,16 +354,16 @@
 				this.selectedWalletId = this.propWalletId
 				this.reset()
 			},
-			propWalletId:function(){
-				this.selectedExchange = this.propExchange;
-				this.selectedWalletId = this.propWalletId;
+			propWalletId: function () {
+				this.selectedExchange = this.propExchange
+				this.selectedWalletId = this.propWalletId
 
 				if (this.propExchange) // we have an exchange and wallet id as prop, let's go to check directly
 					this.check()
-				this.reset();
+				this.reset()
 			},
 			selectedWalletId: function () {
-				//this.check()
+				this.check()
 			},
 			isRemoving: function () {
 				if (this.propWalletId && this.assocExchanges[this.selectedExchange])// we have a wallet id as prop and exchange input is valid, let's go to check
@@ -388,5 +384,11 @@
 <style lang='scss'>
 	.add-wallet .dropdown-content {
 		max-height: 100px !important;
+	}
+
+	.d-grid {
+		.radio {
+			margin-left: 0 !important;
+		}
 	}
 </style>

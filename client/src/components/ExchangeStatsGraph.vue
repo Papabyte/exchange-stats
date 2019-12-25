@@ -67,9 +67,9 @@ export default {
 			const data = response.data.history;
 			this.exchangeWallets = response.data.info.wallets.split('@');
 			this.creation_date = response.data.info.creation_date;
-			this.chartOptions.zoomType = 'x';	
+			this.chartOptions.zoomType = 'x';
 
-			
+
 			this.chartOptions.xAxis = {
 				type: 'datetime',
 				dateTimeLabelFormats: {
@@ -109,7 +109,6 @@ export default {
 				name: "Daily withdrawn"
 			});
 		});
-		console.log(this.$t('rankingGraphPageTitle', {exchange: this.assocExchanges[this.exchange], website_name: conf.website_name}));
 		document.title = this.$t('rankingGraphPageTitle', {exchange: this.assocExchanges[this.exchange], website_name: conf.website_name});
 		document.getElementsByName('description')[0].setAttribute('content',this.$t("rankingGraphDescription",{exchange: this.assocExchanges[this.exchange]}));
 	}

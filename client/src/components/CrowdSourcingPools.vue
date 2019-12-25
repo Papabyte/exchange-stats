@@ -51,8 +51,7 @@
 
 	export default {
 		components: {
-			ByteAmount,
-			// DonateRewardModal,
+			ByteAmount
 		},
 		data () {
 			return {

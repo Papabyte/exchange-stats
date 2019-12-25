@@ -3,9 +3,6 @@
 	<div class="container">
 		<contest-operation-modal :operationItem="clicked_item"/>
 		<claim-gain-modal :operationItem="clicked_item"/>
-		<view-url-proofs-modal :operationItem="clicked_item"/>
-		<commit-operation-modal :operationItem="clicked_item"/>
-		<operation-history-modal :operationItem="clicked_item"/>
 
 		<div class="notification is-warning">
 			<contributors-greeting/>
@@ -85,7 +82,7 @@
 									<b-button
 											class="button is-info is-outlined"
 											v-if="props.row.status == 'onreview' && props.row.is_commitable"
-											v-on:click="clicked_item=props.row;$bvModal.show('commitOperation');">
+											@click="commitOperation(props.row)">
 										{{$t('crowdSourcingOperationsButtonCommit')}}
 									</b-button>
 								</b-tooltip>
@@ -95,7 +92,7 @@
 											class="button is-info is-outlined"
 											v-if="props.row.status == 'committed' && props.row.claimAddresses.length>0"
 											v-on:click="clicked_item=props.row;$bvModal.show('claimGain');">
-										{{$t('crowdSourcingOperationsButtonClaim')}}
+										123 {{$t('crowdSourcingOperationsButtonClaim')}}
 									</b-button>
 								</b-tooltip>
 								<b-dropdown aria-role="list">
@@ -105,12 +102,12 @@
 									</button>
 
 									<b-dropdown-item
-											v-on:click="clicked_item=props.row;$bvModal.show('viewUrlProofs');"
-											aria-role="listitem">
+											aria-role="listitem"
+											@click="viewUrlProofs(props.row)">
 										{{$t('crowdSourcingOperationsButtonViewProofs')}}
 									</b-dropdown-item>
 									<b-dropdown-item
-											v-on:click="clicked_item=props.row;$bvModal.show('operationHistory');"
+											@click="operationHistory(props.row)"
 											aria-role="listitem">
 										{{$t('crowdSourcingOperationsButtonHistory')}}
 									</b-dropdown-item>
@@ -134,6 +131,8 @@
 	import OperationHistoryModal from './commons/OperationHistoryModal.vue'
 	import ContributorsGreeting from './commons/ContributorsGreeting.vue'
 
+	import { ModalProgrammatic } from 'buefy'
+
 	import Exchange from './commons/Exchange.vue'
 	import WalletId from './commons/WalletId.vue'
 	import moment from 'moment/src/moment'
@@ -143,11 +142,8 @@
 			ByteAmount,
 			ContestOperationModal,
 			ClaimGainModal,
-			ViewUrlProofsModal,
 			Exchange,
 			WalletId,
-			CommitOperationModal,
-			OperationHistoryModal,
 			ContributorsGreeting,
 		},
 		data () {
@@ -172,6 +168,33 @@
 			clearInterval(this.timerId)
 		},
 		methods: {
+			commitOperation (clicked_item) {
+				let operationItem = clicked_item
+				ModalProgrammatic.open({
+					parent: this,
+					component: CommitOperationModal,
+					hasModalCard: true,
+					props: {operationItem},
+				})
+			},
+			viewUrlProofs (clicked_item) {
+				let operationItem = clicked_item
+				ModalProgrammatic.open({
+					parent: this,
+					component: ViewUrlProofsModal,
+					hasModalCard: true,
+					props: {operationItem},
+				})
+			},
+			operationHistory (clicked_item) {
+				let operationItem = clicked_item
+				ModalProgrammatic.open({
+					parent: this,
+					component: OperationHistoryModal,
+					hasModalCard: true,
+					props: {operationItem},
+				})
+			},
 			getData () {
 				this.axios.get('/api/operations').then((response) => {
 					this.operations = []
