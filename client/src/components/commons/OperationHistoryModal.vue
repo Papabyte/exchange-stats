@@ -107,7 +107,7 @@ export default {
 			this.getHistory();
 		}
 	},
-	methods:{
+	methods: {
 		getHistory(){
 			if (this.operationItem.key){
 				this.isSpinnerActive = true;

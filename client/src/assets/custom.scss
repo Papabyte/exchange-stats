@@ -3,11 +3,11 @@
 @import "~bulma/sass/utilities/_all";
 
 $theme-colors: (
-	"primary": hsl(204, 71%, 53%),
-	"bar-yes": #2c8f31,
-	"bar-no" : #c21a23,
-	"welcome-message" : #a07373,
-	"main-block" : white
+		"primary": hsl(204, 71%, 53%),
+		"bar-yes": #2c8f31,
+		"bar-no" : #c21a23,
+		"welcome-message" : #a07373,
+		"main-block" : white
 );
 
 $background: $white-ter;
@@ -46,24 +46,31 @@ body {
 .mr-05 {
 	margin-right: 0.5rem !important;
 }
+
 .mb-05 {
 	margin-bottom: 0.5rem !important;
 }
+
 .mb-1 {
 	margin-bottom: 2rem !important;
 }
+
 .mb-2 {
 	margin-bottom: 2rem !important;
 }
+
 .mt-1 {
 	margin-top: 1rem;
 }
+
 .mt-2 {
 	margin-top: 2rem !important;
 }
+
 .ml-1 {
 	margin-left: 1rem !important;
 }
+
 .ml-05 {
 	margin-left: 0.5rem !important;
 }
@@ -84,6 +91,7 @@ body {
 	width: 100%;
 	display: block;
 	margin-bottom: 1rem;
+
 	&:last-child {
 		margin-bottom: 0;
 	}
@@ -95,15 +103,18 @@ body {
 
 .is-unknown {
 	cursor: default;
+
 	&:focus,
 	&:active {
 		background-color: #ffdd57;
 		box-shadow: none;
 	}
 }
+
 .f-end {
 	justify-content: flex-end;
 }
+
 .f-around {
 	justify-content: space-around;
 }
@@ -111,15 +122,19 @@ body {
 .f-between {
 	justify-content: space-between;
 }
+
 .fw-w {
 	flex-wrap: wrap;
 }
+
 .d-flex {
 	display: flex !important;
 }
+
 .d-inline-block {
 	display: inline-block !important;
 }
+
 .ai-center {
 	align-items: center;
 }
@@ -127,21 +142,27 @@ body {
 .d-grid {
 	display: grid;
 }
+
 .d-grid-2-row {
 	grid-template-rows: 1fr 1fr;
 }
+
 .d-grid-3-row {
 	grid-template-rows: 1fr 1fr 1fr;
 }
+
 .d-grid-4-row {
 	grid-template-rows: 1fr 1fr 1fr 1fr;
 }
+
 .d-grid-2-col {
 	grid-template-columns: 1fr 1fr;
 }
+
 .d-grid-3-col {
 	grid-template-columns: 1fr 1fr 1fr;
 }
+
 .d-grid-4-col {
 	grid-template-columns: 1fr 1fr 1fr 1fr;
 }

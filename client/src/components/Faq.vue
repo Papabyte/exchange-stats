@@ -39,43 +39,43 @@
 <script>
 	import NavBar from './commons/NavBar.vue'
 
-	const conf = require("../conf.js");
+	const conf = require('../conf.js')
 
 	export default {
 		components: {
-			NavBar
+			NavBar,
 		},
-		data() {
+		data () {
 			return {
 				conf: conf,
 				isOpen: 0,
 				collapses: [
 					{
 						title: this.$t('faqQuestion1'),
-						text: this.$t('faqAnswer1')
+						text: this.$t('faqAnswer1'),
 					}, {
 						title: this.$t('faqQuestion2'),
-						text: this.$t('faqAnswer2')
+						text: this.$t('faqAnswer2'),
 					}, {
 						title: this.$t('faqQuestion3'),
-						text: this.$t('faqAnswer3')
+						text: this.$t('faqAnswer3'),
 					}, {
 						title: this.$t('faqQuestion4'),
-						text: this.$t('faqAnswer4')
+						text: this.$t('faqAnswer4'),
 					}, {
 						title: this.$t('faqQuestion5'),
-						text: this.$t('faqAnswer5')
+						text: this.$t('faqAnswer5'),
 					}, {
 						title: this.$t('faqQuestion6'),
-						text: this.$t('faqAnswer6')
-					}
-				]
+						text: this.$t('faqAnswer6'),
+					},
+				],
 			}
 		},
-		created() {
-			document.title = this.$t("faqPageTitle", {website_name: conf.website_name});
-			document.getElementsByName('description')[0].setAttribute('content', this.$t("faqMetaDescription"));
-		}
+		created () {
+			document.title = this.$t('faqPageTitle', { website_name: conf.website_name })
+			document.getElementsByName('description')[0].setAttribute('content', this.$t('faqMetaDescription'))
+		},
 	}
 </script>
 

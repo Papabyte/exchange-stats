@@ -51,7 +51,7 @@
 
 	export default {
 		components: {
-			ByteAmount
+			ByteAmount,
 		},
 		data () {
 			return {
@@ -84,9 +84,9 @@
 				ModalProgrammatic.open({
 					parent: this,
 					component: DonateRewardModal,
-					hasModalCard: true
+					hasModalCard: true,
 				})
-			}
+			},
 		},
 	}
 </script>

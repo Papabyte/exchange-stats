@@ -11,7 +11,6 @@
 					<b-field :label="$t('donateModalSelectExchange')">
 						<b-autocomplete
 								v-model="exchange"
-								@input="option => exchanges = option"
 								:keep-first="false"
 								:open-on-focus="true"
 								:data="objOfItems"
@@ -26,10 +25,6 @@
 							</template>
 						</b-autocomplete>
 					</b-field>
-
-					<!--					<label for="input-with-list">{{$t("donateModalSelectExchange")}}</label>-->
-					<!--					<b-form-input id="input-with-list" list="input-list"  :state="validExchange" :disabled="isForAny" v-model="exchange"></b-form-input>-->
-					<!--					<b-form-datalist id="input-list" :options="objExchanges"  ></b-form-datalist>-->
 				</div>
 				<div class="row">
 					<div class="field">
@@ -115,7 +110,7 @@
 				link: false,
 				gb_to_bytes: conf.gb_to_bytes,
 				objOfItems: [],
-				id: ''
+				id: '',
 			}
 		},
 		computed: {
@@ -123,20 +118,20 @@
 				if (this.isForAny)
 					return null
 				return !!this.objExchanges[this.exchange]
-			}
+			},
 		},
 		mounted () {
 			this.axios.get('/api/exchanges').then((response) => {
-				response.data.forEach((row)=>{
-					this.objExchanges[row.id] = row.name;
-				});
-				this.objOfItems = Object.entries(this.objExchanges).map(([id, name]) => ({id, name}))
+				response.data.forEach((row) => {
+					this.objExchanges[row.id] = row.name
+				})
+				this.objOfItems = Object.entries(this.objExchanges).map(([id, name]) => ({ id, name }))
 				return this.objOfItems.filter((option) => {
 					return option.id.toString().toLowerCase().indexOf(this.exchange.toLowerCase()) >= 0
 				})
 			}).catch(function (error) {
-				console.log(error);
-			});
+				console.log(error)
+			})
 		},
 		methods: {
 			handleOk (bvModalEvt) {
@@ -163,6 +158,7 @@
 			line-height: 37px;
 		}
 	}
+
 	.field {
 		&.has-addons {
 			display: block;

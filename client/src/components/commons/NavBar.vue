@@ -9,11 +9,10 @@
 				</template>
 
 				<template slot="end">
-					<b-navbar-item tag="router-link" :to="{ path: '/' }">{{$t("navbarRanking")}}</b-navbar-item>
-					<b-navbar-item tag="router-link" :to="{ path: '/explorer' }">{{$t("navbarExplorer")}}</b-navbar-item>
-					<b-navbar-item tag="router-link" :to="{ path: '/crowdsourcing' }">{{$t("navbarCrowdsourcing")}}
-					</b-navbar-item>
-					<b-navbar-item tag="router-link" :to="{ path: '/faq' }">{{$t("navbarFaq")}}</b-navbar-item>
+					<b-navbar-item tag="router-link" :to="{ path: '/' }">{{$t('navbarRanking')}}</b-navbar-item>
+					<b-navbar-item tag="router-link" :to="{ path: '/explorer' }">{{$t('navbarExplorer')}}</b-navbar-item>
+					<b-navbar-item tag="router-link" :to="{ path: '/crowdsourcing' }">{{$t('navbarCrowdsourcing')}}</b-navbar-item>
+					<b-navbar-item tag="router-link" :to="{ path: '/faq' }">{{$t('navbarFaq')}}</b-navbar-item>
 				</template>
 			</b-navbar>
 		</div>
@@ -22,21 +21,21 @@
 </template>
 
 <script>
-	const conf = require("../../conf.js");
+	const conf = require('../../conf.js')
 
 	export default {
 		name: 'NavBar',
 		props: {
 			selected_item: {
 				type: String,
-				default: '0'
+				default: '0',
+			},
+		},
+		data () {
+			return {
+				conf: conf,
 			}
 		},
-		data() {
-			return {
-				conf: conf
-			}
-		}
 	}
 </script>
 

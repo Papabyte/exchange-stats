@@ -54,7 +54,8 @@
 							<b-tag type="is-info">{{ props.row.outcome_yes_or_no }}</b-tag>
 						</b-table-column>
 
-						<b-table-column field="staked_on_outcome" :label="$t('crowdSourcingOperationsTableColStakedOnOutcome')" sortable>
+						<b-table-column field="staked_on_outcome" :label="$t('crowdSourcingOperationsTableColStakedOnOutcome')"
+														sortable>
 							<byte-amount :amount="props.row.staked_on_outcome"/>
 						</b-table-column>
 
@@ -174,7 +175,7 @@
 					parent: this,
 					component: CommitOperationModal,
 					hasModalCard: true,
-					props: {operationItem},
+					props: { operationItem },
 				})
 			},
 			viewUrlProofs (clicked_item) {
@@ -183,7 +184,7 @@
 					parent: this,
 					component: ViewUrlProofsModal,
 					hasModalCard: true,
-					props: {operationItem},
+					props: { operationItem },
 				})
 			},
 			operationHistory (clicked_item) {
@@ -192,7 +193,7 @@
 					parent: this,
 					component: OperationHistoryModal,
 					hasModalCard: true,
-					props: {operationItem},
+					props: { operationItem },
 				})
 			},
 			getData () {
@@ -251,15 +252,18 @@
 	#action {
 		display: flex;
 		align-items: center;
+
 		& > span {
 			margin: 0 5px;
 		}
 	}
+
 	.btn-group {
 		button {
 			margin-right: 5px;
 		}
 	}
+
 	.table-wrapper {
 		td {
 			vertical-align: middle;

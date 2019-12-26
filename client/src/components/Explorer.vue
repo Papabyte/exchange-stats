@@ -30,8 +30,9 @@
 					<div class="container" v-if="arrExchanges">
 						<h6 class="title is-6 mb-2">{{$t('explorerOrBrowseExchanges')}}</h6>
 
-						<span class="exchange-wrapper" >
-							<exchange v-for="(exchange,index) in arrExchanges" v-bind:key="index" :showIcon="false" :id="exchange.id"/>
+						<span class="exchange-wrapper">
+							<exchange v-for="(exchange,index) in arrExchanges" v-bind:key="index" :showIcon="false"
+												:id="exchange.id"/>
 						</span>
 					</div>
 				</div>
@@ -117,6 +118,7 @@
 		flex-wrap: wrap;
 		justify-content: flex-start;
 		margin: -0.75rem;
+
 		& > span {
 			margin: 0.75rem;
 		}

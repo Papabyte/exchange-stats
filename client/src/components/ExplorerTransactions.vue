@@ -203,8 +203,11 @@
 						website_name: conf.website_name,
 					}),
 					meta: [
-						{ name: 'description', content: this.$t('explorerTransactionsMetaDescriptionExchange', { exchange: this.exchangeName })}
-					]
+						{
+							name: 'description',
+							content: this.$t('explorerTransactionsMetaDescriptionExchange', { exchange: this.exchangeName }),
+						},
+					],
 				}
 			} else if (this.tx_id) {
 				return {
@@ -213,8 +216,8 @@
 						website_name: conf.website_name,
 					}),
 					meta: [
-						{ name: 'description', content: this.$t('explorerTransactionsMetaDescriptionTxId', { tx_id: this.tx_id })}
-					]
+						{ name: 'description', content: this.$t('explorerTransactionsMetaDescriptionTxId', { tx_id: this.tx_id }) },
+					],
 				}
 			} else if (this.wallet_id) {
 				return {
@@ -223,8 +226,11 @@
 						website_name: conf.website_name,
 					}),
 					meta: [
-						{ name: 'description', content: this.$t('explorerTransactionsMetaDescriptionWalletId', { wallet_id: this.wallet_id })}
-					]
+						{
+							name: 'description',
+							content: this.$t('explorerTransactionsMetaDescriptionWalletId', { wallet_id: this.wallet_id }),
+						},
+					],
 				}
 			} else if (this.wallet_id && this.walletOwner) {
 				return {
@@ -233,11 +239,13 @@
 						website_name: conf.website_name,
 					}),
 					meta: [
-						{ name: 'description', content: this.$t('explorerTransactionsMetaDescriptionWalletIdWithOwner', {
+						{
+							name: 'description', content: this.$t('explorerTransactionsMetaDescriptionWalletIdWithOwner', {
 								wallet_id: this.wallet_id,
 								exchange: this.walletOwner,
-							})}
-					]
+							}),
+						},
+					],
 				}
 			}
 		},
@@ -248,7 +256,7 @@
 					parent: this,
 					component: EditWalletModal,
 					hasModalCard: true,
-					props: {propWalletId, isRemoving: false },
+					props: { propWalletId, isRemoving: false },
 				})
 			},
 			addWalletTwo (clicked_exchange) {
@@ -275,7 +283,7 @@
 					parent: this,
 					component: EditWalletModal,
 					hasModalCard: true,
-					props: {propWalletId, isRemoving: true },
+					props: { propWalletId, isRemoving: true },
 				})
 			},
 			editWallet (wallet_id) {
@@ -284,7 +292,7 @@
 					parent: this,
 					component: EditWalletModal,
 					hasModalCard: true,
-					props: {walletIdToEdit, isRemoving: true },
+					props: { walletIdToEdit, isRemoving: true },
 				})
 			},
 			onPageChanged (value) {

@@ -30,9 +30,11 @@
 		display: flex;
 		align-items: center;
 	}
+
 	.b-link {
 		display: inline-block;
 	}
+
 	.link-icon {
 		height: 20px;
 	}

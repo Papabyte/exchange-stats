@@ -7,16 +7,16 @@
 		<section class="modal-card-body">
 			<div class="container" v-if="proofsByOutcome.in && proofsByOutcome.in.length>0">
 				<div class="row">
-					{{$t("urlProofModalProofForAdding")}}
-				</div >
+					{{$t('urlProofModalProofForAdding')}}
+				</div>
 				<div class="row" v-for="(url,index) in proofsByOutcome.in" :key="index">
 					<b-link :href="url" target="_blank">{{url}}</b-link>
 				</div>
 			</div>
 			<div class="container" v-if="proofsByOutcome.out && proofsByOutcome.out.length>0">
 				<div class="row">
-					{{$t("urlProofModalProofForRemoving")}}
-				</div >
+					{{$t('urlProofModalProofForRemoving')}}
+				</div>
 				<div class="row" v-for="(url,index) in proofsByOutcome.out" :key="index">
 					<b-link :href="url" target="_blank">{{url}}</b-link>
 				</div>
@@ -26,43 +26,42 @@
 			<button class="button" type="button" @click="$parent.close()">Close</button>
 		</footer>
 	</div>
-	</template>
+</template>
 
 <script>
-const conf = require("../../conf.js");
+	const conf = require('../../conf.js')
 
-export default {
-	components: {
-	},
-	props: {
-		operationItem: {
-			type: Object,
-			required: false,
-			default:  function () {
-				return {}
+	export default {
+		components: {},
+		props: {
+			operationItem: {
+				type: Object,
+				required: false,
+				default: function () {
+					return {}
+				},
+			},
+		},
+		data () {
+			return {
+				proofsByOutcome: {},
 			}
-		}
-	},
-	data(){
-		return {
-			proofsByOutcome: {}
-		}
-	},
-	created () {
-		this.getLink()
-	},
-	watch:{
-		operationItem: function(){
-			this.proofsByOutcome = {};
-			this.getLink();
-		}
-	},
-	methods:{
-		getLink() {
-			this.proofsByOutcome = this.operationItem.url_proofs_by_outcome || {};
-		}
+		},
+		created () {
+			this.getLink()
+		},
+		watch: {
+			operationItem: function () {
+				this.proofsByOutcome = {}
+				this.getLink()
+			},
+		},
+		methods: {
+			getLink () {
+				this.proofsByOutcome = this.operationItem.url_proofs_by_outcome || {}
+			},
+		},
 	}
-}
 </script>
 
 <style lang='scss' scoped>

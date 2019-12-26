@@ -22,53 +22,54 @@
 
 <script>
 
-export default {
-	props: {
-		label: {
-			type: String,
-			required: false,
-			default: null
+	export default {
+		props: {
+			label: {
+				type: String,
+				required: false,
+				default: null,
+			},
+			id: {
+				type: String,
+				required: true,
+			},
+			noUrl: {
+				type: Boolean,
+				required: false,
+				default: false,
+			},
+			showIcon: {
+				type: Boolean,
+				required: false,
+				default: true,
+			},
 		},
-		id: {
-			type: String,
-			required: true
-		},
-		noUrl: {
-			type: Boolean,
-			required: false,
-			default: false
-		},
-		showIcon: {
-			type: Boolean,
-			required: false,
-			default: true
-		}
-	},
-	computed:{
+		computed: {
 
-		exchangeName: function(){
-			return this.$store.state.exchangesById[this.id] ? this.$store.state.exchangesById[this.id] : this.id;
+			exchangeName: function () {
+				return this.$store.state.exchangesById[this.id] ? this.$store.state.exchangesById[this.id] : this.id
 
-		}
+			},
+		},
 	}
-}
 </script>
 
 <style lang='scss'>
-.exchange-link a{
-	color: darkorange;
-	font-weight: 600;
-}
-.wallet-link {
-	a > span {
-		display: flex;
-		align-items: center;
+	.exchange-link a {
+		color: darkorange;
+		font-weight: 600;
 	}
-}
 
-.exchange-icon{
-	height: 20px !important;
-	margin-right: 5px !important;
-}
+	.wallet-link {
+		a > span {
+			display: flex;
+			align-items: center;
+		}
+	}
+
+	.exchange-icon {
+		height: 20px !important;
+		margin-right: 5px !important;
+	}
 
 </style>
