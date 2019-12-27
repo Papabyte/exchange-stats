@@ -1,11 +1,13 @@
 <template>
 	<div class="row">
-		<b-input
-				:placeholder="index == 0 ? (isRequired ? $t('urlInputsFirstHolder') : $t('urlInputsFirstHolderOptional')) : $t('urlInputsNextHolder')"
-				:state="isUrlValid"
-				:formatter="format"
-				v-model="url"
-		/>
+		<b-field
+			:type="type">
+			<b-input
+					:placeholder="index == 0 ? (isRequired ? $t('urlInputsFirstHolder') : $t('urlInputsFirstHolderOptional')) : $t('urlInputsNextHolder')"
+					:formatter="format"
+					v-model="url"
+			/>
+		</b-field>
 		<span v-if="text_error" class="pt-3">{{text_error}}</span>
 	</div>
 </template>
@@ -35,6 +37,17 @@
 				isUrlValid: null,
 			}
 		},
+		
+		computed:{
+			type:function(){
+				if (this.isUrlValid == null) 
+					return ''
+				else if (this.isUrlValid)
+					return 'is-success'
+				else
+					return 'is-danger'
+			}
+		},
 		watch: {
 			url: function () {
 				if (this.url.length >= maxLength) {
@@ -44,10 +57,7 @@
 				}
 				this.isUrlValid = this.isRequired ? isUrl(this.url) : (this.url ? isUrl(this.url) : (isUrl(this.url) || null))
 				this.$emit('url_updated', this.isUrlValid ? this.url : this.isUrlValid, this.index)
-			},
-			required: function () {
-
-			},
+			}
 		},
 		created () {
 			this.isUrlValid = this.isRequired ? false : null
