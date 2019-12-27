@@ -1,90 +1,78 @@
 <template>
-		<b-row>
-			<b-col cols="12">
-				<b-row>
-					<b-col  cols="3">
-						<b-pagination
-							v-model="currentPage"
-							:total-rows="totalRows"
-							per-page="10"
-							align="fill"
-							size="l"
-							class="p-4 my-0"
-							></b-pagination> 
-						</b-col>
-				</b-row>	
-			<b-row>
-					<b-col  cols="12">
-							<b-table 
-							:current-page="currentPage"
-							per-page="10"
-							:items="items"
-							:fields="fields"
-							:sort-by.sync="sortBy"
-							:sort-desc.sync="sortDesc"
-							responsive
-								sort-icon-left
-						>	
-							<template v-slot:cell(amount)="data">
-								<byte-amount :isNegative="data.item.amount<0" :isPositive="data.item.amount>0" :amount="data.item.amount"/>
-							</template>
-							<template v-slot:cell(address)="data">
-								<user :address="data.item.address" :nickname="data.item.nickname"/>
-							</template>
-						</b-table>
-					</b-col>
-				</b-row>
-			</b-col>
-		</b-row>	
+	<div class="container">
+		<b-table
+				:sort-by.sync="sortBy"
+				:sort-desc.sync="defaultSortDirection"
+				:data="items"
+				ref="table"
+				hoverable
+				paginated
+				per-page="10"
+				:current-page.sync="currentPage"
+				pagination-position="bottom"
+				:default-sort-direction="defaultSortDirection"
+				sort-icon="arrow-up"
+				sort-icon-size="is-small"
+				:default-sort="sortBy"
+				aria-next-label="Next page"
+				aria-previous-label="Previous page"
+				aria-page-label="Page"
+				aria-current-label="Current page"
+		>
+			<template slot-scope="props">
+				<b-table-column field="address" :label="$t('crowdSourcingDonatorsTableColAddress')" sortable>
+					<user :address="props.row.address" :nickname="props.row.nickname"/>
+				</b-table-column>
+				<b-table-column field="amount" :label="$t('crowdSourcingDonatorsTableColAmount')" sortable>
+					<byte-amount :isNegative="props.row.amount<0" :isPositive="props.row.amount>0" :amount="props.row.amount"/>
+				</b-table-column>
+			</template>
+		</b-table>
+	</div>
 </template>
 
 <script>
 
-	const conf = require("../conf.js");
-	import ByteAmount from './commons/ByteAmount.vue';
-	import User from './commons/User.vue';
+	const conf = require('../conf.js')
+	import ByteAmount from './commons/ByteAmount.vue'
+	import User from './commons/User.vue'
 
 	export default {
 		components: {
 			ByteAmount,
-			User
+			User,
 		},
-		data() {
+		data () {
 			return {
-				isTestnet : conf.testnet,
+				isTestnet: conf.testnet,
 				isSpinnerActive: true,
-				currentPage:1,
-				totalRows:0,
-				sortBy: 'initiatives',
-				sortDesc: true,
-				fields: [
-					{ key: 'address', label: this.$t("crowdSourcingDonatorsTableColAddress"), sortable: true},
-					{ key: 'amount', label: this.$t("crowdSourcingDonatorsTableColAmount"), sortable: true},
-				],
-				items: [
-				]
+				currentPage: 1,
+				totalRows: 0,
+				sortBy: 'amount',
+				defaultSortDirection: 'desc',
+				items: [],
 			}
 		},
-		created(){
-			this.getData();
-			this.timerId = setInterval(this.getData, 60000);
+		created () {
+			this.getData()
+			this.timerId = setInterval(this.getData, 60000)
 		},
-		beforeDestroy(){
-			clearInterval(this.timerId);
+		beforeDestroy () {
+			clearInterval(this.timerId)
 		},
-		methods:{
-			getData(){
+		methods: {
+			getData () {
 				this.axios.get('/api/donators-ranking/').then((response) => {
-					this.items = response.data;
-					this.totalRows = this.items.length;
-					this.isSpinnerActive= false
-				});
-			}
-		}
+					this.items = response.data
+					this.totalRows = this.items.length
+					this.isSpinnerActive = false
+				})
+			},
+		},
 	}
 </script>
 
-<style >
+<style>
 
 
 </style>

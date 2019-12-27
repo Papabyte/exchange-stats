@@ -1,153 +1,222 @@
 <template>
-	<b-container fluid>
-		<b-row >
-		<edit-wallet-modal :propExchange="clicked_exchange" :isRemoving="isRemoving"/>
-			<b-col offset-lg="1" lg="10" cols="12" class="py-3">
-				<b-row >
-					<b-col cols="12" class="py-3">
-						<h3 class="text-center">{{$t('rankingTitle')}}</h3>
-					</b-col >
-				</b-row >
-				<b-row class="main-block">
-					<b-pagination
-					v-model="currentPage"
-					:total-rows="totalRows"
-					:per-page="perPage"
-					size="l"
-					class="p-4 my-0"
-					></b-pagination> 
-					<b-table 
-					:current-page="currentPage"
-					:per-page="perPage"
-					:items="items"
-					:fields="fields"
-					:sort-by.sync="sortBy"
-					:sort-desc.sync="sortDesc"
-					responsive
-					sort-icon-left
-					>
-						<template v-slot:head(reported_volume)="data">
-							<span v-b-tooltip.hover :title="$t('rankingTableColReportedVolumeTip')">{{data.label}}</span>
-						</template>
+	<section class="section">
+		<div class="container">
+			<h3 class="title is-3 mb-2">{{$t('rankingTitle')}}</h3>
+		</div>
+		<div class="container">
+			<div v-if="!isLoading" class="box">
+				<b-table
+						:data="data"
+						ref="table"
+						detailed
+						hoverable
+						:detail-key="data.name"
+						:show-detail-icon="!isVisible"
+						:paginated="isPaginated"
+						:loading="isLoading"
+						:per-page="perPage"
+						:current-page.sync="currentPage"
+						:pagination-simple="isPaginationSimple"
+						:pagination-position="paginationPosition"
+						:default-sort-direction="defaultSortDirection"
+						:sort-icon="sortIcon"
+						:sort-icon-size="sortIconSize"
+						default-sort="total_btc_wallet"
+						aria-next-label="Next page"
+						aria-previous-label="Previous page"
+						aria-page-label="Page"
+						aria-current-label="Current page">
 
-						<template v-slot:head(last_month_volume)="data">
-							<span v-b-tooltip.hover :title="$t('rankingTableColMonthlyTip')">{{data.label}}</span>
-						</template>
+					<template slot-scope="props">
+						<b-table-column field="name" :label="$t('rankingTableColName')" sortable>
+							{{ props.row.name }}
+						</b-table-column>
 
-						<template v-slot:head(nb_addresses)="data">
-							<span v-b-tooltip.hover :title="$t('rankingTableColNbAddressesTip')">{{data.label}}</span>
-						</template>
+						<b-table-column field="reported_volume" :label="$t('rankingTableColReportedVolume')" sortable>
+							<BtcAmount :amount="props.row.reported_volume"/>
+						</b-table-column>
 
-						<template v-slot:head(last_day_deposits)="data">
-							<span v-b-tooltip.hover :title="$t('rankingTableColLastDayDepositsTip')">{{data.label}}</span>
-						</template>
+						<b-table-column field="last_month_volume" :label="$t('rankingTableColMonthlyVolume')" sortable>
+							<BtcAmount v-if="props.row.last_month_volume" :amount="props.row.last_month_volume"/>
+						</b-table-column>
 
-						<template v-slot:cell(last_month_volume)="data">
-								<BtcAmount v-if="data.item.last_month_volume" :amount="data.item.last_month_volume"/>
-							</template>
+						<b-table-column field="nb_addresses" :label="$t('rankingTableColNbAddresses')" sortable>
+							{{ props.row.nb_deposit_addresses }}
+						</b-table-column>
 
-						<template v-slot:cell(last_day_deposits)="data">
-							<BtcAmount v-if="data.item.last_day_deposits" :amount="data.item.last_day_deposits"/>
-						</template>
+						<b-table-column field="total_btc_wallet" :label="$t('rankingTableColTotalBtcWallet')" sortable>
+							<BtcAmount v-if="props.row.total_btc_wallet" :amount="props.row.total_btc_wallet"/>
+						</b-table-column>
 
-						<template v-slot:head(last_day_withdrawals)="data">
-							<span v-b-tooltip.hover :title="$t('rankingTableColLastDayWithdrawalsTip')">{{data.label}}</span>
-						</template>
+						<b-table-column field="last_day_deposits" :label="$t('rankingTableColLastDayDeposits')" sortable>
+							<BtcAmount v-if="props.row.last_day_deposits" :amount="props.row.last_day_deposits"/>
+						</b-table-column>
 
-						<template v-slot:cell(last_day_withdrawals)="data">
-							<BtcAmount v-if="data.item.last_day_withdrawals" :amount="data.item.last_day_withdrawals"/>
-						</template>
+						<b-table-column field="last_day_withdrawals" :label="$t('rankingTableColLastDayWithdrawals')" sortable>
+							<BtcAmount v-if="props.row.last_day_withdrawals" :amount="props.row.last_day_withdrawals"/>
+						</b-table-column>
 
-						<template v-slot:head(trend)="data">
-							<span v-b-tooltip.hover :title="$t('rankingTableColTrendTip')">{{data.label}}</span>
-						</template>
-						
-						<template v-slot:cell(trend)="data">
-							<router-link :to="{name: 'exchangesStats', params: { exchange: data.item.exchange_id } }">
-							<exchange-trend v-if="data.item.trend" :data="data.item.trend"/>
+						<b-table-column field="actions" :label="$t('rankingTableColTrend')" :visible="isVisible">
+							<router-link :to="{name: 'exchangesStats', params: { exchange: props.row.exchange_id } }">
+								<exchange-trend v-if="props.row.trend" :data="props.row.trend"/>
 							</router-link>
-						</template>
+						</b-table-column>
 
-						<template v-slot:head(total_btc_wallet)="data">
-							<span v-b-tooltip.hover :title="$t('rankingTableColTotalBtcWalletTip')">{{data.label}}</span>
-						</template>
-
-						<template v-slot:cell(total_btc_wallet)="data">
-							<BtcAmount v-if="data.item.total_btc_wallet" :amount="data.item.total_btc_wallet"/>
-						</template>
-						<template v-slot:cell(reported_volume)="data">
-							<BtcAmount :amount="data.item.reported_volume"/>
-						</template>
-						<template v-slot:cell(action)="data">
-							<b-button-group class="mr-2">
-									<b-link v-if="data.item.total_btc_wallet || data.item.nb_withdrawal_addresses"  :to="'/explorer/'+ data.item.exchange_id">
-									<b-button  variant="primary" size="m" class="text-nowrap">
+						<b-table-column field="actions" :label="$t('rankingTableColAction')">
+							<b-button-group>
+								<b-link v-if="props.row.total_btc_wallet || props.row.nb_withdrawal_addresses"
+												:to="'/explorer/'+ props.row.exchange_id">
+									<b-button type="is-info" outlined class="text-nowrap">
 										{{$t('rankingTableButtonExploreWallet')}}
 									</b-button>
 								</b-link>
-									<b-dropdown right :text="$t('rankingTableButtonEdit')" variant="primary" size="m" >
-										<b-dropdown-item  v-on:click="isRemoving=false;clicked_exchange=data.item.exchange_id;$bvModal.show('editWallet');">{{$t('rankingTableButtonAddWallet')}}</b-dropdown-item>
-										<b-dropdown-item v-if="data.item.total_btc_wallet || data.item.nb_withdrawal_addresses" v-on:click="isRemoving=true;clicked_exchange=data.item.exchange_id;$bvModal.show('editWallet');">{{$t('rankingTableButtonRemoveWallet')}}</b-dropdown-item>
-									</b-dropdown>
-								</b-button-group>
-						</template>
-					</b-table>
-				</b-row>
-			</b-col>
-		</b-row>
-	</b-container>
+
+								<b-dropdown aria-role="list">
+									<button class="button is-info is-outlined" slot="trigger">
+										<span>{{ $t('rankingTableButtonEdit') }}</span>
+										<b-icon icon="menu-down"></b-icon>
+									</button>
+									<b-dropdown-item aria-role="listitem" @click="editWallet(props.row.exchange_id)">
+										{{$t('rankingTableButtonAddWallet')}}
+									</b-dropdown-item>
+									<b-dropdown-item aria-role="listitem"
+																	 v-if="props.row.total_btc_wallet || props.row.nb_withdrawal_addresses"
+																	 @click="removeWallet(props.row.exchange_id)">
+										{{$t('rankingTableButtonRemoveWallet')}} - {{ props.row.exchange_id }}
+									</b-dropdown-item>
+								</b-dropdown>
+							</b-button-group>
+						</b-table-column>
+					</template>
+
+					<template slot="detail" slot-scope="props">
+						<article class="media">
+							<figure class="media-left">
+								<h6 class="title is-6 mb-2">{{$t('rankingTableColTrend')}}</h6>
+								<router-link :to="{name: 'exchangesStats', params: { exchange: props.row.exchange_id } }">
+									<exchange-trend v-if="props.row.trend" :data="props.row.trend"/>
+								</router-link>
+							</figure>
+						</article>
+					</template>
+				</b-table>
+			</div>
+			<div v-else class="box">
+				<b-loading label="Spinning" :is-full-page="true" :active.sync="isLoading"
+									 :can-cancel="true"></b-loading>
+			</div>
+		</div>
+	</section>
+
 </template>
 
 <script>
-
-import BtcAmount from './commons/BtcAmount.vue';
-import EditWalletModal from './commons/EditWalletModal.vue';
-import ExchangeTrend from './commons/ExchangeTrend.vue';
+	import BtcAmount from './commons/BtcAmount.vue'
+	import EditWalletModal from './commons/EditWalletModal.vue'
+	import ExchangeTrend from './commons/ExchangeTrend.vue'
+	import { ModalProgrammatic } from 'buefy'
 
 	export default {
 		components: {
 			BtcAmount,
-			EditWalletModal,
-			ExchangeTrend
+			ExchangeTrend,
 		},
-		data() {
+		data () {
 			return {
+				data: [],
 				isRemoving: false,
 				clicked_exchange: null,
-				currentPage:1,
-				totalRows:0,
-				perPage: 30,
-				sortBy: 'total_btc_wallet',
-				sortDesc: true,
-				fields: [
-					{ key: 'name', sortable: true, label: this.$t('rankingTableColName')},
-					{ key: 'reported_volume', sortable: true, label: this.$t('rankingTableColReportedVolume')},
-					{ key: 'last_month_volume', sortable: true, label: this.$t('rankingTableColMonthlyVolume')},
-					{ key: 'nb_addresses', sortable: true, label: this.$t('rankingTableColNbAddresses')},
-					{ key: 'total_btc_wallet', sortable: true, label: this.$t('rankingTableColTotalBtcWallet')},
-					{ key: 'last_day_deposits', sortable: true, label: this.$t('rankingTableColLastDayDeposits')},
-					{ key: 'last_day_withdrawals', sortable: true, label: this.$t('rankingTableColLastDayWithdrawals') },
-					{ key: 'trend', label:this.$t('rankingTableColTrend')},
-					{ key: 'action', label: this.$t('rankingTableColAction')},
-
-				],
-				items: [
-				]
+				isPaginated: true,
+				isPaginationSimple: false,
+				paginationPosition: 'bottom',
+				defaultSortDirection: 'desc',
+				sortIcon: 'arrow-up',
+				sortIconSize: 'is-small',
+				currentPage: 1,
+				perPage: 20,
+				isLoading: false,
+				isVisible: true,
 			}
 		},
-		created(){
-			this.axios.get('/api/ranking').then((response) => {
-				this.totalRows = response.data.length;
-				response.data.forEach(function(row){
-					if(row.trend)
-						row.trend = row.trend.split("@").map(function(value){return Number(value)});
-				});
-				this.items = response.data;
-			});
-		}
+		methods: {
+			onResize () {
+				this.isVisible = window.innerWidth > 1216
+			},
+			loadData () {
+				this.isLoading = true
+
+				this.axios.get('/api/ranking').then((response) => {
+					this.total = response.data.length
+					response.data.forEach(function (row) {
+						if (row.trend)
+							row.trend = row.trend.split('@').map(function (value) {
+								return Number(value)
+							})
+					})
+					this.data = response.data
+				})
+
+				this.isLoading = false
+			},
+			editWallet (clicked_exchange) {
+				let propExchange = clicked_exchange
+				ModalProgrammatic.open({
+					parent: this,
+					component: EditWalletModal,
+					hasModalCard: true,
+					props: { propExchange, isRemoving: false },
+				})
+			},
+			removeWallet (clicked_exchange) {
+				let propExchange = clicked_exchange
+				ModalProgrammatic.open({
+					parent: this,
+					component: EditWalletModal,
+					hasModalCard: true,
+					props: { propExchange, isRemoving: true },
+				})
+			},
+			onPageChange (page) {
+				this.page = page
+				this.loadData()
+			},
+			toggle (row) {
+				this.$refs.table.toggleDetails(row)
+			},
+		},
+		mounted () {
+			this.loadData()
+			this.onResize()
+			window.addEventListener('resize', this.onResize, { passive: true })
+		},
+		beforeDestroy () {
+			if (typeof window !== 'undefined') {
+				window.removeEventListener('resize', this.onResize, { passive: true })
+			}
+		},
 	}
 </script>
 
-<style >
+<style lang="scss" scoped>
+	.mb-2 {
+		margin-bottom: 2rem;
+	}
+
+	.btn-group {
+		width: 100%;
+		justify-content: flex-start;
+		display: flex;
+		@media screen and (max-width: 768px) {
+			justify-content: flex-end;
+		}
+
+		a {
+			margin-right: 10px;
+
+			&:hover {
+				text-decoration: none;
+			}
+		}
+	}
 
 </style>

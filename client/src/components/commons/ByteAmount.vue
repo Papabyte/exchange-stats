@@ -6,58 +6,58 @@
 </template>
 
 <script>
-const conf = require("../../conf.js");
+	const conf = require('../../conf.js')
 
-export default {
-	props: {
-		amount: {
-			type: Number,
-			required: true
+	export default {
+		props: {
+			amount: {
+				type: Number,
+				required: true,
+			},
+			label: {
+				type: String,
+				required: false,
+			},
+			isNegative: {
+				type: Boolean,
+				required: false,
+				default: false,
+			},
+			isPositive: {
+				type: Boolean,
+				required: false,
+				default: false,
+			},
 		},
-		label: {
-			type: String,
-			required: false
-		},
-		isNegative: {
-			type: Boolean,
-			required: false,
-			default: false
-		},
-		isPositive: {
-			type: Boolean,
-			required: false,
-			default: false
-		}
-	},
-	data(){
-		return {
-			gb_to_bytes: conf.gb_to_bytes
-		}
-	},
-	computed:{
-		amountClass:function(){
+		data () {
 			return {
-				negative: this.isNegative,
-				positive: this.isPositive,
-				default: !this.isNegative && !this.isPositive
-			};
-		}
+				gb_to_bytes: conf.gb_to_bytes,
+			}
+		},
+		computed: {
+			amountClass: function () {
+				return {
+					negative: this.isNegative,
+					positive: this.isPositive,
+					default: !this.isNegative && !this.isPositive,
+				}
+			},
+		},
 	}
-}
 </script>
 
 <style lang='scss' scoped>
-	.negative{
+	.negative {
 		color: red;
 
 	}
 
-	.positive{
+	.positive {
 		color: green;
 
 	}
 
-	.default{
+	.default {
 
 	}
 </style>

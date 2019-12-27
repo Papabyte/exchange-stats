@@ -4,11 +4,14 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import BootstrapVue from 'bootstrap-vue'
-import 'bootstrap/dist/css/bootstrap.css'
-import 'bootstrap-vue/dist/bootstrap-vue.css'
+// import 'bootstrap/dist/css/bootstrap.css'
+// import 'bootstrap-vue/dist/bootstrap-vue.css'
+import Buefy from 'buefy'
+import 'buefy/dist/buefy.css'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import feather from 'vue-icon'
+import VueMeta from 'vue-meta'
 
 import "@/assets/custom.scss"
 import i18n from './i18n'
@@ -17,7 +20,10 @@ import store from './store'
 Vue.use(feather, 'v-icon');
 
 Vue.use(VueAxios, axios);
+
 Vue.use(BootstrapVue);
+Vue.use(Buefy);
+Vue.use(VueMeta);
 
 Vue.config.productionTip = false;
 

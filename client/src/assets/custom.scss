@@ -1,25 +1,168 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:300,400,400i,500,500i,700,700i&display=swap');
+@import url('https://cdn.materialdesignicons.com/2.5.94/css/materialdesignicons.min.css');
+@import "~bulma/sass/utilities/_all";
+
 $theme-colors: (
-	"primary": #3e1886,
-	"bar-yes": #2c8f31,
-	"bar-no" : #c21a23,
-	"welcome-message" : #a07373,
-	"main-block" : white
+		"primary": hsl(204, 71%, 53%),
+		"bar-yes": #2c8f31,
+		"bar-no" : #c21a23,
+		"welcome-message" : #a07373,
+		"main-block" : white
 );
 
-$body-bg:  rgb(236, 236, 235);
-$btn-border-radius: 0px;
+$background: $white-ter;
+$btn-border-radius: .25rem;
+$dark: #363636;
+$light: #ffffff;
+$info: #3298dc;
 
-// import must be after variables overrides
-@import 'node_modules/bootstrap/scss/bootstrap';
-@import 'node_modules/bootstrap-vue/src/index.scss';
-
+//import must be after variables overrides
+@import '../../node_modules/bulma/bulma.sass';
+@import '../../node_modules/buefy/src/scss/buefy.scss';
 
 
 // general style overrides and custom classes
+html,
 body {
-	font-family: 'Verdana', sans-serif;
+	font-family: 'Roboto', Verdana sans-serif;
+	font-size: 13px;
+	background: $background;
+	height: 100%;
 }
 
-.main-block {
-	background-color: theme-color("main-block");
+.main {
+	background-color: $background;
+}
+
+.navbar-wrapper {
+	background: $white;
+	box-shadow: 0 1px 10px rgba(151, 164, 175, .1)
+}
+
+.pn-75 {
+	padding: 0.75rem;
+}
+
+.mr-05 {
+	margin-right: 0.5rem !important;
+}
+
+.mb-05 {
+	margin-bottom: 0.5rem !important;
+}
+
+.mb-1 {
+	margin-bottom: 2rem !important;
+}
+
+.mb-2 {
+	margin-bottom: 2rem !important;
+}
+
+.mt-1 {
+	margin-top: 1rem;
+}
+
+.mt-2 {
+	margin-top: 2rem !important;
+}
+
+.ml-1 {
+	margin-left: 1rem !important;
+}
+
+.ml-05 {
+	margin-left: 0.5rem !important;
+}
+
+.lh-25 {
+	line-height: 25px !important;
+}
+
+.mn-1 {
+	margin: 1rem !important;
+}
+
+.modal-close {
+	display: none;
+}
+
+.row {
+	width: 100%;
+	display: block;
+	margin-bottom: 1rem;
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+}
+
+.notification {
+	height: 100%;
+}
+
+.is-unknown {
+	cursor: default;
+
+	&:focus,
+	&:active {
+		background-color: #ffdd57;
+		box-shadow: none;
+	}
+}
+
+.f-end {
+	justify-content: flex-end;
+}
+
+.f-around {
+	justify-content: space-around;
+}
+
+.f-between {
+	justify-content: space-between;
+}
+
+.fw-w {
+	flex-wrap: wrap;
+}
+
+.d-flex {
+	display: flex !important;
+}
+
+.d-inline-block {
+	display: inline-block !important;
+}
+
+.ai-center {
+	align-items: center;
+}
+
+.d-grid {
+	display: grid;
+}
+
+.d-grid-2-row {
+	grid-template-rows: 1fr 1fr;
+}
+
+.d-grid-3-row {
+	grid-template-rows: 1fr 1fr 1fr;
+}
+
+.d-grid-4-row {
+	grid-template-rows: 1fr 1fr 1fr 1fr;
+}
+
+.d-grid-2-col {
+	grid-template-columns: 1fr 1fr;
+}
+
+.d-grid-3-col {
+	grid-template-columns: 1fr 1fr 1fr;
+}
+
+.d-grid-4-col {
+	grid-template-columns: 1fr 1fr 1fr 1fr;
 }

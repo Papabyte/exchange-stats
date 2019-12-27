@@ -1,299 +1,413 @@
 <template>
-	<b-container fluid>
-		<edit-wallet-modal :propExchange="exchange || walletOwner" :propWalletId="walletIdToEdit" :isRemoving="isRemoving"/>
+	<div class="section">
 
-		<b-row v-if="blockTitle">
-			<b-col offset-lg="1" lg="10" cols="12" class="py-3">
-			<h3 class="text-center">{{blockTitle}}</h3>
-			</b-col>
-		</b-row >
+		<div class="container" v-if="blockTitle">
+			<h3 class="title is-3 mb-2">{{ blockTitle }}</h3>
+		</div>
+		<div class="container test">
+			<div v-if="!isSpinnerActive" class="box">
 
-		<b-col offset-lg="1" lg="10" cols="12" class="py-3">
-			<div v-if="!isSpinnerActive">
-				<b-row>
-					<b-col cols="10">
-						<b-row class="text-center" v-if="failoverText">
-							{{failoverText}}
-						</b-row>
+				<div class="text-center" v-if="failoverText">
+					{{failoverText}}
+				</div>
 
-						<b-row class="text-center" v-if="walletOwner">
-							<span class="pr-2">{{$t("explorerTransactionsBelongsTo")}}</span> <Exchange :id="walletOwner"/>
-							<b-button 
-							v-if="wallet_id" 
-							variant="primary"  
-							@click="isRemoving=true;walletIdToEdit=wallet_id;$bvModal.show('editWallet');" 
-							class="ml-2 button-xs" 
-							v-b-tooltip.hover 
-							:title="$t('explorerTransactionsButtonRemoveFromExchangeTip')"
-							>
-							<v-icon name='x' class="x-icon"/></b-button>
-						</b-row>
+				<div class="row" v-if="walletOwner">
+					<h5 class="title is-5">{{$t('explorerTransactionsBelongsTo')}}</h5>
+					<div class="field has-addons">
+						<span class="control">
+							<Exchange :id="walletOwner"/>
+						</span>
+						<span class="control">
+							<b-tooltip type="is-info" :label="$t('explorerTransactionsButtonRemoveFromExchangeTip')">
+								<b-button
+										v-if="wallet_id"
+										type="is-warning"
+										icon-right="close"
+										size="is-medium"
+										@click="removeWallet(wallet_id)"
+								/>
+							</b-tooltip>
+						</span>
+					</div>
+				</div>
 
-						<b-row v-if="wallet_id&&!walletOwner">
-							<b-button variant="primary" size="sm" @click="isRemoving=false;$bvModal.show('editWallet');">{{$t("explorerTransactionsButtonAddToExchange")}}</b-button>
-						</b-row>
+				<div class="row" v-if="wallet_id&&!walletOwner">
+					<b-button
+							size="is-medium"
+							type="is-warning"
+							icon-left="plus"
+							@click="addWallet(walletIdToEdit)">
+						{{$t('explorerTransactionsButtonAddToExchange')}}
+					</b-button>
+				</div>
 
-						<b-row v-if="exchangeWallets">
-							{{$t("explorerTransactionsWalletsForExchange")}}
-							<b-row class="pl-3" align-h="start">
-								<div v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
-									<b-col >
+				<div class="row" v-if="exchangeWallets">
+					<h5 class="title is-5">{{$t('explorerTransactionsWalletsForExchange')}}</h5>
+					<div class="columns">
+						<div class="column">
+							<span class="wpallet-wrapper" v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
+								<div class="field has-addons">
+									<span class="control">
 										<wallet-id :id="Number(wallet)"/>
-										<b-button 
-										variant="primary" 
-										@click="isRemoving=true;walletIdToEdit=Number(wallet);$bvModal.show('editWallet');" 
-										v-b-tooltip.hover 
-										:title="$t('explorerTransactionsButtonRemoveFromExchangeTip')"
-										class="ml-2 button-xs" >
-										<v-icon name='x' class="x-icon"/></b-button>
-									</b-col>
+									</span>
+									<span class="control">
+										<b-tooltip type="is-info" :label="$t('explorerTransactionsButtonRemoveFromExchangeTip')">
+											<b-button
+													type="is-warning"
+													icon-right="close"
+													size="is-medium"
+													@click="removeWalletTwo(Number(wallet))"
+											/>
+										</b-tooltip>
+									</span>
 								</div>
-							</b-row >
-						</b-row>
+							</span>
+						</div>
+						<div class="column has-text-right" v-if="exchange">
+							<b-button
+									size="is-medium"
+									type="is-warning"
+									icon-left="plus"
+									@click="addWalletTwo(exchange)"
+							>
+								{{$t('explorerTransactionsButtonAddWallet')}}
+							</b-button>
+						</div>
+					</div>
+				</div>
 
-						<b-row class="text-center" v-if="total_on_wallets">
-							<span class="pr-1">{{$t("explorerTransactionsTotalOnWallet")}}</span> <btc-amount :amount="total_on_wallets"/>
-						</b-row>
+				<div class="row" v-if="total_on_wallets">
+					<span class="title is-5">{{$t('explorerTransactionsTotalOnWallet')}}</span>
+					<btc-amount :amount="total_on_wallets"/>
+				</div>
 
-						<b-row v-if="count_total">
-							{{$t("explorerTransactionsTotalTransactions")}}{{count_total}}
-						</b-row>
+				<div class="row" v-if="count_total">
+					<span class="title is-5">{{$t('explorerTransactionsTotalTransactions')}}</span>
+					<span class="has-text-weight-medium">{{count_total}}</span>
+				</div>
 
-						<b-row v-if="wallet_id">
-								<span class="pr-1">{{$t("explorerTransactionsAddressCount")}}</span>
-							<router-link :to="{name: 'explorerAddresses', params: { request_input: wallet_id} }">
-								{{addr_count}}
-							</router-link>
-						</b-row>
-					</b-col>
-					<b-col cols="2" v-if="exchange" class="float-right">
-						<b-button 
-						variant="primary"
-						@click="isRemoving=false;walletIdToEdit=null;$bvModal.show('editWallet');">
-						{{$t('explorerTransactionsButtonAddWallet')}}
-						</b-button>
-					</b-col>
-				</b-row>
+				<div class="notification" v-if="wallet_id">
+					<span class="title is-6">{{$t('explorerTransactionsAddressCount')}}</span>
+					<router-link :to="{name: 'explorerAddresses', params: { request_input: wallet_id} }">
+						{{addr_count}}
+					</router-link>
+				</div>
 			</div>
-			<b-row v-else>
-				<div class="text-center w-100">
-					<b-spinner label="Spinning"></b-spinner>
+			<div v-else class="box">
+				<div class="container">
+					<b-loading label="Spinning" :is-full-page="true" :active.sync="isSpinnerActive"
+										 :can-cancel="true"></b-loading>
 				</div>
-			</b-row>
-		</b-col>
-
-		<b-row v-if="!isSpinnerActive && transactions">
-			<b-col offset-lg="1" lg="10" cols="12" class="py-3 main-block">
-				<b-row  class="text-center">
-		<b-pagination
-			v-model="currentPage"
-			:total-rows="count_total"
-			per-page="20"
-			@change="onPageChanged"
-			size="l"
-			class="pl-4 pt-2 my-0"
-			></b-pagination> 
-					<div  class="w-100" v-for="(transaction,key,index) in transactions" v-bind:key="key">
-					<transaction v-if="progressive_display_level>index" :tx_id="key" :transaction="transaction" :no_border="index == (Object.keys(transactions).length-1)" :about_wallet_ids="redirected_ids" @expand="expand_tx"/>
-				</div>
-				</b-row>
-			</b-col>
-		</b-row>
-
-	</b-container>
+			</div>
+		</div>
+		<div class="container">
+			<br>
+		</div>
+		<div v-if="!isSpinnerActive && transactions" class="box">
+			<div class="row mb-2">
+				<b-pagination
+						:total="count_total"
+						:current.sync="currentPage"
+						:per-page="perPage"
+						range-before="3"
+						range-after="3"
+						@change="onPageChanged"
+						aria-next-label="Next page"
+						aria-previous-label="Previous page"
+						aria-page-label="Page"
+						aria-current-label="Current page">
+				</b-pagination>
+			</div>
+			<div class="container" v-for="(transaction,key,index) in transactions" v-bind:key="key">
+				<transaction v-if="progressive_display_level>index" :tx_id="key" :transaction="transaction"
+										 :no_border="index == (Object.keys(transactions).length-1)" :about_wallet_ids="redirected_ids"
+										 @expand="expand_tx"/>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script>
-import Transaction from './ExplorerTransaction.vue'
-import validate from 'bitcoin-address-validation';
-import EditWalletModal from './commons/EditWalletModal.vue';
-import Exchange from './commons/Exchange.vue';
-import BtcAmount from './commons/BtcAmount.vue';
-import WalletId from './commons/WalletId.vue';
-const conf = require("../conf.js");
+	import Transaction from './ExplorerTransaction.vue'
+	import validate from 'bitcoin-address-validation'
+	import EditWalletModal from './commons/EditWalletModal.vue'
+	import Exchange from './commons/Exchange.vue'
+	import BtcAmount from './commons/BtcAmount.vue'
+	import WalletId from './commons/WalletId.vue'
+	import { ModalProgrammatic } from 'buefy'
 
-export default {
+	const conf = require('../conf.js')
+
+	export default {
 		components: {
 			Transaction,
-			EditWalletModal,
 			Exchange,
 			BtcAmount,
-			WalletId
+			WalletId,
 		},
 		props: {
 			request_input: {
 				type: String,
-				required: true
+				required: true,
 			},
 			page: {
 				type: Number || String,
 				required: false,
-				default: 1
-			}
-	},
-	data() {
-		return {
-			transactions: null,
-			count_total: null,
-			exchangeName: null,
-			exchange :null,
-			wallet_id: null,
-			exchangeWallets: null,
-			title: null,
-			isSpinnerActive: true,
-			failoverText: null,
-			redirected_ids: [],
-			isRemoving: null,
-			walletOwner: null,
-			walletIdToEdit: null,
-			tx_id: null,
-			total_on_wallets: null,
-			addr_count: null,
-			progressive_display_level: 1,
-			timerId: null
-		}
-	},
-	watch: {
-		$route(route) {
-			this.currentPage = this.page || 1;
-			this.getTransactions();
-		}
-	},
-	created() {
-		this.currentPage = this.page || 1;
-		this.getTransactions();
-		this.timerId = setInterval(() => {
-			this.progressive_display_level++;
-		}, 200);
-	},
-	beforeDestroy(){
-		clearInterval(this.timerId);
-	},
-	methods: {
-		updateTitleAndDescription(){
-			if (this.wallet_id){
-				document.title =  this.$t("explorerTransactionsPageTitleWalletId", {wallet_id: this.wallet_id, website_name: conf.website_name});;
-				if (this.walletOwner)
-					var description = this.$t("explorerTransactionsMetaDescriptionWalletIdWithOwner", {wallet_id: this.wallet_id, exchange: this.walletOwner});
-				else
-					var description = this.$t("explorerTransactionsMetaDescriptionWalletId", {wallet_id: this.wallet_id});
-			} else if (this.tx_id){
-				document.title =  this.$t("explorerTransactionsPageTitleTxId", {tx_id: this.tx_id, website_name: conf.website_name});
-				var description = this.$t("explorerTransactionsMetaDescriptionTxId", {tx_id: this.tx_id});
-			} else if (this.exchangeName){
-				document.title =  this.$t("explorerTransactionsPageExchange", {exchange: this.exchangeName, website_name: conf.website_name});
-				var description = this.$t("explorerTransactionsMetaDescriptionExchange", {exchange: this.exchangeName});
-			}
-			document.getElementsByName('description')[0].setAttribute('content', description);
+				default: 1,
+			},
 		},
-		onPageChanged(value){
-			this.$router.push({ name: 'explorerInputPaged', params: { url_input: this.request_input, page: value } })
-		},
-		getTransactions() {
-			this.isSpinnerActive = true;
-			this.transactions = null;
-			this.count_total = null;
-			this.exchangeName = null;
-			this.exchangeWallets = null;
-			this.exchange = null;
-			this.blockTitle = null;
-			this.failoverText =null;
-			this.redirected_ids = [];
-			this.wallet_id = null;
-			this.walletOwner = null;
-			this.walletIdToEdit = null;
-			this.total_on_wallets = null;
-			this.tx_id = null;
-			this.addr_count = null;
-
-			if (Number(this.request_input)) { // it's a wallet id
-				this.blockTitle = this.$t("explorerTransactionsTransactionsForWallet") + this.request_input;
-				this.axios.get('/api/wallet/' + this.request_input+'/' + (this.currentPage-1)).then((response) => {
-					this.progressive_display_level = 1;
-					this.blockTitle = this.$t("explorerTransactionsTransactionsForWallet") + response.data.redirected_id;
-					if (response.data.txs){
-						this.transactions = response.data.txs.txs;
-						this.count_total = response.data.txs.count_total;
-						this.redirected_ids = [response.data.redirected_id];
-						this.total_on_wallets = response.data.txs.total_on_wallets;
-						this.addr_count = response.data.txs.addr_count; 
-					} else {
-						this.failoverText = this.$t("explorerTransactionsNoTransactionsFound") + this.request_input;
-					}
-						this.wallet_id = Number(response.data.redirected_id);
-						this.walletIdToEdit = this.wallet_id;
-						this.walletOwner = response.data.exchange;
-						this.isSpinnerActive = false;
-						this.updateTitleAndDescription();
-					});
-			} else if (isTxId(this.request_input)) { // it's a tx id
-				this.blockTitle = "Transaction " + this.request_input;
-				this.tx_id = this.request_input;
-				this.axios.get('/api/txid/' + this.request_input).then((response) => {
-					if (response.data.txs){
-						this.transactions = response.data.txs;
-						this.count_total = null;
-						this.isSpinnerActive = false;
-					} else {
-						this.failoverText = this.$t("explorerTransactionsTransactionsNotFound", {transaction:  this.request_input});
-					}
-					this.updateTitleAndDescription();
-				});
-
-			} else if (validate(this.request_input)) { // it's a BTC address
-				this.blockTitle = this.$t("explorerTransactionsLookingForWallet", {address: this.request_input});
-				this.axios.get('/api/address/' + this.request_input).then((response) => {
-					this.$router.push({ name: 'explorerInputPaged', params: { url_input: response.data.redirected_id}})
-				});
-
-			} else if (this.request_input) { // should be an exchange
-				this.axios.get('/api/exchange/' + this.request_input+'/' + (this.currentPage-1)).then((response) => {
-					this.progressive_display_level = 1;
-					this.blockTitle = this.$t("explorerTransactionsTransactionsForExchange", {exchange:  response.data.name});
-					if (response.data.txs){
-						this.transactions = response.data.txs.txs;
-						this.count_total = response.data.txs.count_total;
-						this.exchangeWallets = response.data.wallet_ids;
-						this.redirected_ids = response.data.redirected_ids;
-						this.total_on_wallets = response.data.txs.total_on_wallets;
-					} else if (response.data.wallet_ids.length == 0){
-						this.failoverText = this.$t("explorerTransactionsNoWalletKnown", {exchange:  response.data.name});
-					} else {
-						this.failoverText = this.$t("explorerTransactionsNoTransactionFound", {exchange:  response.data.name});
-					}
-					this.exchange = this.request_input;
-					this.exchangeName =  response.data.name;
-					this.isSpinnerActive = false;
-					this.updateTitleAndDescription();
-				});
+		data () {
+			return {
+				transactions: null,
+				count_total: null,
+				exchangeName: null,
+				exchange: null,
+				wallet_id: null,
+				exchangeWallets: null,
+				title: null,
+				isSpinnerActive: true,
+				failoverText: null,
+				redirected_ids: [],
+				isRemoving: null,
+				walletOwner: null,
+				walletIdToEdit: null,
+				tx_id: null,
+				total_on_wallets: null,
+				addr_count: null,
+				progressive_display_level: 1,
+				timerId: null,
+				perPage: 20,
 			}
 		},
-		expand_tx(tx_id){
+		watch: {
+			$route (route) {
+				this.currentPage = this.page || 1
+				this.getTransactions()
+			},
+		},
+		created () {
+			this.currentPage = this.page || 1
+			this.getTransactions()
+			this.timerId = setInterval(() => {
+				this.progressive_display_level++
+			}, 200)
+		},
+		beforeDestroy () {
+			clearInterval(this.timerId)
+		},
+		metaInfo () {
+			if (this.exchangeName) {
+				return {
+					title: this.$t('explorerTransactionsPageExchange', {
+						exchange: this.exchangeName,
+						website_name: conf.website_name,
+					}),
+					meta: [
+						{
+							name: 'description',
+							content: this.$t('explorerTransactionsMetaDescriptionExchange', { exchange: this.exchangeName }),
+						},
+					],
+				}
+			} else if (this.tx_id) {
+				return {
+					title: this.$t('explorerTransactionsPageTitleTxId', {
+						tx_id: this.tx_id,
+						website_name: conf.website_name,
+					}),
+					meta: [
+						{ name: 'description', content: this.$t('explorerTransactionsMetaDescriptionTxId', { tx_id: this.tx_id }) },
+					],
+				}
+			} else if (this.wallet_id) {
+				return {
+					title: this.$t('explorerTransactionsPageTitleWalletId', {
+						wallet_id: this.wallet_id,
+						website_name: conf.website_name,
+					}),
+					meta: [
+						{
+							name: 'description',
+							content: this.$t('explorerTransactionsMetaDescriptionWalletId', { wallet_id: this.wallet_id }),
+						},
+					],
+				}
+			} else if (this.wallet_id && this.walletOwner) {
+				return {
+					title: this.$t('explorerTransactionsPageTitleWalletId', {
+						wallet_id: this.wallet_id,
+						website_name: conf.website_name,
+					}),
+					meta: [
+						{
+							name: 'description', content: this.$t('explorerTransactionsMetaDescriptionWalletIdWithOwner', {
+								wallet_id: this.wallet_id,
+								exchange: this.walletOwner,
+							}),
+						},
+					],
+				}
+			}
+		},
+		methods: {
+			addWallet (walletIdToEdit) {
+				let propWalletId = walletIdToEdit
+				ModalProgrammatic.open({
+					parent: this,
+					component: EditWalletModal,
+					hasModalCard: true,
+					props: { propWalletId, isRemoving: false },
+				})
+			},
+			addWalletTwo (clicked_exchange) {
+				let propExchange = clicked_exchange
+				ModalProgrammatic.open({
+					parent: this,
+					component: EditWalletModal,
+					hasModalCard: true,
+					props: { propExchange, isRemoving: false },
+				})
+			},
+			removeWallet (wallet_id) {
+				let walletIdToEdit = wallet_id
+				ModalProgrammatic.open({
+					parent: this,
+					component: EditWalletModal,
+					hasModalCard: true,
+					props: { isRemoving: true },
+				})
+			},
+			removeWalletTwo (wallet_id) {
+				let propWalletId = wallet_id
+				ModalProgrammatic.open({
+					parent: this,
+					component: EditWalletModal,
+					hasModalCard: true,
+					props: { propWalletId, isRemoving: true },
+				})
+			},
+			editWallet (wallet_id) {
+				let walletIdToEdit = wallet_id
+				ModalProgrammatic.open({
+					parent: this,
+					component: EditWalletModal,
+					hasModalCard: true,
+					props: { walletIdToEdit, isRemoving: true },
+				})
+			},
+			onPageChanged (value) {
+				this.$router.push({ name: 'explorerInputPaged', params: { url_input: this.request_input, page: value } })
+			},
+			getTransactions () {
+				this.isSpinnerActive = true
+				this.transactions = null
+				this.count_total = null
+				this.exchangeName = null
+				this.exchangeWallets = null
+				this.exchange = null
+				this.blockTitle = null
+				this.failoverText = null
+				this.redirected_ids = []
+				this.wallet_id = null
+				this.walletOwner = null
+				this.walletIdToEdit = null
+				this.total_on_wallets = null
+				this.tx_id = null
+				this.addr_count = null
+
+				if (Number(this.request_input)) { // it's a wallet id
+					this.blockTitle = this.$t('explorerTransactionsTransactionsForWallet') + this.request_input
+					this.axios.get('/api/wallet/' + this.request_input + '/' + (this.currentPage - 1)).then((response) => {
+						this.progressive_display_level = 1
+						this.blockTitle = this.$t('explorerTransactionsTransactionsForWallet') + response.data.redirected_id
+						if (response.data.txs) {
+							this.transactions = response.data.txs.txs
+							this.count_total = response.data.txs.count_total
+							this.redirected_ids = [response.data.redirected_id]
+							this.total_on_wallets = response.data.txs.total_on_wallets
+							this.addr_count = response.data.txs.addr_count
+						} else {
+							this.failoverText = this.$t('explorerTransactionsNoTransactionsFound') + this.request_input
+						}
+						this.wallet_id = Number(response.data.redirected_id)
+						this.walletIdToEdit = this.wallet_id
+						this.walletOwner = response.data.exchange
+						this.isSpinnerActive = false
+					})
+				} else if (isTxId(this.request_input)) { // it's a tx id
+					this.blockTitle = 'Transaction ' + this.request_input
+					this.tx_id = this.request_input
+					this.axios.get('/api/txid/' + this.request_input).then((response) => {
+						if (response.data.txs) {
+							this.transactions = response.data.txs
+							this.count_total = null
+							this.isSpinnerActive = false
+						} else {
+							this.failoverText = this.$t('explorerTransactionsTransactionsNotFound',
+								{ transaction: this.request_input })
+						}
+					})
+
+				} else if (validate(this.request_input)) { // it's a BTC address
+					this.blockTitle = this.$t('explorerTransactionsLookingForWallet', { address: this.request_input })
+					this.axios.get('/api/address/' + this.request_input).then((response) => {
+						this.$router.push({ name: 'explorerInputPaged', params: { url_input: response.data.redirected_id } })
+					})
+
+				} else if (this.request_input) { // should be an exchange
+					this.axios.get('/api/exchange/' + this.request_input + '/' + (this.currentPage - 1)).then((response) => {
+						this.progressive_display_level = 1
+						this.blockTitle = this.$t('explorerTransactionsTransactionsForExchange', { exchange: response.data.name })
+						if (response.data.txs) {
+							this.transactions = response.data.txs.txs
+							this.count_total = response.data.txs.count_total
+							this.exchangeWallets = response.data.wallet_ids
+							this.redirected_ids = response.data.redirected_ids
+							this.total_on_wallets = response.data.txs.total_on_wallets
+						} else if (response.data.wallet_ids.length == 0) {
+							this.failoverText = this.$t('explorerTransactionsNoWalletKnown', { exchange: response.data.name })
+						} else {
+							this.failoverText = this.$t('explorerTransactionsNoTransactionFound', { exchange: response.data.name })
+						}
+						this.exchange = this.request_input
+						this.exchangeName = response.data.name
+						this.isSpinnerActive = false
+					})
+				}
+			},
+			expand_tx (tx_id) {
 				this.axios.get('/api/txid/' + tx_id).then((response) => {
-
-					this.transactions[tx_id] = response.data.txs[tx_id];
-					console.log(response.data.txs);
-				});
+					this.transactions[tx_id] = response.data.txs[tx_id]
+				})
+			},
 		},
 	}
-}
 
-function isTxId(hex){
-	return (typeof hex === "string" && hex.length === 64 && hex === (new Buffer(hex, "hex")).toString("hex"));
-}
+	function isTxId (hex) {
+		return (typeof hex === 'string' && hex.length === 64 && hex === (new Buffer(hex, 'hex')).toString('hex'))
+	}
 
 </script>
 
-<style>
-.x-icon{
-	height: 20px;
-	width: 20px;
-	margin-left: -8px;
-	margin-top: -10px;
-}
+<style lang="scss">
+	.wpallet-wrapper {
+		display: inline-block;
+		margin-left: 15px;
 
-.button-xs{
-	height: 30px;
-	width: 30px;
-}
+		&:first-child {
+			margin-left: 0;
+		}
+	}
+
+	.x-icon {
+		height: 20px;
+		width: 20px;
+		margin-left: -8px;
+		margin-top: -10px;
+	}
+
+	.button-xs {
+		height: 30px;
+		width: 30px;
+	}
 </style>

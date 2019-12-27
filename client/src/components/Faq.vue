@@ -1,76 +1,92 @@
 <template>
-	<div>
-		<nav-bar selected_item='3' />
-			<b-container fluid>
-				<b-row>
-					<b-col cols="12" class="py-3">
-						<h3 class="text-center">Faq</h3>
-					</b-col>
-				</b-row >
-				<b-row>
-					<b-col offset-lg="2" lg="8" cols="12" class="main-block p-5">
-						<b-media>
-							<h5 class="mt-3 question"> {{$t('faqQuestion1')}}</h5>
-							<p class="answer" v-html="$t('faqAnswer1')"/>
-						</b-media>
-						<b-media>
-							<h5 class="mt-3 question"> {{$t('faqQuestion2')}}</h5>
-							<p class="answer">
-							{{$t('faqAnswer2')}}
-							</p>
-						</b-media>
-						<b-media>
-							<h5 class="mt-3 question"> {{$t('faqQuestion3')}}</h5>
-							<p class="answer">
-							{{$t('faqAnswer3')}}
-							</p>
-						</b-media>
-						<b-media>
-							<h5 class="mt-3 question"> {{$t('faqQuestion4')}}</h5>
-							<p class="answer" v-html="$t('faqAnswer4')"/>
-						</b-media>
-						<b-media>
-							<h5 class="mt-3 question"> {{$t('faqQuestion5')}}</h5>
-							<p class="answer">
-							{{$t('faqAnswer5',{initial_stake: conf.challenge_min_stake_gb, period: conf.challenge_period_in_days,  coeff: conf.challenge_coeff})}}
-							</p>
-						</b-media>
-						<b-media>
-							<h5 class="mt-3 question"> {{$t('faqQuestion6')}}</h5>
-							<p class="answer" v-html="$t('faqAnswer6')"/>
-						</b-media>
-					</b-col>
-				</b-row >
-			</b-container>
+	<div class="main">
+		<nav-bar selected_item='0'/>
+
+		<section class="section">
+			<div class="container">
+				<h3 class="title is-3 mb-2">Faq</h3>
+			</div>
+
+			<div class="container">
+
+				<b-collapse
+						class="card"
+						v-for="(collapse, index) of collapses"
+						:key="index"
+						:open="isOpen == index"
+						@open="isOpen = index">
+					<div
+							slot="trigger"
+							slot-scope="props"
+							class="card-header"
+							role="button">
+						<p class="card-header-title">
+							{{ collapse.title }}
+						</p>
+						<a class="card-header-icon">
+							<b-icon size="is-small" :icon="props.open ? 'arrow-down' : 'arrow-up'"></b-icon>
+						</a>
+					</div>
+					<div class="card-content">
+						<div class="content" v-html="collapse.text"></div>
+					</div>
+				</b-collapse>
+			</div>
+		</section>
 	</div>
 </template>
 
 <script>
-import NavBar from './commons/NavBar.vue'
-const conf = require("../conf.js");
+	import NavBar from './commons/NavBar.vue'
 
-export default {
-	components: {
-		NavBar
-	},
-	data() {
-		return {
-			conf: conf
-		}
-	},
-	created(){
-		document.title = this.$t("faqPageTitle", {website_name: conf.website_name});
-		document.getElementsByName('description')[0].setAttribute('content',this.$t("faqMetaDescription"));
+	const conf = require('../conf.js')
+
+	export default {
+		components: {
+			NavBar,
+		},
+		data () {
+			return {
+				conf: conf,
+				isOpen: 0,
+				collapses: [
+					{
+						title: this.$t('faqQuestion1'),
+						text: this.$t('faqAnswer1'),
+					}, {
+						title: this.$t('faqQuestion2'),
+						text: this.$t('faqAnswer2'),
+					}, {
+						title: this.$t('faqQuestion3'),
+						text: this.$t('faqAnswer3'),
+					}, {
+						title: this.$t('faqQuestion4'),
+						text: this.$t('faqAnswer4'),
+					}, {
+						title: this.$t('faqQuestion5'),
+						text: this.$t('faqAnswer5'),
+					}, {
+						title: this.$t('faqQuestion6'),
+						text: this.$t('faqAnswer6'),
+					},
+				],
+			}
+		},
+		created () {
+			document.title = this.$t('faqPageTitle', { website_name: conf.website_name })
+			document.getElementsByName('description')[0].setAttribute('content', this.$t('faqMetaDescription'))
+		},
 	}
-}
 </script>
 
 <style lang='scss' scoped>
-.question{
+	.question {
 
-}
-.answer{
+	}
+
+	.answer {
 
 
-}
+	}
+
 </style>

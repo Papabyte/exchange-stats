@@ -1,100 +1,84 @@
 <template>
-		<b-row >
-			<b-col cols="12">
-				<b-row>
-					<b-col  cols="3">
-						<b-pagination
-							v-model="currentPage"
-							:total-rows="totalRows"
-							per-page="10"
-							align="fill"
-							size="l"
-							class="p-4 my-0"
-							></b-pagination> 
-						</b-col>
-				</b-row>	
-			<b-row>
-					<b-col  cols="12">
-							<b-table 
-							:current-page="currentPage"
-							per-page="10"
-							:items="items"
-							:fields="fields"
-							:sort-by.sync="sortBy"
-							:sort-desc.sync="sortDesc"
-							responsive
-							sort-icon-left
-						>	
-							<template v-slot:cell(income)="data">
-								<byte-amount :isNegative="data.item.income<0" :isPositive="data.item.income>0" :amount="data.item.income || 0"/>
-							</template>
-							<template v-slot:cell(address)="data">
-								<user :address="data.item.address" :nickname="data.item.nickname"/>
-							</template>
-							<template v-slot:head(initiatives)="data">
-								<span v-b-tooltip.hover :title="$t('crowdSourcingContributorsTableColInitiativesTip')">{{data.label}}</span>
-							</template>
-							<template v-slot:head(successes)="data">
-								<span v-b-tooltip.hover :title="$t('crowdSourcingContributorsTableColSuccessesTip')">{{data.label}}</span>
-							</template>
-							<template v-slot:head(income)="data">
-								<span v-b-tooltip.hover :title="$t('crowdSourcingContributorsTableColIncomeTip')">{{data.label}}</span>
-							</template>
-						</b-table>
-					</b-col>
-				</b-row>
-			</b-col>
-		</b-row>	
+	<div class="container">
+		<b-table
+				:sort-by.sync="sortBy"
+				:sort-desc.sync="defaultSortDirection"
+				:data="items"
+				ref="table"
+				hoverable
+				paginated
+				per-page="10"
+				:current-page.sync="currentPage"
+				pagination-position="bottom"
+				:default-sort-direction="defaultSortDirection"
+				sort-icon="arrow-up"
+				sort-icon-size="is-small"
+				:default-sort="sortBy"
+				aria-next-label="Next page"
+				aria-previous-label="Previous page"
+				aria-page-label="Page"
+				aria-current-label="Current page"
+		>
+			<template slot-scope="props">
+				<b-table-column field="address" :label="$t('crowdSourcingContributorsTableColAddress')" sortable>
+					<user :address="props.row.address" :nickname="props.row.nickname"/>
+				</b-table-column>
+				<b-table-column field="initiatives" :label="$t('crowdSourcingContributorsTableColInitiatives')" sortable>
+					{{props.row.initiatives}}
+				</b-table-column>
+				<b-table-column field="successes" :label="$t('crowdSourcingContributorsTableColSuccesses')" sortable>
+					{{props.row.successes}}
+				</b-table-column>
+				<b-table-column field="income" :label="$t('crowdSourcingContributorsTableColIncome')" sortable>
+					<byte-amount :isNegative="props.row.income<0" :isPositive="props.row.income>0"
+											 :amount="props.row.income || 0"/>
+				</b-table-column>
+			</template>
+		</b-table>
+	</div>
 </template>
 
 <script>
 
-	const conf = require("../conf.js");
-	import ByteAmount from './commons/ByteAmount.vue';
-	import User from './commons/User.vue';
+	const conf = require('../conf.js')
+	import ByteAmount from './commons/ByteAmount.vue'
+	import User from './commons/User.vue'
 
 	export default {
 		components: {
 			ByteAmount,
-			User
+			User,
 		},
-		data() {
+		data () {
 			return {
-				isTestnet : conf.testnet,
+				isTestnet: conf.testnet,
 				isSpinnerActive: true,
-				currentPage:1,
-				totalRows:0,
+				currentPage: 1,
+				totalRows: 0,
 				sortBy: 'initiatives',
-				sortDesc: true,
-				fields: [
-					{ key: 'address', label: this.$t("crowdSourcingContributorsTableColAddress"), sortable: true},
-					{ key: 'initiatives',label: this.$t("crowdSourcingContributorsTableColInitiatives"),  sortable: true },
-					{ key: 'successes', label: this.$t("crowdSourcingContributorsTableColSuccesses"), sortable: true },
-					{ key: 'income', label: this.$t("crowdSourcingContributorsTableColIncome"), sortable: true }
-				],
-				items: [
-				]
+				defaultSortDirection: 'desc',
+				items: [],
 			}
 		},
-		created(){
-			this.getData();
-			this.timerId = setInterval(this.getData, 60000);
+		created () {
+			this.getData()
+			this.timerId = setInterval(this.getData, 60000)
 		},
-		beforeDestroy(){
-			clearInterval(this.timerId);
+		beforeDestroy () {
+			clearInterval(this.timerId)
 		},
-		methods:{
-			getData(){
+		methods: {
+			getData () {
 				this.axios.get('/api/contributors-ranking/').then((response) => {
-					this.items = response.data;
-					this.totalRows = this.items.length;
-					this.isSpinnerActive= false
-				});
-			}
-		}
+					this.items = response.data
+					this.totalRows = this.items.length
+					this.isSpinnerActive = false
+				})
+			},
+		},
 	}
 </script>
 
-<style >
+<style>
 
 </style>

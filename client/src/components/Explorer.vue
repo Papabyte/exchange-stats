@@ -1,112 +1,126 @@
 <template>
 	<div class="main">
-		<nav-bar selected_item='1' />
-		<b-container fluid >
-					<b-col  offset-lg="3" lg="6" cols="12"  class="py-3">
-						<b-alert v-if="welcomeMessageShow" @dismissed="$store.commit('setWasExplorerWelcomeMessageClosed',true)" variant="welcome-message" show dismissible>
-						{{$t('explorerWelcomeMessage')}}
-						</b-alert>
-					</b-col>
-			<b-row v-if="!url_input">
-				<b-col cols="12" class="py-3">
-					<h3 class="text-center">{{$t("explorerTitle")}}</h3>
-				</b-col>
-			</b-row >
-			<b-row v-if="!url_input" >
-				<b-col offset-lg="3" lg="6" cols="12"  class="py-3 main-block">
-					<div>
-						<b-form class="form-inline w-100 mt-5" @submit="onSubmit">
-							<b-form-input responsive
-							id="input-1"
-							v-model="user_input"
-							type="text"
-							required
-							placeholder="Enter BTC address, transaction id or wallet id."
-							class="mx-2 flex-fill"
-							></b-form-input>
-							<button type="submit" class="btn btn-primary">{{$t("explorerButtonGo")}}</button>
-						</b-form>
-					</div>
-				<div v-if="arrExchanges" class="pt-4">
-					{{$t("explorerOrBrowseExchanges")}}
-					<b-row class="py-4" align-h="start">
-						<div v-for="(exchange,index) in arrExchanges" v-bind:key="index">
-							<b-col >	<exchange :showIcon="false" :id="exchange.id"/></b-col>
-						</div>
-					</b-row >
-				</div>
-				</b-col>
-			</b-row>
+		<nav-bar selected_item='0'/>
 
-			<b-row v-else-if="show_addresses">
+		<section class="section">
+			<div class="container">
+				<b-notification v-if="welcomeMessageShow" type="is-info" aria-close-label="Close"
+												@close="$store.commit('setWasExplorerWelcomeMessageClosed',true)">
+					{{$t('explorerWelcomeMessage')}}
+				</b-notification>
+			</div>
+		</section>
+
+		<section class="section">
+			<div class="container" v-if="!url_input">
+				<h3 class="title is-3 mb-2">{{$t('explorerTitle')}}</h3>
+			</div>
+
+			<div class="container" v-if="!url_input">
+				<div class="box">
+					<b-field @submit="onSubmit">
+						<b-input
+								id="input-1"
+								v-model="user_input"
+								type="text"
+								required
+								placeholder="Enter BTC address, transaction id or wallet id."></b-input>
+					</b-field>
+
+					<div class="container" v-if="arrExchanges">
+						<h6 class="title is-6 mb-2">{{$t('explorerOrBrowseExchanges')}}</h6>
+
+						<span class="exchange-wrapper">
+							<exchange v-for="(exchange,index) in arrExchanges" v-bind:key="index" :showIcon="false"
+												:id="exchange.id"/>
+						</span>
+					</div>
+				</div>
+			</div>
+
+			<div class="container" v-else-if="show_addresses">
 				<addresses :request_input="url_input" :page="Number(page)"/>
-			</b-row>
-			<b-row v-else >
+			</div>
+			<div class="container" v-else>
 				<transactions :request_input="url_input" :page="Number(page)"/>
-			</b-row>
-		</b-container>
+			</div>
+		</section>
 	</div>
 </template>
 
 <script>
-import NavBar from './commons/NavBar.vue'
-import Transactions from './ExplorerTransactions.vue'
-import Addresses from './ExplorerAddresses.vue'
-import Exchange from './commons/Exchange.vue';
-const conf = require('../conf.js');
-export default {
-	components: {
-		NavBar,
-		Transactions,
-		Exchange,
-		Addresses
-	},
-	props: {
-		url_input: {
-			type: String,
-			required: false
+	import NavBar from './commons/NavBar.vue'
+	import Transactions from './ExplorerTransactions.vue'
+	import Addresses from './ExplorerAddresses.vue'
+	import Exchange from './commons/Exchange.vue'
+
+	const conf = require('../conf.js')
+	export default {
+		components: {
+			NavBar,
+			Transactions,
+			Exchange,
+			Addresses,
 		},
-		page: {
-			type: Number,
-			required: false,
-			default: 1
+		props: {
+			url_input: {
+				type: String,
+				required: false,
+			},
+			page: {
+				type: Number,
+				required: false,
+				default: 1,
+			},
+			show_addresses: {
+				type: Boolean,
+				required: false,
+				default: false,
+			},
 		},
-		show_addresses:{
-			type: Boolean,
-			required: false,
-			default: false
-		}
-	},
-	data() {
-		return {
-			user_input: ""
-		}
-	},
-	computed:{
-		arrExchanges: function(){
-			return this.$store.state.exchanges;
+		data () {
+			return {
+				user_input: '',
+			}
 		},
-		welcomeMessageShow(){
-			return !this.$store.state.wasExplorerWelcomeMessageClosed;
-		}
-	},
-	watch: {
-		$route(route) {
-		}
-	},
-	created(){
-		console.log(this.show_addresses);
-		document.title = this.$t("explorerPageTitle", {website_name:conf.website_name});
-		document.getElementsByName('description')[0].setAttribute('content',this.$t("explorerMetaDescription"));
-	},
-	methods:{ 
-		onSubmit(){
-			this.$router.push({ name: 'explorerInput', params: { url_input: this.user_input } })
-		}
+		computed: {
+			arrExchanges: function () {
+				return this.$store.state.exchanges
+			},
+			welcomeMessageShow () {
+				return !this.$store.state.wasExplorerWelcomeMessageClosed
+			},
+		},
+		watch: {
+			$route (route) {
+			},
+		},
+		created () {
+			console.log(this.show_addresses)
+			document.title = this.$t('explorerPageTitle', { website_name: conf.website_name })
+			document.getElementsByName('description')[0].setAttribute('content', this.$t('explorerMetaDescription'))
+		},
+		methods: {
+			onSubmit () {
+				this.$router.push({ name: 'explorerInput', params: { url_input: this.user_input } })
+			},
+		},
 	}
-}
 </script>
 
 <style lang='scss'>
+	.section {
+		padding: 2rem 1.5rem;
+	}
 
+	.exchange-wrapper {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: flex-start;
+		margin: -0.75rem;
+
+		& > span {
+			margin: 0.75rem;
+		}
+	}
 </style>

@@ -1,66 +1,71 @@
 <template>
-	<b-modal id="operationHistory" hide-footer scrollable>
-		<template v-slot:modal-title>	
-			<i18n v-if="operationItem.initial_outcome=='in'" tag="span" path="crowdSourcingOperationsAddXToX" id="action">
-				<template #wallet>
-					<wallet-id :id="operationItem.wallet_id" :showIcon="false"/>
-				</template>
-				<template #exchange>
-					<exchange :id="operationItem.exchange" :showIcon="false"/>
-				</template>
-			</i18n>
-			<i18n v-else tag="span" path="crowdSourcingOperationsRemoveXFromX" id="action">
-				<template #wallet>
-					<wallet-id :id="operationItem.wallet_id" :showIcon="false"/>
-				</template>
-				<template #exchange>
-					<exchange :id="operationItem.exchange" :showIcon="false"/>
-				</template>
-			</i18n>
-		</template>
-		<b-container>
-			<div v-if="!isSpinnerActive">
-			<b-row v-for="item in historyItems" class="pb-3 my-4 border" :key="item.operation_id">
-				<b-col cols="12">
-					<b-row v-if="item.operation_type =='stake' || item.operation_type=='initial_stake'" >
-						<b-col cols="12">
-							<span class="d-block event-block"><b>{{item.operation_type =='stake' ? 'Counter stake' : 'Initial stake'}} </b> - {{item.time}} </span>
-	
-							<div class="pt-2">
-								<span class="d-block text-break"><b><user :address="item.author_address" :nickname="item.author_nickname"/></b> staked <b><byte-amount :amount="item.accepted_amount"/></b> on <b>{{item.stake_on}}</b></span>
+	<div class="modal-card add-wallet">
+		<header class="modal-card-head">
+			<p class="modal-card-title">
+				<i18n v-if="operationItem.initial_outcome=='in'" tag="span" path="crowdSourcingOperationsAddXToX" id="action">
+					<template #wallet>
+						<wallet-id :id="operationItem.wallet_id" :showIcon="false"/>
+					</template>
+					<template #exchange>
+						<exchange :id="operationItem.exchange" :showIcon="false"/>
+					</template>
+				</i18n>
+				<i18n v-else tag="span" path="crowdSourcingOperationsRemoveXFromX" id="action">
+					<template #wallet>
+						<wallet-id :id="operationItem.wallet_id" :showIcon="false"/>
+					</template>
+					<template #exchange>
+						<exchange :id="operationItem.exchange" :showIcon="false"/>
+					</template>
+				</i18n>
+			</p>
+			<button class="delete" aria-label="close" @click="$parent.close()"></button>
+		</header>
+		<section class="modal-card-body">
+			<div class="container">
+				<div v-if="!isSpinnerActive">
+					<div v-for="item in historyItems" class="row" :key="item.operation_id">
+						<div>
+							<div class="box" v-if="item.operation_type =='stake' || item.operation_type=='initial_stake'" >
+								<div class="title is-6"><b>{{item.operation_type =='stake' ? 'Counter stake' : 'Initial stake'}} </b> - {{item.time}}</div>
+
+								<div class="d-block text-break">
+									<b><user :address="item.author_address" :nickname="item.author_nickname"/></b>
+									staked <b><byte-amount :amount="item.accepted_amount"/></b> on <b>{{item.stake_on}}</b>
+								</div>
 								<span class="d-block">Resulting outcome: <b>{{item.resulting_outcome}}</b></span>
 								<span v-if="item.expected_reward" class="d-block">Expected reward: <b><byte-amount :amount="item.expected_reward"/></b></span>
-								<b-progress :max="item.staked_on_yes + item.staked_on_no" show-value height="1.5rem" class="mt-1">
-									<b-progress-bar :value="item.staked_on_yes" variant="bar-yes"><b><byte-amount :amount="item.staked_on_yes"/></b> </b-progress-bar>
-									<b-progress-bar :value="item.staked_on_no" variant="bar-no"><b><byte-amount :amount="item.staked_on_no"/></b> </b-progress-bar>
-								</b-progress>
+								<div class="progress-stacked mt-1">
+									<div class="bar" :style="{ height: 15 + 'px', background: '#48c774', width: ( item.staked_on_yes * 100) / (item.staked_on_yes + item.staked_on_no) + '%' }">
+										<byte-amount :amount="item.staked_on_yes"/>
+									</div>
+									<div class="bar" :style="{ height: 15 + 'px', background: '#f00', width: ( item.staked_on_no * 100) / (item.staked_on_yes + item.staked_on_no) + '%' }">
+										<byte-amount :amount="item.staked_on_no"/>
+									</div>
+								</div>
 							</div>
-						</b-col>
-					</b-row>
-					<b-row v-if="item.operation_type =='commit'">
-						<b-col cols="12">
-							<span class="d-block event-block"><b>Committed</b> - {{item.time}} </span>
-							<div class="pt-2">
-							<span v-if="item.paid_out_amount" class="d-block"><b><byte-amount :amount="item.paid_out_amount"/></b> paid to <b>{{item.paid_out_address}}</b></span>
+							<div v-if="item.operation_type =='commit'">
+								<div class="title is-6"><b>Committed</b> - {{item.time}} </div>
+								<div class="pt-2">
+									<span v-if="item.paid_out_amount" class="d-block"><b><byte-amount :amount="item.paid_out_amount"/></b> paid to <b>{{item.paid_out_address}}</b></span>
+								</div>
 							</div>
-						</b-col>
-					</b-row>
-					<b-row v-if="item.operation_type =='withdraw'" >
-						<b-col cols="12">
-							<span class="d-block event-block"><b>Withdraw</b> - {{item.time}} </span>
-							<div class="pt-2">
-							<span v-if="item.paid_out_amount" class="d-block"><b><byte-amount :amount="item.paid_out_amount"/></b> paid to <b>{{item.paid_out_address}}</b></span>
+							<div v-if="item.operation_type =='withdraw'" >
+								<div class="title is-6"><b>Withdraw</b> - {{item.time}} </div>
+								<div class="pt-2">
+									<span v-if="item.paid_out_amount" class="d-block"><b><byte-amount :amount="item.paid_out_amount"/></b> paid to <b>{{item.paid_out_address}}</b></span>
+								</div>
 							</div>
-						</b-col>
-					</b-row>
-				</b-col>
-			</b-row>
+						</div>
+					</div>
+				</div>
+				<b-loading label="Spinning" :is-full-page="false" :active.sync="isSpinnerActive" :can-cancel="true"></b-loading>
 			</div>
-			<div v-if="isSpinnerActive" class="text-center w-100">
-					<b-spinner label="Spinning"></b-spinner>
-			</div>
-		</b-container>
-	</b-modal>
+		</section>
+		<footer class="modal-card-foot f-end">
+			<button class="button" type="button" @click="$parent.close()">Close</button>
+		</footer>
+	</div>
 </template>
 
 <script>
@@ -71,7 +76,7 @@ import WalletId from '../commons/WalletId.vue';
 import ByteAmount from './ByteAmount.vue';
 import User from './User.vue';
 
-export default {	
+export default {
 	components: {
 		Exchange,
 		WalletId,
@@ -93,13 +98,16 @@ export default {
 			isSpinnerActive: false,
 		}
 	},
+	created () {
+		this.getHistory();
+	},
 	watch:{
 		operationItem: function(){
-			this.historyItems= [];
+			this.historyItems = [];
 			this.getHistory();
 		}
 	},
-	methods:{
+	methods: {
 		getHistory(){
 			if (this.operationItem.key){
 				this.isSpinnerActive = true;
@@ -129,7 +137,28 @@ export default {
 </script>
 
 <style lang='scss' scoped>
-.event-block{
-	background-color: gainsboro;
-}
+	.event-block{
+		background-color: gainsboro;
+	}
+	.progress-stacked {
+		display: flex;
+		border-radius: 4px;
+		overflow: hidden;
+		.bar {
+			position: relative;
+			& > span {
+				display: block;
+				text-align: center;
+				line-height: 15px;
+				font-weight: bold;
+				color: #fff;
+			}
+		}
+	}
+	/*.progress-value {*/
+	/*	display: flex;*/
+	/*	.progress-wrapper {*/
+
+	/*	}*/
+	/*}*/
 </style>

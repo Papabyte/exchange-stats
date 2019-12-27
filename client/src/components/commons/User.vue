@@ -7,19 +7,19 @@
 
 <script>
 
-export default {	
-	props: {
-		nickname: {
-			type: String,
-			required: false,
-			default: null
+	export default {
+		props: {
+			nickname: {
+				type: String,
+				required: false,
+				default: null,
+			},
+			address: {
+				type: String,
+				required: true,
+			},
 		},
-		address: {
-			type: String,
-			required: true
-		}
 	}
-}
 </script>
 
 <style lang='scss' scoped>
