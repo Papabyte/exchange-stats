@@ -152,7 +152,7 @@
 				isSpinnerActive: true,
 				currentPage: 1,
 				totalRows: 0,
-				sortBy: 'countdown_start',
+				sortBy: 'end',
 				defaultSortDirection: 'desc',
 				timerId: null,
 				operations: [],

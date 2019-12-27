@@ -18,17 +18,19 @@
 
 			<div class="container" v-if="!url_input">
 				<div class="box">
-					<b-field @submit="onSubmit">
-						<b-input
-								id="input-1"
-								v-model="user_input"
-								type="text"
-								required
-								placeholder="Enter BTC address, transaction id or wallet id."></b-input>
-					</b-field>
+					<form @submit="onSubmit">
+						<b-field >
+							<b-input
+									id="input-1"
+									v-model="user_input"
+									type="text"
+									required
+									placeholder="Enter BTC address, transaction id or wallet id."></b-input>
+						</b-field>
+					</form>
 
 					<div class="container" v-if="arrExchanges">
-						<h6 class="title is-6 mb-2">{{$t('explorerOrBrowseExchanges')}}</h6>
+						<h6 class="title is-6 mt-1 mb-2">{{$t('explorerOrBrowseExchanges')}}</h6>
 
 						<span class="exchange-wrapper">
 							<exchange v-for="(exchange,index) in arrExchanges" v-bind:key="index" :showIcon="false"
@@ -102,6 +104,7 @@
 		},
 		methods: {
 			onSubmit () {
+				console.log("onSubmit")
 				this.$router.push({ name: 'explorerInput', params: { url_input: this.user_input } })
 			},
 		},
