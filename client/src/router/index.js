@@ -9,8 +9,12 @@ export default new Router({
 
 	routes: [
 		{
-			name: 'stats',
 			path: '/',
+			redirect: '/ranking'
+		},
+		{
+			name: 'stats',
+			path: '/ranking',
 			component: lazyLoading('components/ExchangesStats'),
 			default: true,
 		},

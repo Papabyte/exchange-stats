@@ -1,6 +1,6 @@
 <template>
 	<div class="main">
-		<nav-bar selected_item='0'/>
+		<nav-bar/>
 
 		<section class="section">
 			<div class="container">

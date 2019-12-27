@@ -9,7 +9,7 @@
 				</template>
 
 				<template slot="end">
-					<b-navbar-item tag="router-link" :to="{ path: '/' }">{{$t('navbarRanking')}}</b-navbar-item>
+					<b-navbar-item tag="router-link" :to="{ path: '/ranking' }">{{$t('navbarRanking')}}</b-navbar-item>
 					<b-navbar-item tag="router-link" :to="{ path: '/explorer' }">{{$t('navbarExplorer')}}</b-navbar-item>
 					<b-navbar-item tag="router-link" :to="{ path: '/crowdsourcing' }">{{$t('navbarCrowdsourcing')}}</b-navbar-item>
 					<b-navbar-item tag="router-link" :to="{ path: '/faq' }">{{$t('navbarFaq')}}</b-navbar-item>
@@ -25,12 +25,6 @@
 
 	export default {
 		name: 'NavBar',
-		props: {
-			selected_item: {
-				type: String,
-				default: '0',
-			},
-		},
 		data () {
 			return {
 				conf: conf,
