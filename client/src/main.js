@@ -3,9 +3,6 @@ import 'mutationobserver-shim'
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
-import BootstrapVue from 'bootstrap-vue'
-// import 'bootstrap/dist/css/bootstrap.css'
-// import 'bootstrap-vue/dist/bootstrap-vue.css'
 import Buefy from 'buefy'
 import 'buefy/dist/buefy.css'
 import axios from 'axios'
@@ -21,7 +18,6 @@ Vue.use(feather, 'v-icon');
 
 Vue.use(VueAxios, axios);
 
-Vue.use(BootstrapVue);
 Vue.use(Buefy);
 Vue.use(VueMeta);
 

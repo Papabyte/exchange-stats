@@ -3,9 +3,9 @@
 		<div v-if="label" class="title is-6 is-marginless">{{label}}</div>
 		<div class="row">
 			<span>{{address}}</span>
-			<b-link target="_blank" :href="'https://blockstream.info/address/'+address" class="ml-05">
+			<a target="_blank" :href="'https://blockstream.info/address/'+address" class="ml-05">
 				<v-icon name='external-link' class="custom-icon"/>
-			</b-link>
+			</a>
 		</div>
 	</div>
 </template>

@@ -1,6 +1,11 @@
 <template>
 	<div class="d-inline">
-		<span v-if="nickname" v-b-tooltip.hover :title="address">{{nickname}}</span>
+		<span v-if="nickname">
+			<b-tooltip 
+				:label="address"
+				position="is-right">
+					{{nickname}}
+			</b-tooltip></span>
 		<span v-else>{{address}}</span>
 	</div>
 </template>

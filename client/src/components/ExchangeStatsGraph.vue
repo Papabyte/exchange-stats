@@ -1,27 +1,25 @@
 <template>
-	<b-col offset-lg="1" lg="10" cols="12" class="py-3">
-		<b-row>
-			<b-col cols="12" class="py-3">
-				<h3 class="text-center">{{$t('rankingGraphTitle', {exchange: assocExchanges[exchange]})}}</h3>
-			</b-col>
-		</b-row>
-		<b-row class="main-block">
-			<b-col cols="12" class="py-3">
+	<section class="section">
+		<div class="container">
+			<h3 class="title is-3 mb-2">{{$t('rankingGraphTitle', {exchange: assocExchanges[exchange]})}}</h3>
+		</div>
+		<div class="container box">
 				<highcharts :options="chartOptions"></highcharts>
-			</b-col>
-		</b-row>
-		<b-row class="pl-3 mt-3">
-			<div>{{$t('rankingGraphLegendTimespan')}}</div>
-		</b-row>
-		<b-row class="pl-3 mt-1">
-			<div>{{$t('rankingGraphLegendWallets',{creation_date: creation_date})}}</div>
-			<div v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
-				<b-col>
-					<wallet-id :id="Number(wallet)"/>
-				</b-col>
-			</div>
-		</b-row>
-	</b-col>
+		</div>
+		<div class="container">
+			<div class="mt-1">{{$t('rankingGraphLegendTimespan')}}</div>
+		</div>
+		<div class="container">
+			<div class="mt-1">{{$t('rankingGraphLegendWallets',{creation_date: creation_date})}}</div>
+				<span class="wallet-wrapper mt-1" v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
+					<div class="field">
+						<span class="control">
+							<wallet-id :id="Number(wallet)"/>
+						</span>
+					</div>
+				</span>
+		</div>
+	</section>
 </template>
 
 <script>
@@ -115,4 +113,14 @@
 		},
 	}
 </script>
+<style lang="scss" scoped>
 
+	.wallet-wrapper {
+		display: inline-block;
+		margin-left: 15px;
+
+		&:first-child {
+			margin-left: 0;
+		}
+	}
+</style>

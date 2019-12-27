@@ -10,7 +10,7 @@
 					{{$t('urlProofModalProofForAdding')}}
 				</div>
 				<div class="row" v-for="(url,index) in proofsByOutcome.in" :key="index">
-					<b-link :href="url" target="_blank">{{url}}</b-link>
+					<a :href="url" target="_blank">{{url}}</a>
 				</div>
 			</div>
 			<div class="container" v-if="proofsByOutcome.out && proofsByOutcome.out.length>0">
@@ -18,7 +18,7 @@
 					{{$t('urlProofModalProofForRemoving')}}
 				</div>
 				<div class="row" v-for="(url,index) in proofsByOutcome.out" :key="index">
-					<b-link :href="url" target="_blank">{{url}}</b-link>
+					<a :href="url" target="_blank">{{url}}</a>
 				</div>
 			</div>
 		</section>

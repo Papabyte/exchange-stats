@@ -2,9 +2,9 @@
 	<div class="notification">
 		<span v-if="label" class="title is-6">{{label}}</span>
 		<span class="title is-5 is-marginless">{{tx_id}}</span>
-		<b-link target="_blank" :href="'https://blockstream.info/tx/'+tx_id" class="ml-1 b-link">
+		<a target="_blank" :href="'https://blockstream.info/tx/'+tx_id" class="ml-1 a">
 			<v-icon name='external-link' class="link-icon"/>
-		</b-link>
+		</a>
 	</div>
 </template>
 
@@ -31,7 +31,7 @@
 		align-items: center;
 	}
 
-	.b-link {
+	.a {
 		display: inline-block;
 	}
 

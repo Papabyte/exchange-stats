@@ -63,29 +63,27 @@
 						</b-table-column>
 
 						<b-table-column field="actions" :label="$t('rankingTableColAction')">
-							<b-button-group>
-								<b-link v-if="props.row.total_btc_wallet || props.row.nb_withdrawal_addresses"
-												:to="'/explorer/'+ props.row.exchange_id">
-									<b-button type="is-info" outlined class="text-nowrap">
-										{{$t('rankingTableButtonExploreWallet')}}
-									</b-button>
-								</b-link>
+							<router-link v-if="props.row.total_btc_wallet || props.row.nb_withdrawal_addresses"
+											:to="'/explorer/'+ props.row.exchange_id">
+								<b-button type="is-info" outlined class="text-nowrap">
+									{{$t('rankingTableButtonExploreWallet')}}
+								</b-button>
+							</router-link>
 
-								<b-dropdown aria-role="list">
-									<button class="button is-info is-outlined" slot="trigger">
-										<span>{{ $t('rankingTableButtonEdit') }}</span>
-										<b-icon icon="menu-down"></b-icon>
-									</button>
-									<b-dropdown-item aria-role="listitem" @click="addAWallet(props.row.exchange_id)">
-										{{$t('rankingTableButtonAddWallet')}}
-									</b-dropdown-item>
-									<b-dropdown-item aria-role="listitem"
-																	 v-if="props.row.total_btc_wallet || props.row.nb_withdrawal_addresses"
-																	 @click="removeAWallet(props.row.exchange_id)">
-										{{$t('rankingTableButtonRemoveWallet')}} - {{ props.row.exchange_id }}
-									</b-dropdown-item>
-								</b-dropdown>
-							</b-button-group>
+							<b-dropdown aria-role="list">
+								<button class="button is-info is-outlined" slot="trigger">
+									<span>{{ $t('rankingTableButtonEdit') }}</span>
+									<b-icon icon="menu-down"></b-icon>
+								</button>
+								<b-dropdown-item aria-role="listitem" @click="addAWallet(props.row.exchange_id)">
+									{{$t('rankingTableButtonAddWallet')}}
+								</b-dropdown-item>
+								<b-dropdown-item aria-role="listitem"
+																	v-if="props.row.total_btc_wallet || props.row.nb_withdrawal_addresses"
+																	@click="removeAWallet(props.row.exchange_id)">
+									{{$t('rankingTableButtonRemoveWallet')}} - {{ props.row.exchange_id }}
+								</b-dropdown-item>
+							</b-dropdown>
 						</b-table-column>
 					</template>
 

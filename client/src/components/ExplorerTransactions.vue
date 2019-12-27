@@ -45,7 +45,7 @@
 					<h5 class="title is-5">{{$t('explorerTransactionsWalletsForExchange')}}</h5>
 					<div class="columns">
 						<div class="column">
-							<span class="wpallet-wrapper" v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
+							<span class="wallet-wrapper" v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
 								<div class="field has-addons">
 									<span class="control">
 										<wallet-id :id="Number(wallet)"/>
@@ -366,7 +366,7 @@
 </script>
 
 <style lang="scss">
-	.wpallet-wrapper {
+	.wallet-wrapper {
 		display: inline-block;
 		margin-left: 15px;
 

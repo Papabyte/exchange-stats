@@ -69,7 +69,6 @@
 
 						<b-table-column field="actions" :label="$t('crowdSourcingOperationsTableColAction')">
 
-							<b-button-group>
 								<b-tooltip type="is-info" :label="$t('crowdSourcingOperationsButtonContestTip')">
 									<b-button
 											class="button is-info is-outlined"
@@ -113,7 +112,6 @@
 										{{$t('crowdSourcingOperationsButtonHistory')}}
 									</b-dropdown-item>
 								</b-dropdown>
-							</b-button-group>
 						</b-table-column>
 					</template>
 				</b-table>
