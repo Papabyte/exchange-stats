@@ -24,7 +24,7 @@
 										type="is-warning"
 										icon-right="close"
 										size="is-medium"
-										@click="removeWallet(wallet_id)"
+										@click="removeWalletFromExchange(wallet_id, walletOwner)"
 								/>
 							</b-tooltip>
 						</span>
@@ -36,7 +36,7 @@
 							size="is-medium"
 							type="is-warning"
 							icon-left="plus"
-							@click="addWallet(walletIdToEdit)">
+							@click="addWalletToAnExchange(wallet_id)">
 						{{$t('explorerTransactionsButtonAddToExchange')}}
 					</b-button>
 				</div>
@@ -56,7 +56,7 @@
 													type="is-warning"
 													icon-right="close"
 													size="is-medium"
-													@click="removeWalletTwo(Number(wallet))"
+													@click="removeWalletFromExchange(Number(wallet), exchange)"
 											/>
 										</b-tooltip>
 									</span>
@@ -68,7 +68,7 @@
 									size="is-medium"
 									type="is-warning"
 									icon-left="plus"
-									@click="addWalletTwo(exchange)"
+									@click="addAWalletToExchange(exchange)"
 							>
 								{{$t('explorerTransactionsButtonAddWallet')}}
 							</b-button>
@@ -170,7 +170,6 @@
 				redirected_ids: [],
 				isRemoving: null,
 				walletOwner: null,
-				walletIdToEdit: null,
 				tx_id: null,
 				total_on_wallets: null,
 				addr_count: null,
@@ -250,49 +249,28 @@
 			}
 		},
 		methods: {
-			addWallet (walletIdToEdit) {
-				let propWalletId = walletIdToEdit
+			addWalletToAnExchange(walletId) {
 				ModalProgrammatic.open({
 					parent: this,
 					component: EditWalletModal,
 					hasModalCard: true,
-					props: { propWalletId, isRemoving: false },
+					props: {propWalletId: walletId, isRemoving: false },
 				})
 			},
-			addWalletTwo (clicked_exchange) {
-				let propExchange = clicked_exchange
+			removeWalletFromExchange (walletId, exchange) {
 				ModalProgrammatic.open({
 					parent: this,
 					component: EditWalletModal,
 					hasModalCard: true,
-					props: { propExchange, isRemoving: false },
+					props: {propExchange: exchange, propWalletId: walletId, isRemoving: true },
 				})
 			},
-			removeWallet (wallet_id) {
-				let walletIdToEdit = wallet_id
+			addAWalletToExchange (exchange) {
 				ModalProgrammatic.open({
 					parent: this,
 					component: EditWalletModal,
 					hasModalCard: true,
-					props: { isRemoving: true },
-				})
-			},
-			removeWalletTwo (wallet_id) {
-				let propWalletId = wallet_id
-				ModalProgrammatic.open({
-					parent: this,
-					component: EditWalletModal,
-					hasModalCard: true,
-					props: { propWalletId, isRemoving: true },
-				})
-			},
-			editWallet (wallet_id) {
-				let walletIdToEdit = wallet_id
-				ModalProgrammatic.open({
-					parent: this,
-					component: EditWalletModal,
-					hasModalCard: true,
-					props: { walletIdToEdit, isRemoving: true },
+					props: {propExchange: exchange, isRemoving: false },
 				})
 			},
 			onPageChanged (value) {
@@ -310,7 +288,6 @@
 				this.redirected_ids = []
 				this.wallet_id = null
 				this.walletOwner = null
-				this.walletIdToEdit = null
 				this.total_on_wallets = null
 				this.tx_id = null
 				this.addr_count = null
@@ -330,7 +307,6 @@
 							this.failoverText = this.$t('explorerTransactionsNoTransactionsFound') + this.request_input
 						}
 						this.wallet_id = Number(response.data.redirected_id)
-						this.walletIdToEdit = this.wallet_id
 						this.walletOwner = response.data.exchange
 						this.isSpinnerActive = false
 					})

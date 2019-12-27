@@ -76,12 +76,12 @@
 										<span>{{ $t('rankingTableButtonEdit') }}</span>
 										<b-icon icon="menu-down"></b-icon>
 									</button>
-									<b-dropdown-item aria-role="listitem" @click="editWallet(props.row.exchange_id)">
+									<b-dropdown-item aria-role="listitem" @click="addAWallet(props.row.exchange_id)">
 										{{$t('rankingTableButtonAddWallet')}}
 									</b-dropdown-item>
 									<b-dropdown-item aria-role="listitem"
 																	 v-if="props.row.total_btc_wallet || props.row.nb_withdrawal_addresses"
-																	 @click="removeWallet(props.row.exchange_id)">
+																	 @click="removeAWallet(props.row.exchange_id)">
 										{{$t('rankingTableButtonRemoveWallet')}} - {{ props.row.exchange_id }}
 									</b-dropdown-item>
 								</b-dropdown>
@@ -158,22 +158,20 @@
 
 				this.isLoading = false
 			},
-			editWallet (clicked_exchange) {
-				let propExchange = clicked_exchange
+			addAWallet (exchange) {
 				ModalProgrammatic.open({
 					parent: this,
 					component: EditWalletModal,
 					hasModalCard: true,
-					props: { propExchange, isRemoving: false },
+					props: { propExchange: exchange, isRemoving: false },
 				})
 			},
-			removeWallet (clicked_exchange) {
-				let propExchange = clicked_exchange
+			removeAWallet (exchange) {
 				ModalProgrammatic.open({
 					parent: this,
 					component: EditWalletModal,
 					hasModalCard: true,
-					props: { propExchange, isRemoving: true },
+					props: { propExchange: exchange, isRemoving: true },
 				})
 			},
 			onPageChange (page) {

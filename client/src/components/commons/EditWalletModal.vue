@@ -11,7 +11,7 @@
 					<b-field :label="$t('editModalSelectExchange')">
 						<b-autocomplete
 								v-model="key"
-								@input="option => selectedExchange = option"
+								@input="option => {selectedExchange = option; check()}"
 								:keep-first="false"
 								:open-on-focus="true"
 								:data="filteredDataObj"
@@ -170,14 +170,6 @@
 				key: '',
 			}
 		},
-		created () {
-			if (this.propExchange) {
-				this.selectedExchange = this.propExchange
-			}
-			if (this.propWalletId) {
-				this.selectedWalletId = this.propWalletId
-			}
-		},
 		methods: {
 			urls_updated (urls, bAreUrlsValid) {
 				this.urls = urls
@@ -187,7 +179,6 @@
 				return (Number(wallet) && parseInt(wallet))
 			},
 			reset () {
-				console.log('reset')
 				this.isSpinnerActive = false
 				this.text_error = null
 				this.isPoolAvailable = false
@@ -209,7 +200,6 @@
 					this.inputCoolDownTimer = setTimeout(this.check, 1000)
 			},
 			check () {
-				console.log('check')
 				this.text_error = null
 				this.bestPoolId = false
 				this.rewardAmount = 0
@@ -348,31 +338,15 @@
 				return !this.bAreUrlsValid || !this.isPoolAvailable
 			},
 		},
+		created() {
+				this.selectedExchange = this.propExchange
+				this.selectedWalletId = this.propWalletId
+				this.reset()
+				if (this.propWalletId && this.assocExchanges[this.selectedExchange])// we have a wallet id as prop and exchange input is valid, let's go to check
+					this.check()
+		},
 		watch: {
-			propExchange: function () {
-				this.selectedExchange = this.propExchange
-				this.selectedWalletId = this.propWalletId
-				this.reset()
-			},
-			propWalletId: function () {
-				this.selectedExchange = this.propExchange
-				this.selectedWalletId = this.propWalletId
-
-				if (this.propExchange) // we have an exchange and wallet id as prop, let's go to check directly
-					this.check()
-				this.reset()
-			},
-			selectedWalletId: function () {
-				this.check()
-			},
-			isRemoving: function () {
-				if (this.propWalletId && this.assocExchanges[this.selectedExchange])// we have a wallet id as prop and exchange input is valid, let's go to check
-					this.check()
-			},
-			selectedExchange: function () {
-				if (this.propWalletId && this.assocExchanges[this.selectedExchange])// we have a wallet id as prop and exchange input is valid, let's go to check
-					this.check()
-			},
+		
 		},
 
 		beforeDestroy () {

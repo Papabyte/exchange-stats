@@ -51,7 +51,7 @@
 		},
 		created () {
 			this.isUrlValid = this.isRequired ? false : null
-			this.$emit('url_updated', null, this.index)
+			this.$emit('url_updated', this.isUrlValid, this.index)
 		},
 		methods: {
 			format (value, event) {
