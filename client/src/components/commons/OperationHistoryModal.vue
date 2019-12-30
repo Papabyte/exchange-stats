@@ -113,19 +113,20 @@ export default {
 				this.isSpinnerActive = true;
 				this.axios.get('/api/operation-history/'+ encodeURIComponent(this.operationItem.key)).then((response) => {
 					response.data.forEach((row)=>{
+						console.log(row)
 						const item = {};
 						item.operation_type = row.operation_type;
 						item.author_address = row.response.your_address;
 						item.author_nickname = row.response.nickname;
-						item.staked_on_yes = Number(row.response['staked_on_' + this.operationItem.initial_outcome]);
-						item.staked_on_no = Number(row.response['staked_on_' + (this.operationItem.initial_outcome == 'in' ? 'out' : 'in')]);
+						item.staked_on_yes = row.response['staked_on_' + this.operationItem.initial_outcome];
+						item.staked_on_no = row.response['staked_on_' + (this.operationItem.initial_outcome == 'in' ? 'out' : 'in')];
 						item.time = moment.unix(row.timestamp).format('LLLL');
 						item.stake_on = row.response.proposed_outcome == this.operationItem.initial_outcome ? this.$t('crowdSourcingOperationsYes') : this.$t('crowdSourcingOperationsNo');
-						item.accepted_amount = Number(row.response.accepted_amount);
+						item.accepted_amount = row.response.accepted_amount;
 						item.resulting_outcome = row.response.outcome == this.operationItem.initial_outcome ? this.$t('crowdSourcingOperationsYes') : this.$t('crowdSourcingOperationsNo');
-						item.paid_out_amount = Number(row.response.paid_out_amount);
+						item.paid_out_amount = row.response.paid_out_amount;
 						item.paid_out_address = row.response.paid_out_address;
-						item.expected_reward = Number(row.response.expected_reward);
+						item.expected_reward = row.response.expected_reward;
 						this.historyItems.push(item);
 						this.isSpinnerActive = false;
 					});

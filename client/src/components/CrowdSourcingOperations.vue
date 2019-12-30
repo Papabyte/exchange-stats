@@ -62,7 +62,8 @@
 						</b-table-column>
 
 						<b-table-column field="end" :label="$t('crowdSourcingOperationsTableColEnd')" sortable>
-							<b-tag type="is-warning">{{ props.row.end }}</b-tag>
+							<b-tag v-if="!props.row.is_commitable"  type="is-warning">{{ moment().to(props.row.end) }}</b-tag>
+							<b-tag v-else  type="is-warning">{{ $t('crowdSourcingOperationsTableEnded') }}</b-tag>
 						</b-table-column>
 
 						<b-table-column field="actions" :label="$t('crowdSourcingOperationsTableColAction')">
@@ -176,6 +177,7 @@
 			clearInterval(this.timerId)
 		},
 		methods: {
+			moment: moment,
 			contestOperation (clicked_item) {
 				let operationItem = clicked_item
 				ModalProgrammatic.open({
@@ -228,20 +230,22 @@
 						operation.outcome = row.outcome
 						operation.isRemovingOperation = row.outcome == 'out'
 						operation.initial_outcome = row.initial_outcome
-						operation.staked_on_outcome = Number(row.staked_on_outcome)
-						operation.total_staked = Number(row.total_staked)
-						operation.wallet_id = Number(row.wallet_id)
+						operation.staked_on_outcome = row.staked_on_outcome
+						operation.total_staked = row.total_staked
+						operation.wallet_id = row.wallet_id
 						operation.exchange = row.exchange
 						operation.key = row.key
 						operation.url_proofs_by_outcome = row.url_proofs_by_outcome
 						operation.countdown_start = row.countdown_start
-						operation.staked_on_opposite = Number(row.staked_on_opposite)
+						operation.staked_on_opposite = row.staked_on_opposite
+						operation.end = moment.unix(conf.challenge_period_in_days * 24 * 3600 + row.countdown_start)
 						if ((new Date().getTime() / 1000 - row.countdown_start) > conf.challenge_period_in_days * 24 * 3600) {
+							
 							operation.is_commitable = true
-							operation.end = this.$t('crowdSourcingOperationsTableEnded')
+						//	operation.end = this.$t('crowdSourcingOperationsTableEnded')
 						} else {
-							operation.end = moment().
-							to(moment.unix(conf.challenge_period_in_days * 24 * 3600 + Number(row.countdown_start)))
+						//	operation.end = moment().
+						//	to(moment.unix(conf.challenge_period_in_days * 24 * 3600 + Number(row.countdown_start)))
 						}
 
 						if (operation.status == 'committed') {

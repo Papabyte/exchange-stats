@@ -22,6 +22,8 @@ var assocStakedByKeyAndAddress = {};
 var assocProofsByKeyAndOutcome = {}
 var assocNicknamesByAddress = {};
 
+const MAX_OPERATIONS = 200;
+
 myWitnesses.readMyWitnesses(function (arrWitnesses) {
 	if (arrWitnesses.length > 0)
 		return start();
@@ -128,16 +130,16 @@ function indexRewardPools(objStateVars){
 	var assocPoolsByExchange = {};
 	poolKeys.forEach(function(poolKey){
 			const pool = {};
-			pool.number_rewards = objStateVars[poolKey+'_number_of_rewards'];
+			pool.number_rewards = Number(objStateVars[poolKey+'_number_of_rewards']);
 			pool.pool_id = poolKey.split('_')[1];
 			pool.sponsor = objStateVars[poolKey+'_sponsor']
-			pool.reward_amount = objStateVars[poolKey+'_reward_amount'];
+			pool.reward_amount = Number(objStateVars[poolKey+'_reward_amount']);
 			if (objStateVars[poolKey+'_exchange'] != undefined)
 				pool.exchange = objStateVars[poolKey+'_exchange'];
 			else
 				pool.exchange = 'any';
 			assocPoolsById[pool.pool_id] = pool;
-			if(objStateVars[poolKey+'_number_of_rewards'] > 0)
+			if(pool.number_rewards > 0)
 				activePools.push(pool);
 			if (!assocPoolsByExchange[pool.exchange])
 				assocPoolsByExchange[pool.exchange] = [];
@@ -157,6 +159,8 @@ function indexOperations(objStateVars){
 	
 	const operationKeys = extractOperationKeys(objStateVars);
 	const assocOperations = {};
+	const arrOperations = [];
+
 	const assocOperationsByExchange = {};
 	const assocWalletIdsByExchange = {};
 	const assocExchangeByWalletId = {};
@@ -169,7 +173,7 @@ function indexOperations(objStateVars){
 		const wallet_id = objStateVars[pairKey + "_wallet_id"];
 		operation.exchange = exchange;
 
-		operation.wallet_id = wallet_id;
+		operation.wallet_id = Number(wallet_id);
 
 		if(!assocWalletIdsByExchange[exchange])
 			assocWalletIdsByExchange[exchange] = [];
@@ -184,14 +188,18 @@ function indexOperations(objStateVars){
 		operation.initial_outcome = objStateVars[key + "_initial_outcome"];
 		operation.staked_on_outcome = Number(objStateVars[key + "_total_staked_on_" + outcome]);
 		operation.staked_on_opposite = Number(objStateVars[key + "_total_staked_on_" + (outcome == "in" ? "out" :"in") ]);
-		operation.countdown_start= objStateVars[key + "_countdown_start"];
+		operation.countdown_start= Number(objStateVars[key + "_countdown_start"]);
 		operation.total_staked = Number(objStateVars[key + "_total_staked"]);
 		operation.pool_id = Number(objStateVars[key + "_pool_id"]);
 		operation.key = key;
 		operation.staked_by_address = assocStakedByKeyAndAddress[key];
 		operation.url_proofs_by_outcome = assocProofsByKeyAndOutcome[key]
+		arrOperations.push(operation);
+	});
 
-		assocOperations[key] = operation;
+	arrOperations.sort(function(a, b) { return b.countdown_start - a.countdown_start});
+	arrOperations.slice(0, MAX_OPERATIONS).forEach(function(operation){
+		assocOperations[operation.key] = operation;
 		if(!assocOperationsByExchange[operation.exchange])
 			assocOperationsByExchange[operation.exchange] = [];
 		assocOperationsByExchange[operation.exchange].push(operation);

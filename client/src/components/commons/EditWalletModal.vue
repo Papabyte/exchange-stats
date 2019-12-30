@@ -255,7 +255,7 @@
 					this.isSpinnerActive = true
 					if (response.data.pool_id) {
 						this.bestPoolId = response.data.pool_id
-						this.rewardAmount = Number(response.data.reward_amount)
+						this.rewardAmount = response.data.reward_amount
 						this.isPoolAvailable = true
 					} else {
 						this.text_error = this.$t('editModalNoRewardAvailable')

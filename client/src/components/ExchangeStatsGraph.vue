@@ -14,7 +14,7 @@
 				<span class="wallet-wrapper mt-1" v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
 					<div class="field">
 						<span class="control">
-							<wallet-id :id="Number(wallet)"/>
+							<wallet-id :id="wallet"/>
 						</span>
 					</div>
 				</span>

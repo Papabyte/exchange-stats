@@ -31,7 +31,7 @@
 				</b-table-column>
 
 				<b-table-column field="reward_amount" :label="$t('crowdSourcingPoolsRewardAmount')" sortable>
-					<byte-amount :amount="Number(props.row.reward_amount)"/>
+					<byte-amount :amount="props.row.reward_amount"/>
 				</b-table-column>
 
 				<b-table-column field="exchange" :label="$t('crowdSourcingPoolsExchange')" sortable>
