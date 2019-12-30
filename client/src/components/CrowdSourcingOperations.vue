@@ -62,7 +62,7 @@
 						</b-table-column>
 
 						<b-table-column field="end" :label="$t('crowdSourcingOperationsTableColEnd')" sortable>
-							<b-tag v-if="!props.row.is_commitable"  type="is-warning">{{ moment().to(props.row.end) }}</b-tag>
+							<b-tag v-if="!props.row.is_committable"  type="is-warning">{{ moment().to(props.row.end) }}</b-tag>
 							<b-tag v-else  type="is-warning">{{ $t('crowdSourcingOperationsTableEnded') }}</b-tag>
 						</b-table-column>
 
@@ -71,7 +71,7 @@
 								<b-tooltip type="is-info" :label="$t('crowdSourcingOperationsButtonContestTip')">
 									<b-button
 											class="button is-info is-outlined"
-											v-if="props.row.status == 'onreview' && !props.row.is_commitable "
+											v-if="props.row.status == 'onreview' && !props.row.is_committable "
 											v-on:click="contestOperation(props.row)">
 										{{$t('crowdSourcingOperationsButtonContest')}}
 									</b-button>
@@ -80,7 +80,7 @@
 								<b-tooltip type="is-info" :label="$t('crowdSourcingOperationsButtonCommitTip')">
 									<b-button
 											class="button is-info is-outlined"
-											v-if="props.row.status == 'onreview' && props.row.is_commitable"
+											v-if="props.row.status == 'onreview' && props.row.is_committable"
 											@click="commitOperation(props.row)">
 										{{$t('crowdSourcingOperationsButtonCommit')}}
 									</b-button>
@@ -90,8 +90,8 @@
 									<b-button
 											class="button is-info is-outlined"
 											v-if="props.row.status == 'committed' && props.row.claimAddresses.length>0"
-											v-on:click="clicked_item=props.row;$bvModal.show('claimGain');">
-										123 {{$t('crowdSourcingOperationsButtonClaim')}}
+											v-on:click="claimGain(props.row)">
+											{{$t('crowdSourcingOperationsButtonClaim')}}
 									</b-button>
 								</b-tooltip>
 								<b-dropdown aria-role="list">
@@ -196,6 +196,15 @@
 					props: { operationItem },
 				})
 			},
+			claimGain (clicked_item) {
+				let operationItem = clicked_item
+				ModalProgrammatic.open({
+					parent: this,
+					component: ClaimGainModal,
+					hasModalCard: true,
+					props: { operationItem },
+				})
+			},
 			viewUrlProofs (clicked_item) {
 				let operationItem = clicked_item
 				ModalProgrammatic.open({
@@ -239,15 +248,8 @@
 						operation.countdown_start = row.countdown_start
 						operation.staked_on_opposite = row.staked_on_opposite
 						operation.end = moment.unix(conf.challenge_period_in_days * 24 * 3600 + row.countdown_start)
-						if ((new Date().getTime() / 1000 - row.countdown_start) > conf.challenge_period_in_days * 24 * 3600) {
-							
-							operation.is_commitable = true
-						//	operation.end = this.$t('crowdSourcingOperationsTableEnded')
-						} else {
-						//	operation.end = moment().
-						//	to(moment.unix(conf.challenge_period_in_days * 24 * 3600 + Number(row.countdown_start)))
-						}
-
+						if ((new Date().getTime() / 1000 - row.countdown_start) > conf.challenge_period_in_days * 24 * 3600)
+							operation.is_committable = true
 						if (operation.status == 'committed') {
 							operation.claimAddresses = []
 							const assocStakedByAdress = row.staked_by_address

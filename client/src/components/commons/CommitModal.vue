@@ -1,5 +1,5 @@
 <template>
-	<div class="modal-card add-wallet">
+	<div class="modal-card">
 		<header class="modal-card-head">
 			<p class="modal-card-title">{{ this.getTitle }}</p>
 			<button class="delete" aria-label="close" @click="$parent.close()"></button>

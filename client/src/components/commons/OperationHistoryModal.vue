@@ -1,5 +1,5 @@
 <template>
-	<div class="modal-card add-wallet">
+	<div class="modal-card">
 		<header class="modal-card-head">
 			<p class="modal-card-title">
 				<i18n v-if="operationItem.initial_outcome=='in'" tag="span" path="crowdSourcingOperationsAddXToX" id="action">

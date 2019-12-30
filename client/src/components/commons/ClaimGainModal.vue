@@ -1,32 +1,39 @@
 <template>
-	<b-modal id="claimGain" :title="getTitle" :hide-footer="true">
-		<b-container v-if="!link" fluid>
-			<b-row>
+	<div class="modal-card">
+		<header class="modal-card-head">
+			<p class="modal-card-title">{{ this.getTitle }}</p>
+			<button class="delete" aria-label="close" @click="$parent.close()"></button>
+		</header>	
+		<section class="modal-card-body">
+
+		<div class="container" v-if="!link">
+			<div class="row">
 				{{$t('claimModalSelectAddress')}}
-			</b-row>
-			<b-row v-if="this.operation_item.claimAddresses" class="pt-3">
-				<div v-for="(address,index) in this.operation_item.claimAddresses" :key="index">
-					<b-button variant="primary" @click="claim(address)" class="mb-2 text-monospace" size="m">{{address}}
+			</div>
+			<div class="row">
+				<div v-for="(address,index) in operationItem.claimAddresses" :key="index">
+					<b-button  @click="claim(address)" 	class="button is-info is-outlined mt-1">{{address}}
 					</b-button>
 				</div>
-			</b-row>
-		</b-container>
-		<b-container v-else fluid>
-			<b-row class="pt-3">
+			</div>
+		</div>
+		<div class="container" v-else >
+			<div class="row" >
 				{{$t('claimModalLinkHeader')}}
-			</b-row>
-			<b-row class="pt-3">
-			<span class="text-break">
-				<a :href="link">{{link}}</a>
-			</span>
-			</b-row>
-			<b-row class="py-3">
+			</div>
+			<div class="row">
+				<span class="text-break">
+					<a :href="link">{{link}}</a>
+				</span>
+			</div>
+			<div class="row" >
 				{{$t('claimModalLinkFooter')}}
-			</b-row>
-		</b-container>
-	</b-modal>
-</template>
+			</div>
+		</div>
+		</section>
 
+	</div>
+</template>
 <script>
 	const conf = require('../../conf.js')
 	export default {
@@ -44,7 +51,6 @@
 				text_error: null,
 				items: [],
 				link: false,
-				operation_item: {},
 			}
 		},
 		computed: {
@@ -52,21 +58,12 @@
 				return 'Claim a gain'
 			},
 		},
-		watch: {
-			operationItem: function () {
-				this.operation_item = this.operationItem
-				this.listAddresses()
-			},
-		},
 		methods: {
-			listAddresses () {
-
-			},
 			claim (address) {
 				const base64url = require('base64url')
 				const data = {
 					withdraw: 1,
-					operation_id: this.operation_item.key,
+					operation_id: this.operationItem.key,
 					address: address,
 				}
 

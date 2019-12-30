@@ -244,17 +244,17 @@ function extractStakedByKeyAndAddress(objStateVars){
 	assocStakedByKeyAndAddress = {};
 	for (var key in objStateVars){
 		if (key.indexOf("operation_") == 0){
-		var splitKey = key.split('_');
-		 if (splitKey[3] == "total" && splitKey[7] == "by"){
-			var address = splitKey[9];
-			var outcome = splitKey[7];
-			var operation_key = splitKey[0] + '_' + splitKey[1] + '_' + splitKey[2] + '_' + splitKey[3];
-			if (!assocStakedByKeyAndAddress[operation_key])
-				assocStakedByKeyAndAddress[operation_key] = {};
-			if(!assocStakedByKeyAndAddress[operation_key][address])
-				assocStakedByKeyAndAddress[operation_key][address] = {};
-			assocStakedByKeyAndAddress[operation_key][address][outcome]= objStateVars[key];
-		 }
+			var splitKey = key.split('_');
+			if (splitKey[4] == "total" && splitKey[8] == "by"){
+				var address = splitKey[9];
+				var outcome = splitKey[7];
+				var operation_key = splitKey[0] + '_' + splitKey[1] + '_' + splitKey[2] + '_' + splitKey[3];
+				if (!assocStakedByKeyAndAddress[operation_key])
+					assocStakedByKeyAndAddress[operation_key] = {};
+				if(!assocStakedByKeyAndAddress[operation_key][address])
+					assocStakedByKeyAndAddress[operation_key][address] = {};
+				assocStakedByKeyAndAddress[operation_key][address][outcome]= objStateVars[key];
+			}
 		}
 	}
 }
