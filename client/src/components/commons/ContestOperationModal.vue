@@ -1,68 +1,73 @@
 <template>
-	<b-modal 
-	id="contestOperation" 
-	:title="getTitle" 
-	:hide-footer="!!link"
-	:okDisabled="isOkDisabled" 
-	@close="link=false" 
-	@ok="handleOk">
-		<b-container v-if="!link" fluid >
-			<b-row class="pt-3" >
-				<label for="range-1">{{$t("contestModalAmountToStake")}}</label>
-				<b-form-input id="range-1" 
-				v-model="stakeAmountGb" 
-				type="range" 
-				:number="true" 
-				:min="conf.challenge_min_stake_gb" 
-				:max="reversalStakeGb*1.01" 
-				:step="reversalStakeGb/100"></b-form-input>
-			</b-row >
-			<b-row>
-				<span v-if="text_error" class="pt-3">{{text_error}}</span>
-				<div class="pt-3">
-					<i18n path="contestModalGainIfReversed" id="potential-gain">
-						<template #stake_amount>
-							<byte-amount :amount="stakeAmount" />
-						</template>
-						<template #gain_amount>
-							<byte-amount :amount="potentialGainAmount" /> 
-						</template>
-					</i18n>
+	<div class="modal-card" id="donateReward" @close="link=false">
+		<header class="modal-card-head">
+			<p class="modal-card-title">{{ getTitle }}</p>
+			<button class="delete" aria-label="close" @click="$parent.close()"></button>
+		</header>
+		<section class="modal-card-body">
+			<div class="container" v-if="!link">
+				<div class="row">
+						<b-field :label="$t('contestModalAmountToStake')">
+						<b-slider type="is-info" 
+						v-model="stakeAmountGb" 
+						:min="conf.challenge_min_stake_gb" 
+						:max="reversalStakeGb" 
+						:step="reversalStakeGb/100"
+						class="px-1"
+						></b-slider>
+					</b-field>
+				</div >
+				<div class="row">
+					<span v-if="text_error" class="pt-3">{{text_error}}</span>
+					<div class="pt-3">
+						<i18n path="contestModalGainIfReversed" id="potential-gain">
+							<template #stake_amount>
+								<byte-amount :amount="stakeAmount" />
+							</template>
+							<template #gain_amount>
+								<byte-amount :amount="potentialGainAmount" /> 
+							</template>
+						</i18n>
+					</div>
+					<div class="row" v-if="amountLeftToReverse>0">
+						<div class="pt-3">
+							<i18n path="contestModalAmountLeft" id="amount-left">
+								<template #amount>
+									<byte-amount :amount="amountLeftToReverse" />
+								</template>
+								<template #gain_amount>
+									<byte-amount :amount="potentialGainAmount" /> 
+								</template>
+							</i18n>
+						</div>
+					</div>
 				</div>
-			</b-row >
-			<b-row v-if="amountLeftToReverse>0">
-			<div class="pt-3">
-				<i18n path="contestModalAmountLeft" id="amount-left">
-					<template #amount>
-						<byte-amount :amount="amountLeftToReverse" />
-					</template>
-					<template #gain_amount>
-						<byte-amount :amount="potentialGainAmount" /> 
-					</template>
-				</i18n>
+				<div class="row" >
+					<div class="mt-4">
+						{{$t('contestModalProofExplanation')}}
+					</div>
+					<url-inputs @urls_updated="urls_updated" class="mt-1"/>
+				</div>
 			</div>
-			</b-row >
-			<b-row>
-				<div class="mt-4">
-					{{$t('contestModalProofExplanation')}}
+			<div class="container" v-else fluid >
+				<div class="row" >
+					{{$t("contestModalLinkHeader")}}
 				</div>
-				<url-inputs @urls_updated="urls_updated" />
-			</b-row >
-		</b-container>
-		<b-container v-else fluid >
-			<b-row class="pt-3">
-				{{$t("contestModalLinkHeader")}}
-			</b-row >
-		<b-row class="pt-3">
-			<span class="text-break">
-				<a :href="link">{{link}}</a>
-			</span>
-			</b-row >
-			<b-row class="py-3">
-				{{$t("contestModalLinkFooter")}}
-			</b-row >
-		</b-container>
-	</b-modal>
+				<div class="row" >
+				<span class="text-break">
+					<a :href="link">{{link}}</a>
+				</span>
+				</div>
+				<div class="row" >
+					{{$t("contestModalLinkFooter")}}
+				</div>
+			</div>
+		</section>
+		<footer class="modal-card-foot f-end" v-show="!link">
+			<button class="button" type="button" @click="$parent.close()">Close</button>
+			<button class="button is-primary" :disabled="isOkDisabled" @click="handleOk">Ok</button>
+		</footer>
+	</div>
 </template>
 
 <script>
@@ -98,6 +103,13 @@ export default {
 			operation_item:{}
 		}
 	},
+	created(){
+			this.operation_item = this.operationItem;
+			this.reversalStake = (conf.challenge_coeff*this.operation_item.staked_on_outcome - this.operation_item.staked_on_opposite);
+			this.reversalStakeGb = this.reversalStake/conf.gb_to_bytes;
+			this.stakeAmountGb = this.reversalStakeGb;
+
+	},
 	computed:{
 		getTitle:function(){
 			if (this.operation_item.isRemovingOperation)
@@ -120,15 +132,6 @@ export default {
 		}
 	},
 	watch:{
-		operationItem:function(){
-			if(!this.operationItem)
-				return;
-			this.operation_item = this.operationItem;
-			this.reversalStake = (conf.challenge_coeff*this.operation_item.staked_on_outcome - this.operation_item.staked_on_opposite);
-			this.reversalStakeGb = this.reversalStake/conf.gb_to_bytes;
-			this.stakeAmountGb = this.reversalStakeGb;
-			this.reset();
-		},
 		stakeAmountGb: function(){
 			if (this.stakeAmountGb > this.reversalStakeGb)
 				this.stakeAmountGb = this.reversalStakeGb;
@@ -141,9 +144,6 @@ export default {
 		urls_updated(urls, bAreUrlsValid){
 			this.urls = urls;
 			this.isOkDisabled = !bAreUrlsValid;
-		},
-		reset(){
-			this.text_error = null;
 		},
 		handleOk(bvModalEvt){
 				bvModalEvt.preventDefault()	;

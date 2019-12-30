@@ -8,6 +8,7 @@ const mutex = require('ocore/mutex.js');
 const zlib = require('zlib');
 const stats = require("./stats.js");
 
+
 const confirmationsBeforeIndexing = 3;
 const activeRedirectionFromHeight = process.env.testnet && !process.env.full_indexation ? 9000 : 598000;
 const accurateTxsCountUpTo = 10000;
@@ -28,6 +29,8 @@ getLastHeightThenProcess();
 setInterval(getLastHeightThenProcess, 60000);
 
 function getLastHeightThenProcess(){
+	if (process.env.no_indexation)
+	return;
 	getLastBlockHeight(function(error, last_block_height){
 		if (error)
 			return error;

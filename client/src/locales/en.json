@@ -1,4 +1,5 @@
 {
+	"commonEmptyTable" : "Nothing here.",
 	"editModalRemoveXFromX" : "Remove wallet {wallet} from exchange {exchange}",
 	"editModalAddXToX": "Add wallet {wallet} to exchange {exchange}",
 	"editModalRemoveFromX" : "Remove wallet from exchange {exchange}",

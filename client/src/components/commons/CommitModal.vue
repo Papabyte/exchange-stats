@@ -35,8 +35,7 @@
 		},
 		data () {
 			return {
-				link: false,
-				operation_item: {},
+				link: false
 			}
 		},
 		computed: {
@@ -45,10 +44,7 @@
 			},
 		},
 		watch: {
-			operationItem: function () {
-				this.operation_item = this.operationItem
-				this.createLink()
-			},
+
 		},
 		created () {
 			this.createLink()
@@ -57,13 +53,13 @@
 			createLink (address) {
 				const base64url = require('base64url')
 				const data = {
-					exchange: this.operation_item.exchange,
+					exchange: this.operationItem.exchange,
 					commit: 1,
 				}
-				if (this.operation_item.initial_outcome == 'in')
-					data.add_wallet_id = this.operation_item.wallet_id
+				if (this.operationItem.initial_outcome == 'in')
+					data.add_wallet_id = this.operationItem.wallet_id
 				else
-					data.remove_wallet_id = this.operation_item.wallet_id
+					data.remove_wallet_id = this.operationItem.wallet_id
 				const json_string = JSON.stringify(data)
 				const base64data = base64url(json_string)
 				this.link = (conf.testnet ? 'byteball-tn' : 'byteball') + ':' + conf.aa_address + '?amount=10000&base64data=' +

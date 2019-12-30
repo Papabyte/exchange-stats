@@ -44,15 +44,15 @@
 									</div>
 								</div>
 							</div>
-							<div v-if="item.operation_type =='commit'">
+							<div class="box" v-if="item.operation_type =='commit'" >
 								<div class="title is-6"><b>Committed</b> - {{item.time}} </div>
-								<div class="pt-2">
+								<div class="d-block text-break">
 									<span v-if="item.paid_out_amount" class="d-block"><b><byte-amount :amount="item.paid_out_amount"/></b> paid to <b>{{item.paid_out_address}}</b></span>
 								</div>
 							</div>
-							<div v-if="item.operation_type =='withdraw'" >
+							<div class="box" v-if="item.operation_type =='withdraw'" >
 								<div class="title is-6"><b>Withdraw</b> - {{item.time}} </div>
-								<div class="pt-2">
+								<div class="d-block text-break">
 									<span v-if="item.paid_out_amount" class="d-block"><b><byte-amount :amount="item.paid_out_amount"/></b> paid to <b>{{item.paid_out_address}}</b></span>
 								</div>
 							</div>

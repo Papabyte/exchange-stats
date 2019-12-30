@@ -36,6 +36,19 @@
 				</b-table-column>
 
 			</template>
+			<template slot="empty">
+				<section class="section">
+					<div class="content has-text-grey has-text-centered">
+						<p>
+							<b-icon
+								icon="emoticon-sad"
+								size="is-large">
+							</b-icon>
+						</p>
+						<p>{{$t("commonEmptyTable")}}</p>
+					</div>
+				</section>
+			</template>
 		</b-table>
 	</div>
 </template>

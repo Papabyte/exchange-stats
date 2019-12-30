@@ -1,9 +1,6 @@
 <template>
 
 	<div class="container">
-		<contest-operation-modal :operationItem="clicked_item"/>
-		<claim-gain-modal :operationItem="clicked_item"/>
-
 		<div class="notification is-warning">
 			<contributors-greeting/>
 		</div>
@@ -29,6 +26,7 @@
 						aria-current-label="Current page"
 				>
 					<template slot-scope="props">
+						
 						<b-table-column field="status" :label="$t('crowdSourcingOperationsTableColStatus')" sortable>
 							<b-tag type="is-primary">{{ props.row.status }}</b-tag>
 						</b-table-column>
@@ -73,7 +71,7 @@
 									<b-button
 											class="button is-info is-outlined"
 											v-if="props.row.status == 'onreview' && !props.row.is_commitable "
-											v-on:click="clicked_item=data.item;$bvModal.show('contestOperation');">
+											v-on:click="contestOperation(props.row)">
 										{{$t('crowdSourcingOperationsButtonContest')}}
 									</b-button>
 								</b-tooltip>
@@ -114,6 +112,19 @@
 								</b-dropdown>
 						</b-table-column>
 					</template>
+					<template slot="empty">
+						<section class="section">
+							<div class="content has-text-grey has-text-centered">
+								<p>
+									<b-icon
+										icon="emoticon-sad"
+										size="is-large">
+									</b-icon>
+								</p>
+								<p>{{$t("commonEmptyTable")}}</p>
+							</div>
+						</section>
+					</template>
 				</b-table>
 			</div>
 		</div>
@@ -139,8 +150,6 @@
 	export default {
 		components: {
 			ByteAmount,
-			ContestOperationModal,
-			ClaimGainModal,
 			Exchange,
 			WalletId,
 			ContributorsGreeting,
@@ -167,6 +176,15 @@
 			clearInterval(this.timerId)
 		},
 		methods: {
+			contestOperation (clicked_item) {
+				let operationItem = clicked_item
+				ModalProgrammatic.open({
+					parent: this,
+					component: ContestOperationModal,
+					hasModalCard: true,
+					props: { operationItem },
+				})
+			},
 			commitOperation (clicked_item) {
 				let operationItem = clicked_item
 				ModalProgrammatic.open({

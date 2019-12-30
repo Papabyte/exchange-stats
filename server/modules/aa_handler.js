@@ -4,6 +4,7 @@ const myWitnesses = require('ocore/my_witnesses.js');
 const async = require('async');
 const mutex = require('ocore/mutex.js');
 const network = require('ocore/network.js');
+const wallet_general = require('ocore/wallet_general.js');
 const db = require('ocore/db.js');
 const social_networks = require('./social_networks.js');
 
@@ -30,8 +31,11 @@ myWitnesses.readMyWitnesses(function (arrWitnesses) {
 
 function start(){
 	lightWallet.setLightVendorHost(conf.hub);
-	db.query("INSERT "+db.getIgnore()+" INTO my_watched_addresses (address) VALUES (?)", [conf.aa_address], function(){
-		network.addLightWatchedAddress(conf.address);
+	wallet_general.addWatchedAddress(conf.aa_address, function(error){
+		if (error)
+			console.log(error)
+		else
+			console.log(conf.aa_address + " added as watched address")
 		refresh(),
 		setInterval(refresh, 60 * 1000);
 	});
@@ -40,7 +44,9 @@ function start(){
 function refresh(){
 	lightWallet.refreshLightClientHistory();
 	catchUpOperationsHistory();
-	network.requestFromLightVendor('light/get_aa_state_vars', {address: conf.aa_address},function(error, request, objStateVars){
+	network.requestFromLightVendor('light/get_aa_state_vars', {
+		address: conf.aa_address 
+	},function(error, request, objStateVars){
 		indexOperations(objStateVars);
 		indexRewardPools(objStateVars);
 		indexNicknames(objStateVars);
@@ -145,7 +151,7 @@ function indexRewardPools(objStateVars){
 
 //we read state vars to read all past and ongoing operations and sort them in different associative arrays
 function indexOperations(objStateVars){
-
+	console.log(JSON.stringify(objStateVars));
 	extractStakedByKeyAndAddress(objStateVars);
 	extractProofUrls(objStateVars);
 	
@@ -202,7 +208,7 @@ function indexOperations(objStateVars){
 function extractProofUrls(objStateVars){
 	assocProofsByKeyAndOutcome= {};
 	for (var key in objStateVars){
-		if (key.indexOf("k_") == 0){
+		if (key.indexOf("operation_") == 0){
 		var splitKey = key.split('_');
 		 if (splitKey[4] == "url" && splitKey[5] == "proof"){
 			var outcome = splitKey[7];
@@ -229,7 +235,7 @@ function indexNicknames(objStateVars){
 function extractStakedByKeyAndAddress(objStateVars){
 	assocStakedByKeyAndAddress = {};
 	for (var key in objStateVars){
-		if (key.indexOf("k_") == 0){
+		if (key.indexOf("operation_") == 0){
 		var splitKey = key.split('_');
 		 if (splitKey[3] == "total" && splitKey[7] == "by"){
 			var address = splitKey[9];
@@ -249,7 +255,7 @@ function extractStakedByKeyAndAddress(objStateVars){
 function extractOperationKeys(objStateVars){
 	const assocOperationKeys = {};
 	 for (var key in objStateVars){
-		 if (key.indexOf("k_") == 0){
+		 if (key.indexOf("operation_") == 0){
 			var splitKey = key.split('_');
 			assocOperationKeys[splitKey[0] + '_' + splitKey[1] + '_' + splitKey[2] + '_' + splitKey[3]] = true;
 		 }
@@ -264,7 +270,7 @@ function extractOperationKeys(objStateVars){
 
 function convertOperationKeyToPairKey(operationKey){
 	var splitKey = operationKey.split('_');
-	return 	"p" + "_" + splitKey[1] + "_" + splitKey[2];
+	return 	"pair_" + splitKey[1] + "_" + splitKey[2];
 }
 
 
