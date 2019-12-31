@@ -23,7 +23,7 @@ async function start(){
 		getBlocksAboveIndex().then(function() {
 			isProcessing = false;
 		});
-	}, 10000);
+	}, 60000);
 }
 
 

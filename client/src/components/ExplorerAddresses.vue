@@ -27,24 +27,21 @@
 			</div>
 
 			<div class="notification columns transaction-headers is-paddingless is-marginless">
-				<div class="column is-6">
-					<span class="title is-6">Address:</span>
+				<div class="column is-4">
+					<span class="title is-6">{{$t('explorerAddressesTableHeaderAddress')}}</span>
 				</div>
-				<div class="column is-6">
-					<span class="title is-6">View on:</span>
+				<div class="column is-4">
+					<span class="title is-6">{{$t('explorerAddressesTableHeaderBalance')}}</span>
+				</div>
+				<div class="column is-4">
+					<span class="title is-6">{{$t('explorerAddressesTableHeaderViewOn')}}</span>
 				</div>
 			</div>
 			<div class="addr-list" v-for="(address,index) in addresses" v-bind:key="index">
 				<div class="columns">
-					<div class="column">{{address}}</div>
-					<div class="column">
-						<div class="columns">
-							<div class="column"><a :href="'https://blockstream.info/address/' + address">blockstream.info</a></div>
-							<div class="column"><a :href="'https://www.blockchain.com/btc/address/' + address">blockchain.com</a>
-							</div>
-							<div class="column"><a :href="'https://www.walletexplorer.com/?q=' + address">walletexplorer.com</a></div>
-						</div>
-					</div>
+					<div class="column">{{address.address}}</div>
+						<div class="column"><btc-amount :amount="address.balance"/></div>
+						<div class="column"><a :href="'https://blockstream.info/address/' + address.address">blockstream.info</a></div>
 				</div>
 			</div>
 		</div>
@@ -61,10 +58,12 @@
 
 	const conf = require('../conf.js')
 	import WalletId from './commons/WalletId.vue'
+	import BtcAmount from './commons/BtcAmount.vue'
 
 	export default {
 		components: {
 			WalletId,
+			BtcAmount,
 		},
 		props: {
 			request_input: {
@@ -112,7 +111,6 @@
 				this.count_total = null
 				this.axios.get('/api/wallet-addresses/' + this.request_input + '/' + (this.currentPage - 1)).
 				then((response) => {
-					this.progressive_display_level = 1
 					this.addresses = response.data.addresses
 					this.count_total = Number(response.data.addr_count)
 					this.isSpinnerActive = false

@@ -30,11 +30,11 @@ async function getTransactionsFromWallets(arrIds, page, handle){
 
 async function getAddressesFromWallet(id, page, handle){
 	var [addressesRows, addr_count] = await Promise.all([
-		db.query("SELECT address FROM btc_addresses WHERE wallet_id=? LIMIT ?,?",[id,page*ADDR_PER_PAGE,ADDR_PER_PAGE]),
+		db.query("SELECT address,balance FROM btc_addresses WHERE wallet_id=? ORDER BY balance DESC LIMIT ?,? ",[id,page*ADDR_PER_PAGE,ADDR_PER_PAGE]),
 		stats.getAddressesCount([id])
 	]);
 
-	return handle({per_page: ADDR_PER_PAGE,addr_count: addr_count, addresses: addressesRows.map(function(row){return row.address})});
+	return handle({per_page: ADDR_PER_PAGE,addr_count: addr_count, addresses: addressesRows});
 }
 
 
