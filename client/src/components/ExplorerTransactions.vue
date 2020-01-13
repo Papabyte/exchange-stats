@@ -89,7 +89,7 @@
 				<div class="notification" v-if="wallet_id">
 					<span class="title is-6">{{$t('explorerTransactionsAddressCount')}}</span>
 					<router-link :to="{name: 'explorerAddresses', params: { request_input: wallet_id} }">
-						{{addr_count}}
+						{{addr_count || 0}}
 					</router-link>
 				</div>
 			</div>

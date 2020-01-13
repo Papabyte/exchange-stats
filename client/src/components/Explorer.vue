@@ -18,23 +18,35 @@
 
 			<div class="container" v-if="!url_input">
 				<div class="box">
-					<form @submit="onSubmit">
-						<b-field >
-							<b-input
+					<div class="columns">
+						<div class="column is-four-fifths">
+							<b-autocomplete
 									id="input-1"
 									v-model="user_input"
 									type="text"
 									required
-									placeholder="Enter BTC address, transaction id or wallet id."></b-input>
-						</b-field>
-					</form>
-
-					<div class="container" v-if="arrExchanges">
+									:data="filteredDataObj"
+									placeholder="Enter BTC address, transaction id or wallet id."
+									@select="onSubmit">
+								</b-autocomplete>
+						</div>
+						<div class="column">
+					<b-button
+					size="is-medium"
+					type="is-info"
+				@click="onSubmit"
+			>
+				<v-icon name='arrow-right' class="custom-icon"/>
+			</b-button>
+				</div>
+			</div>
+					<div class="container">
 						<h6 class="title is-6 mt-1 mb-2">{{$t('explorerOrBrowseExchanges')}}</h6>
-
 						<span class="exchange-wrapper">
-							<exchange v-for="(exchange,index) in arrExchanges" v-bind:key="index" :showIcon="false"
-												:id="exchange.id"/>
+							<exchange v-for="key in assocExchangesByName" 
+								v-bind:key="key"
+								:showIcon="false"
+								:id="key"/>
 						</span>
 					</div>
 				</div>
@@ -86,8 +98,15 @@
 			}
 		},
 		computed: {
-			arrExchanges: function () {
-				return this.$store.state.exchanges
+			filteredDataObj () {
+				const data = this.assocExchangesByName
+				const options = Object.entries(data).map(([key, value]) => ({ key, value }))
+				return options.filter((option) => {
+					return option.key.toString().toLowerCase().indexOf(this.user_input.toLowerCase()) >= 0
+				})
+			},
+			assocExchangesByName: function () {
+				return this.$store.state.exchangesByName
 			},
 			welcomeMessageShow () {
 				return !this.$store.state.wasExplorerWelcomeMessageClosed
@@ -125,5 +144,10 @@
 		& > span {
 			margin: 0.75rem;
 		}
+	}
+
+	.custom-icon {
+		height: 50px;
+		padding: auto;
 	}
 </style>

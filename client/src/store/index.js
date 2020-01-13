@@ -6,15 +6,15 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
 	state: {
-		exchanges: [],
+		exchangesByName: {},
 		exchangesById: {},
 		wasRankingWelcomeMessageClosed: false,
 		wasExplorerWelcomeMessageClosed: false,
 		wasCrowdSourcingWelcomeMessageClosed: false
 	},
 	mutations: {
-		setExchanges(state, data) {
-			state.exchanges = data;
+		setExchangesByName(state, data) {
+			state.exchangesByName = data;
 		},
 		setExchangesById(state, data) {
 			state.exchangesById = data;
@@ -33,15 +33,14 @@ export default new Vuex.Store({
 	actions: {
 		getExchanges(context){
 			Axios.get('/api/exchanges').then((response) => {
-				const arrExchanges = response.data.sort(function(a,b){
-					return a.name.toUpperCase() > b.name.toUpperCase();
-				});
-				const exchangesById = {};
-				arrExchanges.forEach(function(row){
-					exchangesById[row.id] = row.name
-				});
+				const exchangesById = response.data;
+				const exchangesByName = {};
+
+				for (var key in exchangesById){
+					exchangesByName[exchangesById[key].name] = key;
+				}
 				context.commit('setExchangesById', exchangesById);
-				context.commit('setExchanges', arrExchanges);
+				context.commit('setExchangesByName', exchangesByName);
 			});
 		}
   },

@@ -123,7 +123,7 @@ export default {
 						item.time = moment.unix(row.timestamp).format('LLLL');
 						item.stake_on = row.response.proposed_outcome == this.operationItem.initial_outcome ? this.$t('crowdSourcingOperationsYes') : this.$t('crowdSourcingOperationsNo');
 						item.accepted_amount = row.response.accepted_amount;
-						item.resulting_outcome = row.response.outcome == this.operationItem.initial_outcome ? this.$t('crowdSourcingOperationsYes') : this.$t('crowdSourcingOperationsNo');
+						item.resulting_outcome = row.response.resulting_outcome == this.operationItem.initial_outcome ? this.$t('crowdSourcingOperationsYes') : this.$t('crowdSourcingOperationsNo');
 						item.paid_out_amount = row.response.paid_out_amount;
 						item.paid_out_address = row.response.paid_out_address;
 						item.expected_reward = row.response.expected_reward;

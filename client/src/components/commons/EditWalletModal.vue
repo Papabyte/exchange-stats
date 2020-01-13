@@ -11,7 +11,7 @@
 					<b-field :label="$t('editModalSelectExchange')">
 						<b-autocomplete
 								v-model="key"
-								@input="option => {selectedExchange = option; check()}"
+								@input="onExchangeInput"
 								:keep-first="false"
 								:open-on-focus="true"
 								:data="filteredDataObj"
@@ -51,12 +51,14 @@
 				</div>
 
 				<div class="row">
-					<b-notification v-if="text_error" :closable="false" :auto-close="true"
-													type="is-danger"
-													aria-close-label="Close notification"
-													role="alert"
+					<b-notification
+						:closable="true" 
+						:active.sync="isNotificationActive"
+						:type="notification_type"
+						aria-close-label="Close notification"
+						role="alert"
 					>
-						{{text_error}}
+						{{notification_text}}
 					</b-notification>
 					<div v-if="rewardAmount>0" class="pt-3">
 						<i18n v-if="isRemoving" path="editModalGainIfRemoved" id="potential-gain">
@@ -87,6 +89,37 @@
 								<exchange :id="selectedExchange" noUrl/>
 							</template>
 						</i18n>
+					</div>
+					<div v-else-if="isOperationPossible" class="pt-3">
+						<i18n v-if="isRemoving" path="editModalRefundIfRemoved" id="potential-gain">
+							<template #stake_amount>
+								<byte-amount :amount="stakeAmount"/>
+							</template>
+							<template #gain_amount>
+								<byte-amount :amount="rewardAmount"/>
+							</template>
+							<template #wallet>
+								{{selectedWalletId}}
+							</template>
+							<template #exchange>
+								<exchange :id="selectedExchange" noUrl/>
+							</template>
+						</i18n>
+						<i18n v-else path="editModalRefundIfAdded" id="potential-gain">
+							<template #stake_amount>
+								<byte-amount :amount="stakeAmount"/>
+							</template>
+							<template #gain_amount>
+								<byte-amount :amount="rewardAmount"/>
+							</template>
+							<template #wallet>
+								{{selectedWalletId}}
+							</template>
+							<template #exchange>
+								<exchange :id="selectedExchange" noUrl/>
+							</template>
+						</i18n>
+
 					</div>
 
 					<div v-else-if="isSpinnerActive" class="container">
@@ -154,13 +187,13 @@
 		},
 		data () {
 			return {
-				text_error: null,
+				notification_text: '',
+				notification_type: '',
 				selectedWalletId: null,
 				wallet_choices: [],
 				selectedExchange: null,
-				isOperationAllowed: false,
 				isSpinnerActive: false,
-				isPoolAvailable: false,
+				isOperationPossible: false,
 				rewardAmount: false,
 				stakeAmount: conf.challenge_min_stake_gb * conf.gb_to_bytes,
 				link: false,
@@ -180,8 +213,8 @@
 			},
 			reset () {
 				this.isSpinnerActive = false
-				this.text_error = null
-				this.isPoolAvailable = false
+				this.notification_text = null
+				this.isOperationPossible = false
 				this.bestPoolId = false
 				this.rewardAmount = 0
 				if (!this.selectedWalletId && this.selectedExchange && this.isRemoving) {
@@ -200,17 +233,17 @@
 					this.inputCoolDownTimer = setTimeout(this.check, 1000)
 			},
 			check () {
-				this.text_error = null
+				this.notification_text = null
 				this.bestPoolId = false
 				this.rewardAmount = 0
 				this.isSpinnerActive = true
-				this.isPoolAvailable = false
+				this.isOperationPossible = false
 				this.bestPoolId = false
 
 				this.axios.get('/api/redirection/' + this.selectedWalletId).then((response, error) => {
 					this.selectedWalletId = response.data.redirected_id
 					if (!this.selectedWalletId)
-						this.text_error = this.$t('editModalWalletNotFound')
+						this.notification_text = this.$t('editModalWalletNotFound')
 
 					this.axios.get('/api/operations/' + this.selectedExchange).then((response) => {
 						const operations = response.data
@@ -220,25 +253,29 @@
 								continue
 							bFound = true
 							if (operations[i].committed_outcome == 'in' && !this.isRemoving) {
-								this.text_error = this.$t('editModalAlreadyBelongs',
+								this.notification_text = this.$t('editModalAlreadyBelongs',
 									{ wallet: this.selectedWalletId, exchange: this.selectedExchange })
+								this.notification_type = 'is-danger'
 								break
 							}
 							if ((!operations[i].committed_outcome || operations[i].committed_outcome == 'out') && this.isRemoving) {
-								this.text_error = this.$t('editModalDoesntBelong',
+								this.notification_text = this.$t('editModalDoesntBelong',
 									{ wallet: this.selectedWalletId, exchange: this.selectedExchange })
+								this.notification_type = 'is-danger'
 								break
 							}
-							if (operations[i].status == 'onreview')
-								this.text_error = this.$t('editModalOperationOnGoing',
+							if (operations[i].status == 'onreview'){
+								this.notification_text = this.$t('editModalOperationOnGoing',
 									{ wallet: this.selectedWalletId, exchange: this.selectedExchange })
+								this.notification_type = 'is-danger'
+							}
 						}
 
 						if (!bFound && this.isRemoving)
-							this.text_error = this.$t('editModalDoesntBelong',
+							this.notification_text = this.$t('editModalDoesntBelong',
 								{ wallet: this.selectedWalletId, exchange: this.selectedExchange })
 
-						if (!this.text_error) {
+						if (!this.notification_text) {
 							this.getBestPool()
 						} else {
 							this.isSpinnerActive = false
@@ -246,7 +283,7 @@
 
 					})
 				}).catch((error) => {
-					this.text_error = this.$t('editModalWalletNotFound')
+					this.notification_text = this.$t('editModalWalletNotFound')
 					this.isSpinnerActive = false
 				})
 			},
@@ -256,12 +293,26 @@
 					if (response.data.pool_id) {
 						this.bestPoolId = response.data.pool_id
 						this.rewardAmount = response.data.reward_amount
-						this.isPoolAvailable = true
 					} else {
-						this.text_error = this.$t('editModalNoRewardAvailable')
+						this.notification_text = this.$t('editModalNoRewardAvailable')
+						this.notification_type = 'is-warning'
 					}
+					this.isOperationPossible = true
 					this.isSpinnerActive = false
 				})
+			},
+			onExchangeInput(option){
+
+				if (!this.assocExchangesByName[option]){
+					this.notification_text = this.$t('editModalExchangeNotReferenced')
+					this.notification_type = 'is-danger'
+					return
+				}
+
+				this.selectedExchange = this.assocExchangesByName[option];
+				console.log(this.selectedExchange)
+				this.check()
+
 			},
 			handleOk (bvModalEvt) {
 				bvModalEvt.preventDefault()
@@ -294,8 +345,11 @@
 			},
 		},
 		computed: {
+			isNotificationActive(){
+				return !!this.notification_text
+			},
 			filteredDataObj () {
-				const data = this.assocExchanges
+				const data = this.assocExchangesByName
 				const options = Object.entries(data).map(([key, value]) => ({ key, value }))
 				return options.filter((option) => {
 					return option.key.toString().toLowerCase().indexOf(this.key.toLowerCase()) >= 0
@@ -306,15 +360,15 @@
 				if (this.propExchange) {
 					if (this.selectedWalletId && this.selectedExchange) {
 						title = this.isRemoving ? this.$t('editModalRemoveXFromX',
-							{ exchange: this.assocExchanges[this.selectedExchange], wallet: this.selectedWalletId }) :
+							{ exchange: this.assocExchangesById[this.selectedExchange], wallet: this.selectedWalletId }) :
 							this.$t('editModalAddXToX', {
-								exchange: this.assocExchanges[this.selectedExchange],
+								exchange: this.assocExchangesById[this.selectedExchange],
 								wallet: this.isWalletId(this.selectedWalletId) ? this.selectedWalletId : '',
 							})
 					} else if (this.selectedExchange) {
 						title = this.isRemoving ? this.$t('editModalRemoveFromX',
-							{ exchange: this.assocExchanges[this.selectedExchange] }) :
-							this.$t('editModalAddToX', { exchange: this.assocExchanges[this.selectedExchange] })
+							{ exchange: this.assocExchangesById[this.selectedExchange] }) :
+							this.$t('editModalAddToX', { exchange: this.assocExchangesById[this.selectedExchange] })
 					} else if (this.selectedWalletId) {
 						title = this.isRemoving ? this.$t('editModalRemoveXFrom', { wallet: this.selectedWalletId }) :
 							this.$t('editModalAddXTo',
@@ -322,27 +376,30 @@
 					}
 				} else if (this.propWalletId) {
 					title = this.$t('editModalAddXToX', {
-						exchange: this.assocExchanges[this.selectedExchange],
+						exchange: this.assocExchangesById[this.selectedExchange],
 						wallet: this.isWalletId(this.selectedWalletId) ? this.selectedWalletId : '',
 					})
 				}
 				return title
 			},
 			validExchange () {
-				return !!this.assocExchanges[this.selectedExchange]
+				return !!this.assocExchangesById[this.selectedExchange]
 			},
-			assocExchanges () {
+			assocExchangesById () {
 				return this.$store.state.exchangesById
 			},
+			assocExchangesByName () {
+				return this.$store.state.exchangesByName
+			},
 			isOkDisabled () {
-				return !this.bAreUrlsValid || !this.isPoolAvailable
+				return !this.bAreUrlsValid || !this.isOperationPossible
 			},
 		},
 		created() {
 				this.selectedExchange = this.propExchange
 				this.selectedWalletId = this.propWalletId
 				this.reset()
-				if (this.propWalletId && this.assocExchanges[this.selectedExchange])// we have a wallet id as prop and exchange input is valid, let's go to check
+				if (this.propWalletId && this.assocExchangesById[this.selectedExchange])// we have a wallet id as prop and exchange input is valid, let's go to check
 					this.check()
 		},
 		watch: {

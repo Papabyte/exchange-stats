@@ -7,6 +7,7 @@ const network = require('ocore/network.js');
 const wallet_general = require('ocore/wallet_general.js');
 const db = require('ocore/db.js');
 const social_networks = require('./social_networks.js');
+const eventBus = require('ocore/event_bus.js');
 
 const exchanges = require('./exchanges.js')
 
@@ -38,22 +39,90 @@ function start(){
 			console.log(error)
 		else
 			console.log(conf.aa_address + " added as watched address")
-		refresh(),
+		indexFromStateVars();
 		setInterval(refresh, 60 * 1000);
+		eventBus.on('new_my_transactions', treatUnconfirmedEvents);
+		eventBus.on('my_transactions_became_stable', discardUnconfirmedEvents);
+		eventBus.on('sequence_became_bad', discardUnconfirmedEvents);
 	});
 }
 
 function refresh(){
 	lightWallet.refreshLightClientHistory();
 	catchUpOperationsHistory();
-	network.requestFromLightVendor('light/get_aa_state_vars', {
-		address: conf.aa_address 
-	},function(error, request, objStateVars){
-		indexOperations(objStateVars);
-		indexRewardPools(objStateVars);
-		indexNicknames(objStateVars);
+}
+
+
+function indexFromStateVars(){
+	getStateVarsForPrefixes(["operation_","pair_", "nickname_"], function(error, objStateVars){
+		if (error)
+			return console.log(error);
+			indexOperations(objStateVars);
+			indexRewardPools(objStateVars);
+			indexNicknames(objStateVars);
 	});
 }
+
+
+function getStateVarsForPrefixes(arrPrefixes, handle){
+	console.log("getStateVarsForPrefixes");
+	async.reduce(arrPrefixes, {}, function(memo, item, cb) {
+		getStateVarsRangeForPrefix(item, "0", "z", function(error, result ){
+			if (error)
+				return cb(error);
+			else
+				return cb(null, Object.assign(memo, result));
+			
+		});
+	}, function(error, result){
+		if (error)
+			return handle(error);
+		else
+			return handle(null, result);
+	})
+}
+
+function getStateVarsRangeForPrefix(prefix, start, end, handle){
+	const CHUNK_SIZE = 2000;
+	network.requestFromLightVendor('light/get_aa_state_vars', {
+		address: conf.aa_address,
+		var_prefix_from: prefix + start,
+		var_prefix_to: prefix + end,
+		limit: CHUNK_SIZE
+	}, function(ws, request, objResponse){
+		if (objResponse.error)
+			return handle(objResponse.error);
+
+		if (Object.keys(objResponse).length >= CHUNK_SIZE){
+			const delimiter =  Math.floor((end.charCodeAt(0) - start.charCodeAt(0)) / 2 + start.charCodeAt(0));
+			async.parallel([function(cb){
+				getStateVarsRange(prefix, start, String.fromCharCode(delimiter), cb)
+			},
+			function(cb){
+				getStateVarsRange(prefix, String.fromCharCode(delimiter +1), end, cb)
+			}
+			], function(error, results){
+				if (error)
+					return handle(error);
+				else
+					return handle(null, {...results[0], ...results[1]});
+			})
+		} else {
+			return handle(null, objResponse);
+		}
+	});
+}
+
+
+function treatUnconfirmedEvents(arrUnits){
+	indexFromStateVars();
+}
+
+
+function discardUnconfirmedEvents(arrUnits){
+	indexFromStateVars();
+}
+
 
 //we push in an indexed table all information coming from aa responses
 function catchUpOperationsHistory(){
@@ -169,8 +238,8 @@ function indexOperations(objStateVars){
 		const operation = {};
 		operation.status = objStateVars[key];
 		const pairKey = convertOperationKeyToPairKey(key);
-		const exchange = objStateVars[pairKey + "_exchange"];
-		const wallet_id = objStateVars[pairKey + "_wallet_id"];
+		const exchange = getExchangeFromOperationKey(key);
+		const wallet_id = getWalletIdFromOperationKey(key);
 		operation.exchange = exchange;
 
 		operation.wallet_id = Number(wallet_id);
@@ -279,6 +348,16 @@ function extractOperationKeys(objStateVars){
 function convertOperationKeyToPairKey(operationKey){
 	var splitKey = operationKey.split('_');
 	return 	"pair_" + splitKey[1] + "_" + splitKey[2];
+}
+
+function getExchangeFromOperationKey(operationKey){
+	var splitKey = operationKey.split('_');
+	return splitKey[1];
+}
+
+function getWalletIdFromOperationKey(operationKey){
+	var splitKey = operationKey.split('_');
+	return splitKey[2];
 }
 
 

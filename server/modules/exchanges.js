@@ -1,4 +1,4 @@
-const exchanges = require('../exchanges.json');
+const unsortedExchanges = require('../exchanges.json');
 const explorer = require('./explorer.js');
 const indexer = require('./indexer.js');
 const stats = require('./stats.js');
@@ -8,6 +8,18 @@ const async = require('async');
 
 const db = require('ocore/db.js');
 var assocWalletIdsByExchange = null;
+
+const exchanges = {};
+
+// we sort exchanges by name
+ Object.entries(unsortedExchanges)
+.sort(function (a, b) {
+	return a[1].name > b[1].name ? 1 : -1;
+})
+.forEach(function(arrKeyValue){
+	exchanges[arrKeyValue[0]] = arrKeyValue[1];
+});
+
 
 processNewRanking();
 setInterval(processNewRanking, 3*60*60*1000);
@@ -159,11 +171,7 @@ function getExchangeName(exchange){
 
 
 function getExchangesList(){
-	const arrExchanges = [];
-	for (var key in exchanges){
-		arrExchanges.push({id: key, name: exchanges[key].name});
-	}
-	return arrExchanges;
+	return exchanges;
 }
 
 

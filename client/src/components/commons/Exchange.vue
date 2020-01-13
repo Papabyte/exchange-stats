@@ -47,7 +47,7 @@
 		computed: {
 
 			exchangeName: function () {
-				return this.$store.state.exchangesById[this.id] ? this.$store.state.exchangesById[this.id] : this.id
+				return this.$store.state.exchangesById[this.id] ? this.$store.state.exchangesById[this.id].name : this.id
 
 			},
 		},

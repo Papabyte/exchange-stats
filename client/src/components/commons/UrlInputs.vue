@@ -1,9 +1,12 @@
 <template>
 	<div class="columns">
 		<div class="column">
-			<url-input v-for="(url,index) in urls" :isRequired="index==0&&isAtLeastOneUrlRequired" :index="index"
-								 @url_updated="updateUrl" :key="index"/>
-		</div>
+			<url-input v-for="(url,index) in urls" 
+				:isRequired="index==0&&isAtLeastOneUrlRequired" 
+				:index="index"
+				@url_updated="updateUrl" 
+				:key="index"/>
+			</div>
 		<div class="column is-1">
 			<span @click="addUrlField"><v-icon v-if="urls.length < maxUrls" name='plus' class="plus-icon"/></span>
 		</div>
