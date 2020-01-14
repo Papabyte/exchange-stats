@@ -5,14 +5,14 @@
 			<button class="delete" aria-label="close" @click="$parent.close()"></button>
 		</header>
 		<section class="modal-card-body">
-			<div class="container" v-if="!link">
+			<div class="container" v-show="!link">
 				<div class="row">
 						<b-field :label="$t('contestModalAmountToStake')">
 						<b-slider type="is-info" 
 						v-model="stakeAmountGb" 
-						:min="conf.challenge_min_stake_gb" 
+						:min="min_stake_gb" 
 						:max="reversalStakeGb" 
-						:step="reversalStakeGb/100"
+						:step="min_stake_gb/100"
 						class="px-1"
 						></b-slider>
 					</b-field>
@@ -49,23 +49,22 @@
 					<url-inputs @urls_updated="urls_updated" class="mt-1"/>
 				</div>
 			</div>
-			<div class="container" v-else fluid >
-				<div class="row" >
-					{{$t("contestModalLinkHeader")}}
+			<div class="container" v-if="link" fluid>
+				<div class="pt-3">
+					{{$t('editModalLinkHeader')}}
 				</div>
-				<div class="row" >
-				<span class="text-break">
-					<a :href="link">{{link}}</a>
-				</span>
+				<div class="pt-3">
+					<wallet-link :link="link" />
 				</div>
-				<div class="row" >
-					{{$t("contestModalLinkFooter")}}
+				<div class="py-3 test">
+					{{$t('editModalLinkFooter')}}
 				</div>
 			</div>
 		</section>
-		<footer class="modal-card-foot f-end" v-show="!link">
+		<footer class="modal-card-foot f-end">
+			<button class="button is-primary" v-if="link" @click="link=null">Back</button>
 			<button class="button" type="button" @click="$parent.close()">Close</button>
-			<button class="button is-primary" :disabled="isOkDisabled" @click="handleOk">Ok</button>
+			<button class="button is-primary" v-if="!link" :disabled="isOkDisabled" @click="handleOk">Ok</button>
 		</footer>
 	</div>
 </template>
@@ -74,11 +73,13 @@
 const conf = require("../../conf.js");
 import ByteAmount from './ByteAmount.vue';
 import UrlInputs from './UrlInputs.vue';
+import WalletLink from './WalletLink.vue'
 
 export default {	
 	components: {
 		ByteAmount,
-		UrlInputs
+		UrlInputs,
+		WalletLink
 	},
 	props: {
 		operationItem: {
@@ -93,6 +94,7 @@ export default {
 		return {
 			text_error: null,
 			conf: conf,
+			min_stake_gb: this.$store.state.aaParameters.min_stake/conf.gb_to_bytes,
 			reversalStakeGb:0,
 			reversalStake: 0,
 			stakeAmountGb: 0,
@@ -105,9 +107,12 @@ export default {
 	},
 	created(){
 			this.operation_item = this.operationItem;
+			console.log(this.operationItem)
 			this.reversalStake = (conf.challenge_coeff*this.operation_item.staked_on_outcome - this.operation_item.staked_on_opposite);
 			this.reversalStakeGb = this.reversalStake/conf.gb_to_bytes;
 			this.stakeAmountGb = this.reversalStakeGb;
+			console.log(this.stakeAmountGb)
+			console.log(this.reversalStakeGb)
 
 	},
 	computed:{
@@ -117,27 +122,22 @@ export default {
 			else
 				return this.$t("contestModalTitleAdding", {wallet: this.operation_item.wallet_id, exchange: this.operation_item.exchange});
 		},
-
 		amountLeftToReverse: function(){
-			return ((this.reversalStake - this.stakeAmount) );
-		},
-		newTotalOppositeStakeForReversal: function(){
-			return this.reversalStake + (this.operation_item.total_staked - this.operation_item.staked_on_outcome);
-		},
-		newTotalStake: function(){
-			return this.operation_item.total_staked + this.stakeAmount;
+			return this.reversalStake - this.stakeAmount;
 		},
 		potentialGainAmount: function(){
-			return this.stakeAmount / this.newTotalOppositeStakeForReversal *  this.newTotalStake - this.stakeAmount;
+			return this.stakeAmount / conf.challenge_coeff;
 		}
 	},
 	watch:{
 		stakeAmountGb: function(){
+			console.log(this.reversalStakeGb)
 			if (this.stakeAmountGb > this.reversalStakeGb)
 				this.stakeAmountGb = this.reversalStakeGb;
 			if (this.stakeAmountGb < conf.challenge_min_stake_gb)
 				this.stakeAmountGb = conf.challenge_min_stake_gb;
 			this.stakeAmount = this.stakeAmountGb * conf.gb_to_bytes;
+
 		}
 	},
 	methods:{

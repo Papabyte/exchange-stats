@@ -8,6 +8,7 @@ export default new Vuex.Store({
 	state: {
 		exchangesByName: {},
 		exchangesById: {},
+		aaParameters: {},
 		wasRankingWelcomeMessageClosed: false,
 		wasExplorerWelcomeMessageClosed: false,
 		wasCrowdSourcingWelcomeMessageClosed: false
@@ -28,6 +29,9 @@ export default new Vuex.Store({
 		setWasCrowdSourcingWelcomeMessageClosed(state, data) {
 			state.wasCrowdSourcingWelcomeMessageClosed = data;
 		},
+		setAaParameters(state, data) {
+			state.aaParameters = data;
+		},
 
 	},
 	actions: {
@@ -41,6 +45,12 @@ export default new Vuex.Store({
 				}
 				context.commit('setExchangesById', exchangesById);
 				context.commit('setExchangesByName', exchangesByName);
+			});
+		},
+		getAaParameters(context){
+			Axios.get('/api/aa-parameters').then((response) => {
+				console.log(response.data);
+				context.commit('setAaParameters', response.data);
 			});
 		}
   },

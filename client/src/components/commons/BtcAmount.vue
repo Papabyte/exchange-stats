@@ -1,7 +1,7 @@
 <template>
 	<span>
 		<div v-if="label" class="title is-6 mb-05">{{label}}</div>
-		<span v-bind:class="amountClass">{{(amount/100000000).toPrecision(6)/1}} BTC </span>
+		<span v-bind:class="amountClass">{{amount/100000000 >=1 ? ((amount/100000000).toPrecision(6)/1).toLocaleString() : (amount/100000000).toPrecision(6)/1}} BTC </span>
 	</span>
 </template>
 

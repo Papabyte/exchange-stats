@@ -194,7 +194,11 @@ require('./modules/sqlite_tables.js').create().then(function(){
 		});
 	});
 
+	app.get('/api/aa-parameters/', function(request, response){
+		return response.send(aa_handler.getAaParameters());
+	});
 
+	
 
 	app.listen(conf.api_port);
 

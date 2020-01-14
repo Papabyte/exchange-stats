@@ -9,7 +9,7 @@
 				{{$t('commitModalLinkHeader')}}
 			</div>
 			<div class="container">
-				<a :href="link">{{link}}</a>
+				<wallet-link :link="link" />
 			</div>
 			<div class="container">
 				{{$t('commitModalLinkFooter')}}
@@ -23,7 +23,12 @@
 
 <script>
 	const conf = require('../../conf.js')
+	import WalletLink from './WalletLink.vue'
+
 	export default {
+		components:{
+			WalletLink
+		},
 		props: {
 			operationItem: {
 				type: Object,

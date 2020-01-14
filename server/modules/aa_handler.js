@@ -5,6 +5,8 @@ const async = require('async');
 const mutex = require('ocore/mutex.js');
 const network = require('ocore/network.js');
 const wallet_general = require('ocore/wallet_general.js');
+const aa_composer = require('ocore/aa_composer.js');
+const storage = require('ocore/storage.js');
 const db = require('ocore/db.js');
 const social_networks = require('./social_networks.js');
 const eventBus = require('ocore/event_bus.js');
@@ -23,6 +25,8 @@ var assocStakedByKeyAndAddress = {};
 var assocProofsByKeyAndOutcome = {}
 var assocNicknamesByAddress = {};
 
+const assocAaParameters = {};
+
 const MAX_OPERATIONS = 200;
 
 myWitnesses.readMyWitnesses(function (arrWitnesses) {
@@ -39,7 +43,9 @@ function start(){
 			console.log(error)
 		else
 			console.log(conf.aa_address + " added as watched address")
+		indexAaParameters();
 		indexFromStateVars();
+		refresh();
 		setInterval(refresh, 60 * 1000);
 		eventBus.on('new_my_transactions', treatUnconfirmedEvents);
 		eventBus.on('my_transactions_became_stable', discardUnconfirmedEvents);
@@ -50,6 +56,17 @@ function start(){
 function refresh(){
 	lightWallet.refreshLightClientHistory();
 	catchUpOperationsHistory();
+}
+
+function indexAaParameters(){
+	getStateVarsForPrefixes(["min_stak","min_rewar"], function(error, objStateVars){
+		console.log("indexAaParameters")
+		console.log(objStateVars)
+		if (error)
+			throw Error("couldn't get AA parameters");
+			assocAaParameters.min_stake = Number(objStateVars['min_stake']);
+			assocAaParameters.min_reward = Number(objStateVars['min_reward']);
+	});
 }
 
 
@@ -65,7 +82,6 @@ function indexFromStateVars(){
 
 
 function getStateVarsForPrefixes(arrPrefixes, handle){
-	console.log("getStateVarsForPrefixes");
 	async.reduce(arrPrefixes, {}, function(memo, item, cb) {
 		getStateVarsRangeForPrefix(item, "0", "z", function(error, result ){
 			if (error)
@@ -134,59 +150,66 @@ function catchUpOperationsHistory(){
 			END max_mci\n\
 			FROM operations_history) AND aa_address=?", [conf.aa_address], function(rows){
 				async.eachOf(rows, function(row, index, cb) {
+					storage.readJoint(db, row.trigger_unit, {
+					ifNotFound: function(){
+						throw Error("bad unit not found: "+unit);
+					},
+					ifFound: function(objJoint){
+						const trigger = aa_composer.getTrigger(objJoint.unit, conf.aa_address);
+						const objResponse = JSON.parse(row.response).responseVars;
+						if(!objResponse)
+							return cb();
 
-				const objResponse = JSON.parse(row.response).responseVars;
-				if(!objResponse)
-					return cb();
-
-				var paid_in = 0;
-				var paid_out = 0;
-				if (objResponse.expected_reward){
-					var operation_type = "initial_stake";
-					paid_in = objResponse.your_stake;
-					concerned_address = objResponse.your_address;
-				} else if (objResponse.your_stake){
-					var operation_type = "stake";
-					paid_in = objResponse.your_stake;
-					concerned_address = objResponse.your_address;
-				} else if (objResponse.committed_outcome){
-					var operation_type = "commit";
-					paid_out = objResponse.paid_out_amount;
-					concerned_address = objResponse.paid_out_address;
-				} else if (objResponse.paid_out_amount){
-					var operation_type = "withdraw";
-					paid_out = objResponse.paid_out_amount;
-					concerned_address = objResponse.paid_out_address;
-				} else if (objResponse.created_pool){
-					var operation_type = "create_pool";
-					paid_in = objResponse.amount;
-					concerned_address = objResponse.your_address;
-				} else if (objResponse.destroyed_pool){
-					var operation_type = "destroy_pool";
-					paid_out = objResponse.amount;
-					concerned_address = objResponse.your_address;
-				}
-				if (operation_type){
-					var operation_id = objResponse.operation_id;
-					var pair = objResponse.pair;
-					db.query("INSERT "+db.getIgnore()+" INTO operations_history (operation_id, paid_in, paid_out, concerned_address, pair, operation_type, mci, aa_address, response, trigger_unit,timestamp) VALUES \n\
-					(?,?,?,?,?,?,?,?,?,?,?)",[operation_id, paid_in, paid_out, concerned_address, pair, operation_type, row.mci, row.aa_address, JSON.stringify(objResponse), row.trigger_unit, row.timestamp],
-					function(result){
-						if (result.affectedRows === 1){
-							objResponse.exchange = exchanges.getExchangeName[objResponse.exchange];
-							social_networks.notify(
-								operation_type, 
-								assocCurrentOperations[operation_id], 
-								assocNicknamesByAddress[concerned_address] || concerned_address, 
-								objResponse
-							);
+						var paid_in = 0;
+						var paid_out = 0;
+						if (objResponse.staked_on_in == 0 && objResponse.staked_on_out > 0 || objResponse.staked_on_out == 0 && objResponse.staked_on_in > 0){
+							var operation_type = "initial_stake";
+							paid_in = objResponse.your_stake;
+							concerned_address = trigger.address;
+						} else if (objResponse.your_stake){
+							var operation_type = "stake";
+							paid_in = objResponse.your_stake;
+							concerned_address = trigger.address;
+						} else if (objResponse.committed_outcome){
+							var operation_type = "commit";
+							paid_out = objResponse.paid_out_amount;
+							concerned_address = objResponse.paid_out_address;
+						} else if (objResponse.paid_out_amount){
+							var operation_type = "withdraw";
+							paid_out = objResponse.paid_out_amount;
+							concerned_address = objResponse.paid_out_address;
+						} else if (objResponse.created_pool){
+							var operation_type = "create_pool";
+							paid_in = objResponse.amount;
+							concerned_address = trigger.address;
+						} else if (objResponse.destroyed_pool){
+							var operation_type = "destroy_pool";
+							paid_out = objResponse.amount;
+							concerned_address = trigger.address;
 						}
-						cb();
-					});
-				} else
-					cb();
+						if (operation_type){
+							var operation_id = objResponse.operation_id;
+							var pair = objResponse.pair;
+							db.query("INSERT "+db.getIgnore()+" INTO operations_history (operation_id, paid_in, paid_out, concerned_address, pair, operation_type, mci, aa_address, response, trigger_unit,timestamp) VALUES \n\
+							(?,?,?,?,?,?,?,?,?,?,?)",[operation_id, paid_in, paid_out, concerned_address, pair, operation_type, row.mci, row.aa_address, JSON.stringify(objResponse), row.trigger_unit, row.timestamp],
+							function(result){
+								if (result.affectedRows === 1){
+									objResponse.exchange = exchanges.getExchangeName[objResponse.exchange];
+									social_networks.notify(
+										operation_type, 
+										assocCurrentOperations[operation_id], 
+										assocNicknamesByAddress[concerned_address] || concerned_address, 
+										objResponse
+									);
+								}
+								cb();
+							});
+						} else
+							cb();
+					}
+				})
 			}, unlock);
-		});
+		})
 	});
 }
 
@@ -256,9 +279,9 @@ function indexOperations(objStateVars){
 		operation.committed_outcome = objStateVars[pairKey + "_committed_outcome"];
 		operation.initial_outcome = objStateVars[key + "_initial_outcome"];
 		operation.staked_on_outcome = Number(objStateVars[key + "_total_staked_on_" + outcome]);
-		operation.staked_on_opposite = Number(objStateVars[key + "_total_staked_on_" + (outcome == "in" ? "out" :"in") ]);
+		operation.staked_on_opposite = Number(objStateVars[key + "_total_staked_on_" + (outcome == "in" ? "out" :"in")] || 0);
 		operation.countdown_start= Number(objStateVars[key + "_countdown_start"]);
-		operation.total_staked = Number(objStateVars[key + "_total_staked"]);
+		operation.total_staked = Number(objStateVars[key + "_total_staked_on_in"] || 0) + Number(objStateVars[key + "_total_staked_on_out"] || 0);
 		operation.pool_id = Number(objStateVars[key + "_pool_id"]);
 		operation.key = key;
 		operation.staked_by_address = assocStakedByKeyAndAddress[key];
@@ -382,6 +405,10 @@ function getNicknameForAddress(address){
 
 function getCurrentPools(){
 	return currentActivePools;
+}
+
+function getAaParameters(){
+	return assocAaParameters;
 }
 
 function getCurrentOperations(){
@@ -518,3 +545,4 @@ exports.getContributorsRanking = getContributorsRanking;
 exports.getDonatorsRanking = getDonatorsRanking;
 exports.getNicknameForAddress = getNicknameForAddress;
 exports.getContributorsGreeting = getContributorsGreeting;
+exports.getAaParameters = getAaParameters;

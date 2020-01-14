@@ -11,6 +11,16 @@
 					{{failoverText}}
 				</div>
 
+				<div class="row mt-1" v-if="!wallet_id&&exchange">
+					<b-button
+							size="is-medium"
+							type="is-warning"
+							icon-left="plus"
+							@click="addAWalletToExchange(exchange)"
+					>
+						{{$t('explorerTransactionsButtonAddWallet')}}
+					</b-button>
+				</div>
 				<div class="row" v-if="walletOwner">
 					<h5 class="title is-5">{{$t('explorerTransactionsBelongsTo')}}</h5>
 					<div class="field has-addons">
@@ -345,6 +355,7 @@
 						} else {
 							this.failoverText = this.$t('explorerTransactionsNoTransactionFound', { exchange: response.data.name })
 						}
+						console.log(this.request_input)
 						this.exchange = this.request_input
 						this.exchangeName = response.data.name
 						this.isSpinnerActive = false

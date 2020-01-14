@@ -5,7 +5,7 @@
 			<button class="delete" aria-label="close" @click="$parent.close()"></button>
 		</header>
 		<section class="modal-card-body">
-			<div class="container" v-if="!link">
+			<div class="container" v-show="!link">
 
 				<div class="row" v-if="!propExchange && !isRemoving">
 					<b-field :label="$t('editModalSelectExchange')">
@@ -134,14 +134,12 @@
 				</div>
 
 			</div>
-			<div class="container" v-else fluid>
+			<div class="container" v-if="link" fluid>
 				<div class="pt-3">
 					{{$t('editModalLinkHeader')}}
 				</div>
 				<div class="pt-3">
-				<span class="text-break">
-					<a :href="link">{{link}}</a>
-				</span>
+					<wallet-link :link="link" />
 				</div>
 				<div class="py-3 test">
 					{{$t('editModalLinkFooter')}}
@@ -149,8 +147,9 @@
 			</div>
 		</section>
 		<footer class="modal-card-foot f-end">
+			<button class="button is-primary" v-if="link" @click="link=null">Back</button>
 			<button class="button" type="button" @click="$parent.close()">Close</button>
-			<button class="button is-primary" :disabled="isOkDisabled" @click="handleOk">Ok</button>
+			<button class="button is-primary" v-if="!link" :disabled="isOkDisabled" @click="handleOk">Ok</button>
 		</footer>
 	</div>
 </template>
@@ -161,12 +160,14 @@
 	import Exchange from './Exchange.vue'
 	import UrlInputs from './UrlInputs.vue'
 	import validate from 'bitcoin-address-validation'
+	import WalletLink from './WalletLink.vue'
 
 	export default {
 		components: {
 			ByteAmount,
 			UrlInputs,
 			Exchange,
+			WalletLink
 		},
 		props: {
 			propWalletId: {
@@ -308,11 +309,8 @@
 					this.notification_type = 'is-danger'
 					return
 				}
-
 				this.selectedExchange = this.assocExchangesByName[option];
-				console.log(this.selectedExchange)
 				this.check()
-
 			},
 			handleOk (bvModalEvt) {
 				bvModalEvt.preventDefault()
@@ -357,18 +355,19 @@
 			},
 			getTitle: function () {
 				let title = ''
+				const exchangeName = this.assocExchangesById[this.selectedExchange] ? this.assocExchangesById[this.selectedExchange].name : ''
 				if (this.propExchange) {
 					if (this.selectedWalletId && this.selectedExchange) {
 						title = this.isRemoving ? this.$t('editModalRemoveXFromX',
-							{ exchange: this.assocExchangesById[this.selectedExchange], wallet: this.selectedWalletId }) :
+							{ exchange: exchangeName}) :
 							this.$t('editModalAddXToX', {
-								exchange: this.assocExchangesById[this.selectedExchange],
+								exchange: exchangeName,
 								wallet: this.isWalletId(this.selectedWalletId) ? this.selectedWalletId : '',
 							})
 					} else if (this.selectedExchange) {
 						title = this.isRemoving ? this.$t('editModalRemoveFromX',
-							{ exchange: this.assocExchangesById[this.selectedExchange] }) :
-							this.$t('editModalAddToX', { exchange: this.assocExchangesById[this.selectedExchange] })
+							{ exchange: exchangeName }) :
+							this.$t('editModalAddToX', { exchange: exchangeName })
 					} else if (this.selectedWalletId) {
 						title = this.isRemoving ? this.$t('editModalRemoveXFrom', { wallet: this.selectedWalletId }) :
 							this.$t('editModalAddXTo',
@@ -376,14 +375,11 @@
 					}
 				} else if (this.propWalletId) {
 					title = this.$t('editModalAddXToX', {
-						exchange: this.assocExchangesById[this.selectedExchange],
+						exchange: exchangeName,
 						wallet: this.isWalletId(this.selectedWalletId) ? this.selectedWalletId : '',
 					})
 				}
 				return title
-			},
-			validExchange () {
-				return !!this.assocExchangesById[this.selectedExchange]
 			},
 			assocExchangesById () {
 				return this.$store.state.exchangesById
@@ -399,13 +395,9 @@
 				this.selectedExchange = this.propExchange
 				this.selectedWalletId = this.propWalletId
 				this.reset()
-				if (this.propWalletId && this.assocExchangesById[this.selectedExchange])// we have a wallet id as prop and exchange input is valid, let's go to check
+				if (this.propWalletId && this.assocExchangesById[this.selectedExchange] && this.assocExchangesById[this.selectedExchange].name)// we have a wallet id as prop and exchange input is valid, let's go to check
 					this.check()
 		},
-		watch: {
-		
-		},
-
 		beforeDestroy () {
 			clearTimeout(this.inputCoolDownTimer)
 		},

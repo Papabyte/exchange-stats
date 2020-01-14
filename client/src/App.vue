@@ -9,6 +9,7 @@ export default {
 	name: 'app',
 	created(){
 		this.$store.dispatch('getExchanges');
+		this.$store.dispatch('getAaParameters');
 	}
 }
 </script>

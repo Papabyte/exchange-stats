@@ -5,22 +5,23 @@
 			<button class="delete" aria-label="close" @click="$parent.close()"></button>
 		</header>
 		<section class="modal-card-body">
-			<div class="container" v-if="!link">
+			<div class="container" v-show="!link">
 				<div class="row">
 
 					<b-field :label="$t('donateModalSelectExchange')">
 						<b-autocomplete
-								v-model="exchange"
+								v-model="key"
+								@input="onExchangeInput"
 								:keep-first="false"
 								:open-on-focus="true"
-								:data="objOfItems"
+								:data="filteredDataObj"
 								:disabled="isForAny"
-								field="id">
+								field="key">
 							<template slot-scope="props">
-								<b>{{ props.option.name }}</b>
+								<b>{{ props.option.value }}</b>
 								<br>
 								<small>
-									{{ props.option.id }}
+									{{ props.option.key }}
 								</small>
 							</template>
 						</b-autocomplete>
@@ -30,7 +31,7 @@
 					<div class="field">
 						<b-checkbox
 								v-model="isForAny"
-								@input="exchange =''">
+								@input="exchange ='';key=''">
 							{{$t('donateModalDonateForAny')}}
 						</b-checkbox>
 					</div>
@@ -67,23 +68,22 @@
 					</div>
 				</div>
 			</div>
-			<div class="container" v-else fluid>
-				<b-row class="pt-3">
-					{{$t('donateModalLinkHeader')}}
-				</b-row>
-				<b-row class="pt-3">
-			<span class="text-break">
-				<a :href="link">{{link}}</a>
-			</span>
-				</b-row>
-				<b-row class="py-3">
-					{{$t('donateModalLinkFooter')}}
-				</b-row>
+			<div class="container" v-if="link" fluid>
+				<div class="pt-3">
+					{{$t('editModalLinkHeader')}}
+				</div>
+				<div class="pt-3">
+					<wallet-link :link="link" />
+				</div>
+				<div class="py-3 test">
+					{{$t('editModalLinkFooter')}}
+				</div>
 			</div>
 		</section>
-		<footer class="modal-card-foot f-end" v-show="!link">
+		<footer class="modal-card-foot f-end">
+			<button class="button is-primary" v-if="link" @click="link=null">Back</button>
 			<button class="button" type="button" @click="$parent.close()">Close</button>
-			<button class="button is-primary" :disabled="!validExchange && !isForAny" @click="handleOk">Ok</button>
+			<button class="button is-primary" v-if="!link" :disabled="!validExchange && !isForAny" @click="handleOk">Ok</button>
 		</footer>
 	</div>
 </template>
@@ -91,6 +91,7 @@
 <script>
 	import ByteAmount from './ByteAmount.vue'
 	import Exchange from './Exchange.vue'
+	import WalletLink from './WalletLink.vue'
 
 	const conf = require('../../conf.js')
 
@@ -98,14 +99,16 @@
 		components: {
 			ByteAmount,
 			Exchange,
+			WalletLink,
 		},
 		data () {
 			return {
 				objExchanges: [],
 				selectedExchange: null,
 				isForAny: false,
-				amount: conf.min_reward_gb,
+				amount: this.$store.state.aaParameters.min_reward/conf.gb_to_bytes,
 				exchange: '',
+				key: '',
 				nb_reward: 1,
 				link: false,
 				gb_to_bytes: conf.gb_to_bytes,
@@ -117,23 +120,31 @@
 			validExchange () {
 				if (this.isForAny)
 					return null
-				return !!this.objExchanges[this.exchange]
+				return !!this.assocExchangesById[this.exchange]
 			},
-		},
-		mounted () {
-			this.axios.get('/api/exchanges').then((response) => {
-				response.data.forEach((row) => {
-					this.objExchanges[row.id] = row.name
+			filteredDataObj () {
+				const data = this.assocExchangesByName
+				const options = Object.entries(data).map(([key, value]) => ({ key, value }))
+				return options.filter((option) => {
+					return option.key.toString().toLowerCase().indexOf(this.key.toLowerCase()) >= 0
 				})
-				this.objOfItems = Object.entries(this.objExchanges).map(([id, name]) => ({ id, name }))
-				return this.objOfItems.filter((option) => {
-					return option.id.toString().toLowerCase().indexOf(this.exchange.toLowerCase()) >= 0
-				})
-			}).catch(function (error) {
-				console.log(error)
-			})
+			},
+			assocExchangesByName () {
+				return this.$store.state.exchangesByName
+			},
+			assocExchangesById () {
+				return this.$store.state.exchangesById
+			}
 		},
 		methods: {
+			onExchangeInput(option){
+				console.log(option)
+				if (!this.assocExchangesByName[option])
+					return
+				this.exchange = this.assocExchangesByName[option]
+								console.log(this.exchange)
+
+			},
 			handleOk (bvModalEvt) {
 				bvModalEvt.preventDefault()
 				const base64url = require('base64url')
@@ -148,7 +159,7 @@
 				this.link = (conf.testnet ? 'byteball-tn' : 'byteball') + ':' + conf.aa_address + '?amount='
 					+ (Math.round(this.nb_reward * this.amount * conf.gb_to_bytes)) + '&base64data=' + base64data
 			},
-		},
+		}
 	}
 </script>
 
