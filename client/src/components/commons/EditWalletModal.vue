@@ -60,6 +60,15 @@
 					>
 						{{notification_text}}
 					</b-notification>
+					<div v-if="!propWalletId">
+						<div v-if="redirectedWalletId">
+							{{isRedirected ? "Redirected to wallet: " : ""}} <wallet-id :id="Number(redirectedWalletId)" newTab/>
+						</div>
+						<div v-if="wallet_digest">
+							Total on wallet: <btc-amount :amount="wallet_digest.total_on_wallet"/>
+							Addresses on wallet: {{wallet_digest.addr_count}}
+						</div>
+					</div>
 					<div v-if="rewardAmount>0" class="pt-3">
 						<i18n v-if="isRemoving" path="editModalGainIfRemoved" id="potential-gain">
 							<template #stake_amount>
@@ -161,13 +170,17 @@
 	import UrlInputs from './UrlInputs.vue'
 	import validate from 'bitcoin-address-validation'
 	import WalletLink from './WalletLink.vue'
+	import WalletId from './WalletId.vue'
+	import BtcAmount from './BtcAmount.vue'
 
 	export default {
 		components: {
+			BtcAmount,
 			ByteAmount,
 			UrlInputs,
 			Exchange,
-			WalletLink
+			WalletLink,
+			WalletId
 		},
 		props: {
 			propWalletId: {
@@ -191,11 +204,14 @@
 				notification_text: '',
 				notification_type: '',
 				selectedWalletId: null,
+				redirectedWalletId: null,
 				wallet_choices: [],
 				selectedExchange: null,
 				isSpinnerActive: false,
 				isOperationPossible: false,
+				isRedirected: false,
 				rewardAmount: false,
+				wallet_digest: null,
 				stakeAmount: conf.challenge_min_stake_gb * conf.gb_to_bytes,
 				link: false,
 				urls: [],
@@ -211,18 +227,6 @@
 			},
 			isWalletId (wallet) {
 				return (Number(wallet) && parseInt(wallet))
-			},
-			reset () {
-				this.isSpinnerActive = false
-				this.notification_text = null
-				this.isOperationPossible = false
-				this.bestPoolId = false
-				this.rewardAmount = 0
-				if (!this.selectedWalletId && this.selectedExchange && this.isRemoving) {
-					this.axios.get('/api/exchange-wallets/' + this.selectedExchange).then((response) => {
-						this.wallet_choices = response.data
-					})
-				}
 			},
 			onRadioSelected (arg) {
 				this.selectedWalletId = arg
@@ -240,41 +244,40 @@
 				this.isSpinnerActive = true
 				this.isOperationPossible = false
 				this.bestPoolId = false
+				this.isRedirected = false
+				this.wallet_digest = null
 
 				this.axios.get('/api/redirection/' + this.selectedWalletId).then((response, error) => {
-					this.selectedWalletId = response.data.redirected_id
-					if (!this.selectedWalletId)
-						this.notification_text = this.$t('editModalWalletNotFound')
+					this.redirectedWalletId = response.data.redirected_id
+					if (!this.redirectedWalletId)
+						return this.notification_text = this.$t('editModalWalletNotFound')
 
-					this.axios.get('/api/operations/' + this.selectedExchange).then((response) => {
-						const operations = response.data
-						var bFound = false
-						for (var i = 0; i < operations.length; i++) {
-							if (operations[i].wallet_id != this.selectedWalletId || operations[i].exchange != this.selectedExchange)
-								continue
-							bFound = true
-							if (operations[i].committed_outcome == 'in' && !this.isRemoving) {
-								this.notification_text = this.$t('editModalAlreadyBelongs',
-									{ wallet: this.selectedWalletId, exchange: this.selectedExchange })
-								this.notification_type = 'is-danger'
-								break
-							}
-							if ((!operations[i].committed_outcome || operations[i].committed_outcome == 'out') && this.isRemoving) {
-								this.notification_text = this.$t('editModalDoesntBelong',
-									{ wallet: this.selectedWalletId, exchange: this.selectedExchange })
-								this.notification_type = 'is-danger'
-								break
-							}
-							if (operations[i].status == 'onreview'){
-								this.notification_text = this.$t('editModalOperationOnGoing',
-									{ wallet: this.selectedWalletId, exchange: this.selectedExchange })
-								this.notification_type = 'is-danger'
-							}
+					if (this.selectedWalletId != this.redirectedWalletId)
+						this.isRedirected = true;
+
+					this.axios.get('/api/wallet/' + this.redirectedWalletId+ '/0').then((response) => {
+						if (response.data.isOnOperation && !this.isRemoving) {
+							this.notification_text = this.$t('editModalOperationOnGoing',
+								{ wallet: this.redirectedWalletId })
+							this.notification_type = 'is-danger'
 						}
 
-						if (!bFound && this.isRemoving)
+						if (response.data.exchange == this.selectedExchange && !this.isRemoving){
+							this.notification_text = this.$t('editModalAlreadyBelongs',
+									{ wallet: this.redirectedWalletId, exchange: this.selectedExchange })
+							this.notification_type = 'is-danger'
+							return
+						}
+						if (response.data.exchange != this.selectedExchange && this.isRemoving){
 							this.notification_text = this.$t('editModalDoesntBelong',
-								{ wallet: this.selectedWalletId, exchange: this.selectedExchange })
+									{ wallet: this.redirectedWalletId, exchange: this.selectedExchange })
+							this.notification_type = 'is-danger'
+							return
+						}
+						this.wallet_digest = {
+							addr_count: response.data.addr_count,
+							total_on_wallet: response.data.total_on_wallets
+						}
 
 						if (!this.notification_text) {
 							this.getBestPool()
@@ -362,7 +365,7 @@
 							{ exchange: exchangeName}) :
 							this.$t('editModalAddXToX', {
 								exchange: exchangeName,
-								wallet: this.isWalletId(this.selectedWalletId) ? this.selectedWalletId : '',
+								wallet: this.isWalletId(this.redirectedWalletId || this.selectedWalletId) ? this.redirectedWalletId || this.selectedWalletId : '',
 							})
 					} else if (this.selectedExchange) {
 						title = this.isRemoving ? this.$t('editModalRemoveFromX',
@@ -376,7 +379,7 @@
 				} else if (this.propWalletId) {
 					title = this.$t('editModalAddXToX', {
 						exchange: exchangeName,
-						wallet: this.isWalletId(this.selectedWalletId) ? this.selectedWalletId : '',
+						wallet: this.isWalletId(this.redirectedWalletId || this.selectedWalletId) ? this.redirectedWalletId || this.selectedWalletId : '',
 					})
 				}
 				return title
@@ -394,7 +397,11 @@
 		created() {
 				this.selectedExchange = this.propExchange
 				this.selectedWalletId = this.propWalletId
-				this.reset()
+				if (!this.selectedWalletId && this.selectedExchange && this.isRemoving) {
+					this.axios.get('/api/exchange-wallets/' + this.selectedExchange).then((response) => {
+						this.wallet_choices = response.data
+					})
+				}
 				if (this.propWalletId && this.assocExchangesById[this.selectedExchange] && this.assocExchangesById[this.selectedExchange].name)// we have a wallet id as prop and exchange input is valid, let's go to check
 					this.check()
 		},

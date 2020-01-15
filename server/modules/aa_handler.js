@@ -13,18 +13,21 @@ const eventBus = require('ocore/event_bus.js');
 
 const exchanges = require('./exchanges.js')
 
-var assocCurrentPoolsById = {};
-var assocCurrentPoolsByExchange = {};
+var assocAllPoolsById = {};
+var assocAllPoolsByExchange = {};
 var currentActivePools = [];
 
-var assocCurrentExchangeByWalletId = {};
+var assocExchangeByWalletId = {};
 
-var assocCurrentOperations = {};
-var assocCurrentOperationsByExchange = {};
+var assocAllOperations = {};
+var assocAllOperationsByExchange = {};
+var assocAllOperationsByWalletId = {};
 var assocStakedByKeyAndAddress = {};
-var assocProofsByKeyAndOutcome = {}
-var assocNicknamesByAddress = {};
+var assocProofsByKeyAndOutcome = {};
+var assocProofsByPairAndOutcome = {};
 
+var assocNicknamesByAddress = {};
+var assocWalletOnOperation = {};
 const assocAaParameters = {};
 
 const MAX_OPERATIONS = 200;
@@ -197,7 +200,7 @@ function catchUpOperationsHistory(){
 									objResponse.exchange = exchanges.getExchangeName[objResponse.exchange];
 									social_networks.notify(
 										operation_type, 
-										assocCurrentOperations[operation_id], 
+										assocAllOperations[operation_id], 
 										assocNicknamesByAddress[concerned_address] || concerned_address, 
 										objResponse
 									);
@@ -213,7 +216,7 @@ function catchUpOperationsHistory(){
 	});
 }
 
-//we read state vars to index pool rewards in assocCurrentPoolsByExchange
+//we read state vars to index pool rewards in assocAllPoolsByExchange
 function indexRewardPools(objStateVars){
 
 	const poolKeys = extractPoolKeys(objStateVars);
@@ -239,8 +242,8 @@ function indexRewardPools(objStateVars){
 		
 	});
 	currentActivePools = activePools;
-	assocCurrentPoolsById = assocPoolsById;
-	assocCurrentPoolsByExchange = assocPoolsByExchange;
+	assocAllPoolsById = assocPoolsById;
+	assocAllPoolsByExchange = assocPoolsByExchange;
 }
 
 //we read state vars to read all past and ongoing operations and sort them in different associative arrays
@@ -255,7 +258,9 @@ function indexOperations(objStateVars){
 
 	const assocOperationsByExchange = {};
 	const assocWalletIdsByExchange = {};
-	const assocExchangeByWalletId = {};
+	const assocOperationsByWalletId = {};
+	const _assocExchangeByWalletId = {};
+	const _assocWalletOnOperation = {}
 
 	operationKeys.forEach(function(key){
 		const operation = {};
@@ -266,16 +271,19 @@ function indexOperations(objStateVars){
 		operation.exchange = exchange;
 
 		operation.wallet_id = Number(wallet_id);
+		operation.exchange = exchange;
 
 		if(!assocWalletIdsByExchange[exchange])
 			assocWalletIdsByExchange[exchange] = [];
 		if (objStateVars[pairKey + "_committed_outcome"] == "in") {
 			if (assocWalletIdsByExchange[exchange].indexOf(wallet_id) === -1)
-				assocWalletIdsByExchange[exchange].push(wallet_id);
-			assocExchangeByWalletId[wallet_id] = exchange;
+				assocWalletIdsByExchange[exchange].push(Number(wallet_id));
+				_assocExchangeByWalletId[wallet_id] = exchange;
 		}
 		const outcome = objStateVars[key + "_outcome"]
 		operation.outcome = outcome;
+		if (outcome == 'onreview')
+			_assocWalletOnOperation[wallet_id] = true;
 		operation.committed_outcome = objStateVars[pairKey + "_committed_outcome"];
 		operation.initial_outcome = objStateVars[key + "_initial_outcome"];
 		operation.staked_on_outcome = Number(objStateVars[key + "_total_staked_on_" + outcome]);
@@ -290,6 +298,8 @@ function indexOperations(objStateVars){
 	});
 
 	arrOperations.sort(function(a, b) { return b.countdown_start - a.countdown_start});
+
+
 	arrOperations.slice(0, MAX_OPERATIONS).forEach(function(operation){
 		assocOperations[operation.key] = operation;
 		if(!assocOperationsByExchange[operation.exchange])
@@ -297,27 +307,47 @@ function indexOperations(objStateVars){
 		assocOperationsByExchange[operation.exchange].push(operation);
 	});
 
-	assocCurrentOperations = assocOperations;
-	assocCurrentExchangeByWalletId = assocExchangeByWalletId;
-	assocCurrentOperationsByExchange = assocOperationsByExchange;
+	arrOperations.forEach(function(operation){
+		if(!assocOperationsByExchange[operation.exchange])
+			assocOperationsByExchange[operation.exchange] = [];
+		assocOperationsByExchange[operation.exchange].push(operation);
+		if(!assocOperationsByWalletId[operation.wallet_id])
+		assocOperationsByWalletId[operation.wallet_id] = [];
+		assocOperationsByWalletId[operation.wallet_id].push(operation);
+	});
+
+	assocAllOperations = assocOperations;
+	assocExchangeByWalletId = _assocExchangeByWalletId;
+	assocAllOperationsByExchange = assocOperationsByExchange;
+	assocAllOperationsByWalletId = assocOperationsByWalletId;
+	assocWalletOnOperation = _assocWalletOnOperation;
 	exchanges.setWalletIdsByExchange(assocWalletIdsByExchange);
 
 }
 
 
 function extractProofUrls(objStateVars){
-	assocProofsByKeyAndOutcome= {};
+	assocProofsByKeyAndOutcome = {};
+	assocProofsByPairAndOutcome = {};
 	for (var key in objStateVars){
 		if (key.indexOf("operation_") == 0){
 		var splitKey = key.split('_');
 		 if (splitKey[4] == "url" && splitKey[5] == "proof"){
 			var outcome = splitKey[7];
 			var operation_key = splitKey[0] + '_' + splitKey[1] + '_' + splitKey[2] + '_' + splitKey[3];
+			var pair = splitKey[1] + '_' + splitKey[2];
+
 			if (!assocProofsByKeyAndOutcome[operation_key])
 				assocProofsByKeyAndOutcome[operation_key] = {};
 			if(!assocProofsByKeyAndOutcome[operation_key][outcome])
 				assocProofsByKeyAndOutcome[operation_key][outcome] = [];
 			assocProofsByKeyAndOutcome[operation_key][outcome].push(objStateVars[key]);
+
+			if (!assocProofsByPairAndOutcome[pair])
+			assocProofsByPairAndOutcome[pair] = {};
+			if(!assocProofsByPairAndOutcome[pair][outcome])
+			assocProofsByPairAndOutcome[pair][outcome] = [];
+			assocProofsByPairAndOutcome[pair][outcome].push(objStateVars[key]);
 		 }
 		}
 	}
@@ -403,7 +433,7 @@ function getNicknameForAddress(address){
 	return assocNicknamesByAddress[address];
 }
 
-function getCurrentPools(){
+function getAllPools(){
 	return currentActivePools;
 }
 
@@ -411,30 +441,42 @@ function getAaParameters(){
 	return assocAaParameters;
 }
 
-function getCurrentOperations(){
-	return Object.values(assocCurrentOperations);
+function getAllOperations(){
+	return Object.values(assocAllOperations);
 }
 
-function getCurrentOperationsForExchange(exchange){
-	return assocCurrentOperationsByExchange[exchange] || [];
+function getAllOperationsForExchange(exchange){
+	return assocAllOperationsByExchange[exchange] || [];
 }
 
-function getCurrentExchangeByWalletId(wallet_id){
-	return assocCurrentExchangeByWalletId[wallet_id];
+function getAllOperationsForWalletId(wallet_id){
+	return assocAllOperationsByWalletId[wallet_id] || [];
+}
+
+function getIsWalletOnOperation(wallet_id){
+	return !!assocWalletOnOperation[wallet_id];
+}
+
+function getExchangeByWalletId(wallet_id){
+	return assocExchangeByWalletId[wallet_id];
+}
+
+function getUrlProofsForPair(exchange_id, wallet_id){
+	return assocProofsByPairAndOutcome[wallet_id + "_" + exchange_id] || {};
 }
 
 function getBestPoolForExchange(exchange){
 	var bestPool = {
 		reward_amount: 0
 	};
-	for (var key in assocCurrentPoolsByExchange[exchange]){
-		if (assocCurrentPoolsByExchange[exchange][key].number_rewards > 0 && assocCurrentPoolsByExchange[exchange][key].reward_amount > bestPool.reward_amount)
-			bestPool = assocCurrentPoolsByExchange[exchange][key];
+	for (var key in assocAllPoolsByExchange[exchange]){
+		if (assocAllPoolsByExchange[exchange][key].number_rewards > 0 && assocAllPoolsByExchange[exchange][key].reward_amount > bestPool.reward_amount)
+			bestPool = assocAllPoolsByExchange[exchange][key];
 	}
 	
-	for (var key in assocCurrentPoolsByExchange["any"]){
-		if (assocCurrentPoolsByExchange["any"][key].number_rewards > 0 && assocCurrentPoolsByExchange["any"][key].reward_amount > bestPool.reward_amount)
-			bestPool = assocCurrentPoolsByExchange["any"][key];
+	for (var key in assocAllPoolsByExchange["any"]){
+		if (assocAllPoolsByExchange["any"][key].number_rewards > 0 && assocAllPoolsByExchange["any"][key].reward_amount > bestPool.reward_amount)
+			bestPool = assocAllPoolsByExchange["any"][key];
 	}
 	return bestPool;
 }
@@ -519,11 +561,11 @@ function getContributorsGreeting(handle){
 		var arrGreetings = [];
 		for (var i = 0; i < rows.length; i++){
 			var objResponse = rows[i].response ? JSON.parse(rows[i].response) : null;
-			var objOperation = assocCurrentOperations[rows[i].operation_id];
+			var objOperation = assocAllOperations[rows[i].operation_id];
 			if (objResponse && objOperation && objResponse.committed_outcome == objOperation.initial_outcome){
-				var sponsorAddress = assocCurrentPoolsById[objOperation.pool_id] ? assocCurrentPoolsById[objOperation.pool_id].sponsor : null;
+				var sponsorAddress = assocAllPoolsById[objOperation.pool_id] ? assocAllPoolsById[objOperation.pool_id].sponsor : null;
 				arrGreetings.push({
-					author:assocNicknamesByAddress[objResponse.paid_out_address] || objResponse.paid_out_address,
+					author: assocNicknamesByAddress[objResponse.paid_out_address] || objResponse.paid_out_address,
 					exchange: objOperation.exchange, 
 					outcome: objOperation.initial_outcome, 
 					sponsor: assocNicknamesByAddress[sponsorAddress] || sponsorAddress
@@ -534,11 +576,11 @@ function getContributorsGreeting(handle){
 	});
 }
 
-exports.getCurrentPools = getCurrentPools;
-exports.getCurrentOperations = getCurrentOperations;
-exports.getCurrentOperationsForExchange = getCurrentOperationsForExchange;
+exports.getAllPools = getAllPools;
+exports.getAllOperations = getAllOperations;
+exports.getAllOperationsForExchange = getAllOperationsForExchange;
 exports.getBestPoolForExchange = getBestPoolForExchange;
-exports.getCurrentExchangeByWalletId = getCurrentExchangeByWalletId;
+exports.getExchangeByWalletId = getExchangeByWalletId;
 exports.getLastTransactionsToAA = getLastTransactionsToAA;
 exports.getOperationHistory = getOperationHistory;
 exports.getContributorsRanking = getContributorsRanking;
@@ -546,3 +588,6 @@ exports.getDonatorsRanking = getDonatorsRanking;
 exports.getNicknameForAddress = getNicknameForAddress;
 exports.getContributorsGreeting = getContributorsGreeting;
 exports.getAaParameters = getAaParameters;
+exports.getAllOperationsForWalletId = getAllOperationsForWalletId;
+exports.getIsWalletOnOperation = getIsWalletOnOperation;
+exports.getUrlProofsForPair = getUrlProofsForPair;

@@ -11,6 +11,7 @@
 					icon-left="wallet"
 					tag="router-link"
 					:to="'/explorer/'+id"
+					:target="target"
 			>
 				{{id}}
 			</b-button>

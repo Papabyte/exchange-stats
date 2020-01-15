@@ -8,7 +8,7 @@
 	"editModalAddXTo" : "Add wallet {wallet} to exchange",
 	"editModalAlreadyBelongs": "Wallet {wallet} already belongs to exchange {exchange}",
 	"editModalDoesntBelong": "{wallet} doesn't belong to exchange {exchange}",
-	"editModalOperationOnGoing" : "An operation is already ongoing for wallet {wallet} and exchange {exchange}",
+	"editModalOperationOnGoing" : "An operation is already ongoing for wallet {wallet}",
 	"editModalNoRewardAvailable" : "No reward available for operation on this exchange.",
 	"editModalSelectExchange" : "Select the exchange to which you want to add wallet",
 	"editModalGainIfRemoved" : "Stake {stake_amount}, gain {gain_amount} if wallet {wallet} is successfully removed from {exchange}",

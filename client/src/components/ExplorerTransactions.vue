@@ -64,9 +64,19 @@
 										<b-tooltip type="is-info" :label="$t('explorerTransactionsButtonRemoveFromExchangeTip')">
 											<b-button
 													type="is-warning"
+													icon-right="magnify"
+													size="is-medium"
+													@click="viewAddingUrlProofs(wallet, exchange)"
+											/>
+										</b-tooltip>
+									</span>
+									<span class="control">
+										<b-tooltip type="is-info" :label="$t('explorerTransactionsButtonRemoveFromExchangeTip')">
+											<b-button
+													type="is-warning"
 													icon-right="close"
 													size="is-medium"
-													@click="removeWalletFromExchange(Number(wallet), exchange)"
+													@click="removeWalletFromExchange(wallet, exchange)"
 											/>
 										</b-tooltip>
 									</span>
@@ -93,10 +103,10 @@
 
 				<div class="row" v-if="count_total">
 					<span class="title is-5">{{$t('explorerTransactionsTotalTransactions')}}</span>
-					<span class="has-text-weight-medium">{{count_total}}</span>
+					<span class="has-text-weight-medium">{{count_total == 'over_10000' ? 'more than 10000' : count_total}}</span>
 				</div>
 
-				<div class="notification" v-if="wallet_id">
+				<div class="notification" v-if="wallet_id || exchange">
 					<span class="title is-6">{{$t('explorerTransactionsAddressCount')}}</span>
 					<router-link :to="{name: 'explorerAddresses', params: { request_input: wallet_id} }">
 						{{addr_count || 0}}
@@ -116,7 +126,7 @@
 		<div v-if="!isSpinnerActive && transactions" class="box">
 			<div class="row mb-2">
 				<b-pagination
-						:total="count_total"
+						:total="count_total == 'over_10000' ? 10000 : count_total"
 						:current.sync="currentPage"
 						:per-page="perPage"
 						range-before="3"
@@ -144,6 +154,8 @@
 	import Exchange from './commons/Exchange.vue'
 	import BtcAmount from './commons/BtcAmount.vue'
 	import WalletId from './commons/WalletId.vue'
+	import ViewAddingUrlProofs from './commons/ViewUrlProofForAddingModal.vue'
+
 	import { ModalProgrammatic } from 'buefy'
 
 	const conf = require('../conf.js')
@@ -153,7 +165,7 @@
 			Transaction,
 			Exchange,
 			BtcAmount,
-			WalletId,
+			WalletId
 		},
 		props: {
 			request_input: {
@@ -283,6 +295,17 @@
 					props: {propExchange: exchange, isRemoving: false },
 				})
 			},
+			viewAddingUrlProofs (walletId,exchange) {
+				ModalProgrammatic.open({
+					parent: this,
+					component: ViewAddingUrlProofs,
+					hasModalCard: true,
+					props: {propExchange: exchange, propWalletId: walletId },
+				})
+			},
+
+
+			
 			onPageChanged (value) {
 				this.$router.push({ name: 'explorerInputPaged', params: { url_input: this.request_input, page: value } })
 			},

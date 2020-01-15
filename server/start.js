@@ -36,7 +36,12 @@ require('./modules/sqlite_tables.js').create().then(function(){
 			return response.status(400).send('Wrong page');
 		const redirected_ids = await explorer.getRedirections([id]);
 		explorer.getTransactionsFromWallets(redirected_ids, page, function(assocTxsFromWallet){
-				return response.send({txs: assocTxsFromWallet, redirected_id: redirected_ids[0], exchange: aa_handler.getCurrentExchangeByWalletId(id)});
+				return response.send({
+					txs: assocTxsFromWallet, 
+					redirected_id: redirected_ids[0], 
+					exchange: aa_handler.getExchangeByWalletId(id),
+					isOnOperation: aa_handler.getIsWalletOnOperation(id),
+				});
 		})
 	});
 
@@ -66,7 +71,12 @@ require('./modules/sqlite_tables.js').create().then(function(){
 		const wallet_ids = exchanges.getExchangeWalletIds(exchange);
 		const redirected_ids = await explorer.getRedirections(wallet_ids);
 		explorer.getTransactionsFromWallets(redirected_ids, page, function(assocTxsFromWallet){
-			return response.send({txs: assocTxsFromWallet, wallet_ids: wallet_ids, redirected_ids: redirected_ids, name: exchanges.getExchangeName(exchange)});
+			return response.send({
+				txs: assocTxsFromWallet, 
+				wallet_ids: wallet_ids, 
+				redirected_ids: redirected_ids, 
+				name: exchanges.getExchangeName(exchange),
+			});
 		});
 	});
 
@@ -121,7 +131,7 @@ require('./modules/sqlite_tables.js').create().then(function(){
 	
 
 	app.get('/api/pools', function(request, response){
-		return response.send(aa_handler.getCurrentPools());
+		return response.send(aa_handler.getAllPools());
 	});
 
 	app.get('/api/pool/:exchange', function(request, response){
@@ -137,12 +147,12 @@ require('./modules/sqlite_tables.js').create().then(function(){
 		const exchange = request.params.exchange;
 		if(!validationUtils.isNonemptyString(exchange))
 			return response.status(400).send('Wrong exchange id');
-		return response.send(aa_handler.getCurrentOperationsForExchange(exchange));
+		return response.send(aa_handler.getAllOperationsForExchange(exchange));
 	});
 
 	app.get('/api/operations', function(request, response){
 		console.log('/api/operations');
-		return response.send(aa_handler.getCurrentOperations());
+		return response.send(aa_handler.getAllOperations());
 	});
 
 	app.get('/api/aa_transactions', function(request, response){
@@ -198,7 +208,15 @@ require('./modules/sqlite_tables.js').create().then(function(){
 		return response.send(aa_handler.getAaParameters());
 	});
 
-	
+	app.get('/api/url-proofs/:wallet_id/:exchange_id', function(request, response){
+		const exchange_id = request.params.exchange_id;
+		const wallet_id = Number(request.params.wallet_id);
+		if (!validationUtils.isNonnegativeInteger(wallet_id))
+			return response.status(400).send('Wrong wallet id');
+		if (!validationUtils.isNonemptyString(exchange_id))
+			return response.status(400).send('Wrong exchange id');
+		return response.send(aa_handler.getUrlProofsForPair(wallet_id, exchange_id));
+	});
 
 	app.listen(conf.api_port);
 

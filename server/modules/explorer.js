@@ -24,7 +24,12 @@ async function getTransactionsFromWallets(arrIds, page, handle){
 	});
 	const addr_count = await stats.getAddressesCount(arrIds);
 	getTransactionsFromInternalIds(idRows, function(assocTxsFromWallet){
-		return handle({per_page: TXS_PER_PAGE, addr_count: addr_count, total_on_wallets: total_on_wallets,count_total: transactions_count, txs: assocTxsFromWallet});
+		return handle({
+			per_page: TXS_PER_PAGE, 
+			addr_count: addr_count, 
+			total_on_wallets: total_on_wallets,
+			count_total: transactions_count > 10000 ? 'over_10000' : transactions_count, 
+			txs: assocTxsFromWallet});
 	});
 }
 
@@ -89,12 +94,12 @@ function createTxsAssociativeArray(rows){
 		assocTxsFromWallet[row.tx_id].from = {
 			id: row.from_id,
 			amount: row.amount_from,
-			exchange: aa_handler.getCurrentExchangeByWalletId(row.from_id) 
+			exchange: aa_handler.getExchangeByWalletId(row.from_id) 
 		} ;
 		assocTxsFromWallet[row.tx_id].to.push({
 			address: row.address, id: row.to_id,
 			amount: row.amount_to, 
-			exchange: aa_handler.getCurrentExchangeByWalletId(row.to_id)
+			exchange: aa_handler.getExchangeByWalletId(row.to_id)
 		}) ;
 	});
 	return assocTxsFromWallet;
