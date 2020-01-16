@@ -50,7 +50,6 @@
 		},
 		computed: {
 			target: function () {
-
 				return this.newTab ? '_blank' : ''
 			},
 

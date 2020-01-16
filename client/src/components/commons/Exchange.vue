@@ -12,6 +12,7 @@
 					type="is-warning"
 					tag="router-link"
 					:to="'/explorer/'+id"
+					:target="target"
 			>
 				<v-icon v-if="showIcon" name='trending-up' class="exchange-icon"/>
 				{{exchangeName}}
@@ -38,6 +39,11 @@
 				required: false,
 				default: false,
 			},
+			newTab: {
+				type: Boolean,
+				required: false,
+				default: false,
+			},
 			showIcon: {
 				type: Boolean,
 				required: false,
@@ -45,12 +51,13 @@
 			},
 		},
 		computed: {
-
 			exchangeName: function () {
 				return this.$store.state.exchangesById[this.id] ? this.$store.state.exchangesById[this.id].name : this.id
-
 			},
-		},
+			target: function () {
+				return this.newTab ? '_blank' : ''
+			},
+		}
 	}
 </script>
 

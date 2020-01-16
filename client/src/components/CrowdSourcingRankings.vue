@@ -11,8 +11,8 @@
 			<b-tab-item :label="$t('crowdSourcingContributorsTitle')">
 				<contributors-ranking/>
 			</b-tab-item>
-			<b-tab-item :label="$t('crowdSourcingDonatorsTitle')">
-				<donators-ranking/>
+			<b-tab-item :label="$t('crowdSourcingDonorsTitle')">
+				<Donors-ranking/>
 			</b-tab-item>
 		</b-tabs>
 	</div>
@@ -22,14 +22,14 @@
 
 	const conf = require('../conf.js')
 	import ContributorsRanking from './CrowdSourcingRankingContributors.vue'
-	import DonatorsRanking from './CrowdSourcingRankingDonators.vue'
+	import DonorsRanking from './CrowdSourcingRankingDonors.vue'
 	import SetNicknameModal from './commons/SetNicknameModal.vue'
 	import { ModalProgrammatic } from 'buefy'
 
 	export default {
 		components: {
 			ContributorsRanking,
-			DonatorsRanking,
+			DonorsRanking,
 		},
 		data () {
 			return {}

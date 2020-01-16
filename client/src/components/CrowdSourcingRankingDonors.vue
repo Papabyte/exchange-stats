@@ -20,10 +20,10 @@
 				aria-current-label="Current page"
 		>
 			<template slot-scope="props">
-				<b-table-column field="address" :label="$t('crowdSourcingDonatorsTableColAddress')" sortable>
+				<b-table-column field="address" :label="$t('crowdSourcingDonorsTableColAddress')" sortable>
 					<user :address="props.row.address" :nickname="props.row.nickname"/>
 				</b-table-column>
-				<b-table-column field="amount" :label="$t('crowdSourcingDonatorsTableColAmount')" sortable>
+				<b-table-column field="amount" :label="$t('crowdSourcingDonorsTableColAmount')" sortable>
 					<byte-amount :isNegative="props.row.amount<0" :isPositive="props.row.amount>0" :amount="props.row.amount"/>
 				</b-table-column>
 			</template>
@@ -75,7 +75,7 @@
 		},
 		methods: {
 			getData () {
-				this.axios.get('/api/donators-ranking/').then((response) => {
+				this.axios.get('/api/Donors-ranking/').then((response) => {
 					this.items = response.data
 					this.totalRows = this.items.length
 					this.isSpinnerActive = false

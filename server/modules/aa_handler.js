@@ -20,11 +20,12 @@ var currentActivePools = [];
 var assocExchangeByWalletId = {};
 
 var assocAllOperations = {};
-var assocAllOperationsByExchange = {};
-var assocAllOperationsByWalletId = {};
+var assocPendingOperationsByExchange = {};
+var assocPendingOperationsByWalletId = {};
 var assocStakedByKeyAndAddress = {};
 var assocProofsByKeyAndOutcome = {};
 var assocProofsByPairAndOutcome = {};
+var assocLastOperationForPair = {};
 
 var assocNicknamesByAddress = {};
 var assocWalletOnOperation = {};
@@ -74,7 +75,7 @@ function indexAaParameters(){
 
 
 function indexFromStateVars(){
-	getStateVarsForPrefixes(["operation_","pair_", "nickname_"], function(error, objStateVars){
+	getStateVarsForPrefixes(["pool_","operation_","pair_", "nickname_"], function(error, objStateVars){
 		if (error)
 			return console.log(error);
 			indexOperations(objStateVars);
@@ -163,16 +164,28 @@ function catchUpOperationsHistory(){
 						if(!objResponse)
 							return cb();
 
+						function attachProofUrls(){
+							for (var i=1; i<=5; i++){
+								if (trigger.data["url_" + i]){
+									if(!objResponse.proof_urls)
+										objResponse.proof_urls = [];
+										objResponse.proof_urls.push(trigger.data["url_" + i]);
+								}
+							}
+						}
+
 						var paid_in = 0;
 						var paid_out = 0;
 						if (objResponse.staked_on_in == 0 && objResponse.staked_on_out > 0 || objResponse.staked_on_out == 0 && objResponse.staked_on_in > 0){
 							var operation_type = "initial_stake";
 							paid_in = objResponse.your_stake;
 							concerned_address = trigger.address;
+							attachProofUrls();
 						} else if (objResponse.your_stake){
 							var operation_type = "stake";
 							paid_in = objResponse.your_stake;
 							concerned_address = trigger.address;
+							attachProofUrls();
 						} else if (objResponse.committed_outcome){
 							var operation_type = "commit";
 							paid_out = objResponse.paid_out_amount;
@@ -224,21 +237,21 @@ function indexRewardPools(objStateVars){
 	const activePools = [];
 	var assocPoolsByExchange = {};
 	poolKeys.forEach(function(poolKey){
-			const pool = {};
-			pool.number_rewards = Number(objStateVars[poolKey+'_number_of_rewards']);
-			pool.pool_id = poolKey.split('_')[1];
-			pool.sponsor = objStateVars[poolKey+'_sponsor']
-			pool.reward_amount = Number(objStateVars[poolKey+'_reward_amount']);
-			if (objStateVars[poolKey+'_exchange'] != undefined)
-				pool.exchange = objStateVars[poolKey+'_exchange'];
-			else
-				pool.exchange = 'any';
-			assocPoolsById[pool.pool_id] = pool;
-			if(pool.number_rewards > 0)
-				activePools.push(pool);
-			if (!assocPoolsByExchange[pool.exchange])
-				assocPoolsByExchange[pool.exchange] = [];
-			assocPoolsByExchange[pool.exchange].push(pool);
+		const pool = {};
+		pool.number_rewards = Number(objStateVars[poolKey+'_number_of_rewards']);
+		pool.pool_id = poolKey.split('_')[1];
+		pool.sponsor = objStateVars[poolKey+'_sponsor']
+		pool.reward_amount = Number(objStateVars[poolKey+'_reward_amount']);
+		if (objStateVars[poolKey+'_exchange'] != undefined)
+			pool.exchange = objStateVars[poolKey+'_exchange'];
+		else
+			pool.exchange = 'any';
+		assocPoolsById[pool.pool_id] = pool;
+		if(pool.number_rewards > 0)
+			activePools.push(pool);
+		if (!assocPoolsByExchange[pool.exchange])
+			assocPoolsByExchange[pool.exchange] = [];
+		assocPoolsByExchange[pool.exchange].push(pool);
 		
 	});
 	currentActivePools = activePools;
@@ -256,11 +269,12 @@ function indexOperations(objStateVars){
 	const assocOperations = {};
 	const arrOperations = [];
 
-	const assocOperationsByExchange = {};
+	const _assocPendingOperationsByExchange = {};
 	const assocWalletIdsByExchange = {};
-	const assocOperationsByWalletId = {};
+	const _assocPendingOperationsByWalletId = {};
 	const _assocExchangeByWalletId = {};
-	const _assocWalletOnOperation = {}
+	const _assocWalletOnOperation = {};
+	const _assocLastOperationForPair = {};
 
 	operationKeys.forEach(function(key){
 		const operation = {};
@@ -272,6 +286,7 @@ function indexOperations(objStateVars){
 
 		operation.wallet_id = Number(wallet_id);
 		operation.exchange = exchange;
+		operation.number = Number(objStateVars[pairKey + "_number"]);
 
 		if(!assocWalletIdsByExchange[exchange])
 			assocWalletIdsByExchange[exchange] = [];
@@ -282,7 +297,7 @@ function indexOperations(objStateVars){
 		}
 		const outcome = objStateVars[key + "_outcome"]
 		operation.outcome = outcome;
-		if (outcome == 'onreview')
+		if (operation.status == 'onreview')
 			_assocWalletOnOperation[wallet_id] = true;
 		operation.committed_outcome = objStateVars[pairKey + "_committed_outcome"];
 		operation.initial_outcome = objStateVars[key + "_initial_outcome"];
@@ -295,6 +310,11 @@ function indexOperations(objStateVars){
 		operation.staked_by_address = assocStakedByKeyAndAddress[key];
 		operation.url_proofs_by_outcome = assocProofsByKeyAndOutcome[key]
 		arrOperations.push(operation);
+		if (!_assocLastOperationForPair[pairKey])
+			_assocLastOperationForPair[pairKey] = operation;
+		else if (operation.number > _assocLastOperationForPair[pairKey].number)
+			_assocLastOperationForPair[pairKey] = operation;
+
 	});
 
 	arrOperations.sort(function(a, b) { return b.countdown_start - a.countdown_start});
@@ -302,27 +322,26 @@ function indexOperations(objStateVars){
 
 	arrOperations.slice(0, MAX_OPERATIONS).forEach(function(operation){
 		assocOperations[operation.key] = operation;
-		if(!assocOperationsByExchange[operation.exchange])
-			assocOperationsByExchange[operation.exchange] = [];
-		assocOperationsByExchange[operation.exchange].push(operation);
 	});
 
 	arrOperations.forEach(function(operation){
-		if(!assocOperationsByExchange[operation.exchange])
-			assocOperationsByExchange[operation.exchange] = [];
-		assocOperationsByExchange[operation.exchange].push(operation);
-		if(!assocOperationsByWalletId[operation.wallet_id])
-		assocOperationsByWalletId[operation.wallet_id] = [];
-		assocOperationsByWalletId[operation.wallet_id].push(operation);
+		if (operation.status != 'onreview')
+			return;
+		if(!_assocPendingOperationsByExchange[operation.exchange])
+			_assocPendingOperationsByExchange[operation.exchange] = [];
+		_assocPendingOperationsByExchange[operation.exchange].push(operation);
+		if(!_assocPendingOperationsByWalletId[operation.wallet_id])
+			_assocPendingOperationsByWalletId[operation.wallet_id] = [];
+		_assocPendingOperationsByWalletId[operation.wallet_id].push(operation);
 	});
 
 	assocAllOperations = assocOperations;
 	assocExchangeByWalletId = _assocExchangeByWalletId;
-	assocAllOperationsByExchange = assocOperationsByExchange;
-	assocAllOperationsByWalletId = assocOperationsByWalletId;
+	assocPendingOperationsByExchange = _assocPendingOperationsByExchange;
+	assocPendingOperationsByWalletId = _assocPendingOperationsByWalletId;
 	assocWalletOnOperation = _assocWalletOnOperation;
+	assocLastOperationForPair= _assocLastOperationForPair;
 	exchanges.setWalletIdsByExchange(assocWalletIdsByExchange);
-
 }
 
 
@@ -445,12 +464,12 @@ function getAllOperations(){
 	return Object.values(assocAllOperations);
 }
 
-function getAllOperationsForExchange(exchange){
-	return assocAllOperationsByExchange[exchange] || [];
+function getPendingOperationsForExchange(exchange){
+	return assocPendingOperationsByExchange[exchange] || [];
 }
 
-function getAllOperationsForWalletId(wallet_id){
-	return assocAllOperationsByWalletId[wallet_id] || [];
+function getPendingOperationsForWalletId(wallet_id){
+	return assocPendingOperationsByWalletId[wallet_id] || [];
 }
 
 function getIsWalletOnOperation(wallet_id){
@@ -461,9 +480,24 @@ function getExchangeByWalletId(wallet_id){
 	return assocExchangeByWalletId[wallet_id];
 }
 
-function getUrlProofsForPair(exchange_id, wallet_id){
-	return assocProofsByPairAndOutcome[wallet_id + "_" + exchange_id] || {};
+function getUrlProofsForPair(wallet_id, exchange_id){
+	return assocProofsByPairAndOutcome[ exchange_id+ "_" + wallet_id] || {};
 }
+
+function getLastOperationHistoryForPair(wallet_id, exchange_id, handle){
+	const pair = "pair_" + exchange_id + "_" + wallet_id;
+	console.log(pair)
+	console.log(assocLastOperationForPair)
+
+	if (!assocLastOperationForPair[pair])
+		return handle('no last operation found');
+	else
+	getOperationHistory(assocLastOperationForPair[pair].key, function(objHistory){
+		console.log(objHistory);
+		return handle(null, objHistory);
+	});
+}
+
 
 function getBestPoolForExchange(exchange){
 	var bestPool = {
@@ -507,14 +541,13 @@ function getLastTransactionsToAA(handle){
 
 function getOperationHistory(id, handle){
 	db.query("SELECT operation_type,timestamp,response FROM operations_history WHERE operation_id=? ORDER BY mci DESC",[id], function(rows){
-		return handle(
-			rows.map(function(row){
-				var objResponse = JSON.parse(row.response);
-				if (assocNicknamesByAddress[objResponse.your_address])
-					objResponse.nickname = assocNicknamesByAddress[objResponse.your_address];
-				return {operation_type: row.operation_type, response: objResponse, timestamp: row.timestamp};
-			})
-		)
+		rows = rows.map(function(row){
+			var objResponse = JSON.parse(row.response);
+			if (assocNicknamesByAddress[objResponse.your_address])
+				objResponse.nickname = assocNicknamesByAddress[objResponse.your_address];
+			return {operation_type: row.operation_type, response: objResponse, timestamp: row.timestamp};
+		})
+		return handle({history: rows, operation: assocAllOperations[id]});
 	});
 }
 
@@ -544,7 +577,7 @@ function getContributorsRanking(handle){
 	});
 }
 
-function getDonatorsRanking(handle){
+function getDonorsRanking(handle){
 	db.query("SELECT (SUM(paid_in) - SUM(paid_out)) as amount, concerned_address AS address FROM operations_history \n\
 	WHERE (operation_type='create_pool' OR operation_type='destroyed_pool') \n\
 	GROUP BY concerned_address",function(rows){
@@ -578,16 +611,17 @@ function getContributorsGreeting(handle){
 
 exports.getAllPools = getAllPools;
 exports.getAllOperations = getAllOperations;
-exports.getAllOperationsForExchange = getAllOperationsForExchange;
+exports.getPendingOperationsForExchange = getPendingOperationsForExchange;
 exports.getBestPoolForExchange = getBestPoolForExchange;
 exports.getExchangeByWalletId = getExchangeByWalletId;
 exports.getLastTransactionsToAA = getLastTransactionsToAA;
 exports.getOperationHistory = getOperationHistory;
 exports.getContributorsRanking = getContributorsRanking;
-exports.getDonatorsRanking = getDonatorsRanking;
+exports.getDonorsRanking = getDonorsRanking;
 exports.getNicknameForAddress = getNicknameForAddress;
 exports.getContributorsGreeting = getContributorsGreeting;
 exports.getAaParameters = getAaParameters;
-exports.getAllOperationsForWalletId = getAllOperationsForWalletId;
+exports.getPendingOperationsForWalletId = getPendingOperationsForWalletId;
 exports.getIsWalletOnOperation = getIsWalletOnOperation;
 exports.getUrlProofsForPair = getUrlProofsForPair;
+exports.getLastOperationHistoryForPair = getLastOperationHistoryForPair;

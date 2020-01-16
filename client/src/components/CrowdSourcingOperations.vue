@@ -106,7 +106,7 @@
 										{{$t('crowdSourcingOperationsButtonViewProofs')}}
 									</b-dropdown-item>
 									<b-dropdown-item
-											@click="operationHistory(props.row)"
+											@click="viewOperationHistory(props.row)"
 											aria-role="listitem">
 										{{$t('crowdSourcingOperationsButtonHistory')}}
 									</b-dropdown-item>
@@ -214,7 +214,7 @@
 					props: { operationItem },
 				})
 			},
-			operationHistory (clicked_item) {
+			viewOperationHistory (clicked_item) {
 				let operationItem = clicked_item
 				ModalProgrammatic.open({
 					parent: this,

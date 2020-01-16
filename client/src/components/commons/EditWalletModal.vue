@@ -64,9 +64,9 @@
 						<div v-if="redirectedWalletId">
 							{{isRedirected ? "Redirected to wallet: " : ""}} <wallet-id :id="Number(redirectedWalletId)" newTab/>
 						</div>
-						<div v-if="wallet_digest">
+						<div v-if="wallet_digest" class="mb-05">
 							Total on wallet: <btc-amount :amount="wallet_digest.total_on_wallet"/>
-							Addresses on wallet: {{wallet_digest.addr_count}}
+							- Addresses on wallet: {{wallet_digest.addr_count}}
 						</div>
 					</div>
 					<div v-if="rewardAmount>0" class="pt-3">
@@ -84,7 +84,7 @@
 								<exchange :id="selectedExchange" noUrl/>
 							</template>
 						</i18n>
-						<i18n v-else path="editModalGainIfAdded" id="potential-gain">
+						<i18n v-else path="editModalGainIfAdded" class="mb-05" id="potential-gain">
 							<template #stake_amount>
 								<byte-amount :amount="stakeAmount"/>
 							</template>
@@ -142,6 +142,10 @@
 					<url-inputs @urls_updated="urls_updated" :isAtLeastOneUrlRequired="true"/>
 				</div>
 
+				<div class="row" v-if="isRemoving && (propWalletId || selectedWalletId)">
+					<operation-history-collapse :exchange="selectedExchange" :walletId="selectedWalletId" />
+				</div>
+
 			</div>
 			<div class="container" v-if="link" fluid>
 				<div class="pt-3">
@@ -172,6 +176,7 @@
 	import WalletLink from './WalletLink.vue'
 	import WalletId from './WalletId.vue'
 	import BtcAmount from './BtcAmount.vue'
+	import OperationHistoryCollapse from './LastOperationHistoryCollapse.vue'
 
 	export default {
 		components: {
@@ -180,7 +185,8 @@
 			UrlInputs,
 			Exchange,
 			WalletLink,
-			WalletId
+			WalletId,
+			OperationHistoryCollapse
 		},
 		props: {
 			propWalletId: {
@@ -275,8 +281,8 @@
 							return
 						}
 						this.wallet_digest = {
-							addr_count: response.data.addr_count,
-							total_on_wallet: response.data.total_on_wallets
+							addr_count: response.data.txs.addr_count,
+							total_on_wallet: response.data.txs.total_on_wallets
 						}
 
 						if (!this.notification_text) {
@@ -343,7 +349,7 @@
 				const base64data = base64url(json_string)
 				this.link = (conf.testnet ? 'byteball-tn' : 'byteball') + ':' + conf.aa_address + '?amount='
 					+ this.stakeAmount + '&base64data=' + base64data
-			},
+			}
 		},
 		computed: {
 			isNotificationActive(){
@@ -359,13 +365,16 @@
 			getTitle: function () {
 				let title = ''
 				const exchangeName = this.assocExchangesById[this.selectedExchange] ? this.assocExchangesById[this.selectedExchange].name : ''
+				const walletId = this.isWalletId(this.selectedWalletId) ? this.selectedWalletId : '' 
 				if (this.propExchange) {
 					if (this.selectedWalletId && this.selectedExchange) {
 						title = this.isRemoving ? this.$t('editModalRemoveXFromX',
-							{ exchange: exchangeName}) :
+							{ exchange: exchangeName,
+								wallet: walletId,
+							}) :
 							this.$t('editModalAddXToX', {
 								exchange: exchangeName,
-								wallet: this.isWalletId(this.redirectedWalletId || this.selectedWalletId) ? this.redirectedWalletId || this.selectedWalletId : '',
+								wallet: walletId,
 							})
 					} else if (this.selectedExchange) {
 						title = this.isRemoving ? this.$t('editModalRemoveFromX',
@@ -374,12 +383,12 @@
 					} else if (this.selectedWalletId) {
 						title = this.isRemoving ? this.$t('editModalRemoveXFrom', { wallet: this.selectedWalletId }) :
 							this.$t('editModalAddXTo',
-								{ wallet: this.isWalletId(this.selectedWalletId) ? this.selectedWalletId : '' })
+								{ wallet: walletId})
 					}
 				} else if (this.propWalletId) {
 					title = this.$t('editModalAddXToX', {
 						exchange: exchangeName,
-						wallet: this.isWalletId(this.redirectedWalletId || this.selectedWalletId) ? this.redirectedWalletId || this.selectedWalletId : '',
+						wallet: walletId,
 					})
 				}
 				return title

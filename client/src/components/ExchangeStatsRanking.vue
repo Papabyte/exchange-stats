@@ -21,6 +21,7 @@
 						:default-sort-direction="defaultSortDirection"
 						:sort-icon="sortIcon"
 						:sort-icon-size="sortIconSize"
+						@sort="currentPage=1"
 						default-sort="total_btc_wallet"
 						aria-next-label="Next page"
 						aria-previous-label="Previous page"
@@ -28,11 +29,18 @@
 						aria-current-label="Current page">
 
 					<template slot-scope="props">
+
+
 						<b-table-column field="name" :label="$t('rankingTableColName')" sortable>
 							{{ props.row.name }}
 						</b-table-column>
 
 						<b-table-column field="reported_volume" :label="$t('rankingTableColReportedVolume')" sortable>
+							<template slot="header" slot-scope="{ column }">
+								<b-tooltip :label="$t('rankingTableColReportedVolumeTip')">
+									{{ column.label }}
+								</b-tooltip>
+							</template> 
 							<BtcAmount :amount="props.row.reported_volume"/>
 						</b-table-column>
 
@@ -70,20 +78,7 @@
 								</b-button>
 							</router-link>
 
-							<b-dropdown aria-role="list">
-								<button class="button is-info is-outlined" slot="trigger">
-									<span>{{ $t('rankingTableButtonEdit') }}</span>
-									<b-icon icon="menu-down"></b-icon>
-								</button>
-								<b-dropdown-item aria-role="listitem" @click="addAWallet(props.row.exchange_id)">
-									{{$t('rankingTableButtonAddWallet')}}
-								</b-dropdown-item>
-								<b-dropdown-item aria-role="listitem"
-																	v-if="props.row.total_btc_wallet || props.row.nb_withdrawal_addresses"
-																	@click="removeAWallet(props.row.exchange_id)">
-									{{$t('rankingTableButtonRemoveWallet')}} - {{ props.row.exchange_id }}
-								</b-dropdown-item>
-							</b-dropdown>
+							<contribute :row="props.row" />
 						</b-table-column>
 					</template>
 
@@ -112,12 +107,14 @@
 	import BtcAmount from './commons/BtcAmount.vue'
 	import EditWalletModal from './commons/EditWalletModal.vue'
 	import ExchangeTrend from './commons/ExchangeTrend.vue'
+	import Contribute from './ExchangeStatsRankingContribute.vue'
 	import { ModalProgrammatic } from 'buefy'
 
 	export default {
 		components: {
 			BtcAmount,
 			ExchangeTrend,
+			Contribute
 		},
 		data () {
 			return {

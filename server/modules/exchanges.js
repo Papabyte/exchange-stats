@@ -179,6 +179,7 @@ function setWalletIdsByExchange(obj){
 	assocWalletIdsByExchange = obj;
 }
 
+
 exports.getLastRanking = getLastRanking;
 exports.getExchangeWalletIds = getExchangeWalletIds;
 exports.getExchangesList = getExchangesList;

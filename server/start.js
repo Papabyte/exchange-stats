@@ -69,6 +69,7 @@ require('./modules/sqlite_tables.js').create().then(function(){
 		if(!validationUtils.isNonemptyString(exchange))
 			return response.status(400).send('Wrong exchange id');
 		const wallet_ids = exchanges.getExchangeWalletIds(exchange);
+		console.log(wallet_ids);
 		const redirected_ids = await explorer.getRedirections(wallet_ids);
 		explorer.getTransactionsFromWallets(redirected_ids, page, function(assocTxsFromWallet){
 			return response.send({
@@ -192,8 +193,8 @@ require('./modules/sqlite_tables.js').create().then(function(){
 		});
 	});
 
-	app.get('/api/donators-ranking/', function(request, response){
-		aa_handler.getDonatorsRanking(function(rankingRows){
+	app.get('/api/Donors-ranking/', function(request, response){
+		aa_handler.getDonorsRanking(function(rankingRows){
 			return response.send(rankingRows);
 		});
 	});
@@ -216,6 +217,27 @@ require('./modules/sqlite_tables.js').create().then(function(){
 		if (!validationUtils.isNonemptyString(exchange_id))
 			return response.status(400).send('Wrong exchange id');
 		return response.send(aa_handler.getUrlProofsForPair(wallet_id, exchange_id));
+	});
+
+	app.get('/api/last-operation-history/:wallet_id/:exchange_id', function(request, response){
+		const exchange_id = request.params.exchange_id;
+		const wallet_id = Number(request.params.wallet_id);
+		if (!validationUtils.isNonnegativeInteger(wallet_id))
+			return response.status(400).send('Wrong wallet id');
+		if (!validationUtils.isNonemptyString(exchange_id))
+			return response.status(400).send('Wrong exchange id');
+			aa_handler.getLastOperationHistoryForPair(wallet_id, exchange_id, function(error, objHistory){
+				if (error)
+					return response.status(400).send(error);
+				response.send(objHistory);
+			})
+	});
+
+	app.get('/api/pending-operations-for-exchange/:exchange_id', function(request, response){
+		const exchange_id = request.params.exchange_id;
+		if (!validationUtils.isNonemptyString(exchange_id))
+			return response.status(400).send('Wrong exchange id');
+		return response.send(aa_handler.getPendingOperationsForExchange(exchange_id));
 	});
 
 	app.listen(conf.api_port);

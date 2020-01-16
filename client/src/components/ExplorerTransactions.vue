@@ -11,7 +11,7 @@
 					{{failoverText}}
 				</div>
 
-				<div class="row mt-1" v-if="!wallet_id&&exchange">
+				<div class="row mt-1" v-if="!wallet_id&&exchange&&!exchangeWallets">
 					<b-button
 							size="is-medium"
 							type="is-warning"
@@ -61,7 +61,7 @@
 										<wallet-id :id="Number(wallet)"/>
 									</span>
 									<span class="control">
-										<b-tooltip type="is-info" :label="$t('explorerTransactionsButtonRemoveFromExchangeTip')">
+										<b-tooltip type="is-info" :label="$t('explorerTransactionsButtonViewProofsTip')">
 											<b-button
 													type="is-warning"
 													icon-right="magnify"

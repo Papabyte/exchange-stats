@@ -67,9 +67,17 @@ export default new Router({
 			component: lazyLoading('components/Faq')
 		}	,
 		{
+			name: 'crowdsourcingOperation',
+			path: '/crowdsourcing/:operation_id',
+			component: lazyLoading('components/CrowdSourcing'),
+			props:  route => ({
+				...route.params
+			})
+		},
+		{
 			name: 'crowdsourcing',
-			path: '/crowdsourcing',
-			component: lazyLoading('components/CrowdSourcing')
+			path: '/crowdsourcing/',
+			component: lazyLoading('components/CrowdSourcing'),
 		}
 	],
 })
