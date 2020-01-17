@@ -267,10 +267,15 @@
 								{ wallet: this.redirectedWalletId })
 							this.notification_type = 'is-danger'
 						}
-
 						if (response.data.exchange == this.selectedExchange && !this.isRemoving){
 							this.notification_text = this.$t('editModalAlreadyBelongs',
 									{ wallet: this.redirectedWalletId, exchange: this.selectedExchange })
+							this.notification_type = 'is-danger'
+							return
+						}
+						if (response.data.exchange && !this.isRemoving){
+							this.notification_text = this.$t('editModalBelongsToAnotherExchange',
+									{wallet: this.redirectedWalletId, exchange: this.selectedExchange })
 							this.notification_type = 'is-danger'
 							return
 						}

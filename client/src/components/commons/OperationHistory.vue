@@ -1,6 +1,11 @@
 <template>
 	<div class="container">
 		<div v-if="!isSpinnerActive">
+			<div v-if="title">
+				<h5 class="title is-5 is-marginless mb-05">
+					{{title}}
+				</h5>
+			</div>
 			<div v-for="item in historyItems" class="row" :key="item.operation_id">
 				<div>
 					<div class="box" v-if="item.operation_type =='stake' || item.operation_type=='initial_stake'" >
@@ -67,12 +72,18 @@ export default {
 		propHistoryData: {
 			type: Object,
 			required: false
+		},
+		showTitle: {
+			type: Boolean,
+			required: false
+
 		}
 	},
 	data(){
 		return {
 			historyItems: [],
 			isSpinnerActive: false,
+			title: null
 		}
 	},
 	created () {
@@ -81,24 +92,31 @@ export default {
 			this.formatHistory(this.propHistoryData)
 		} else {
 			this.axios.get('/api/operation-history/'+ this.propOperationId).then((response) => {
-				console.log(response.data)
 				this.formatHistory(response.data)
 			});
 		}
 	},
 	methods: {
 		formatHistory(objData){
-			objData.history.forEach((row)=>{
+			console.log(objData.history)
+			console.log(objData.operation)
+			if (this.showTitle){
+				if (objData.operation.initial_outcome == 'in')
+					this.title = this.$t('crowdSourcingOperationsAddXToX', {wallet: objData.operation.wallet_id, exchange: objData.operation.exchange});
+				else
+					this.title = this.$t('crowdSourcingOperationsRemoveXFromX', {wallet: objData.operation.wallet_id, exchange: objData.operation.exchange});
+			}
+		objData.history.forEach((row)=>{
 				const item = {};
 				item.operation_type = row.operation_type;
 				item.author_address = row.response.your_address;
 				item.author_nickname = row.response.nickname;
 				item.staked_on_yes = row.response['staked_on_' + 	objData.operation.initial_outcome];
-				item.staked_on_no = row.response['staked_on_' + (objData.operation == 'in' ? 'out' : 'in')];
+				item.staked_on_no = row.response['staked_on_' + (objData.operation.initial_outcome == 'in' ? 'out' : 'in')];
 				item.time = moment.unix(row.timestamp).format('LLLL');
-				item.stake_on = row.response.proposed_outcome == objData.operation ? this.$t('crowdSourcingOperationsYes') : this.$t('crowdSourcingOperationsNo');
+				item.stake_on = row.response.proposed_outcome == objData.operation.initial_outcome ? this.$t('crowdSourcingOperationsYes') : this.$t('crowdSourcingOperationsNo');
 				item.accepted_amount = row.response.accepted_amount;
-				item.resulting_outcome = row.response.resulting_outcome == objData.operation ? this.$t('crowdSourcingOperationsYes') : this.$t('crowdSourcingOperationsNo');
+				item.resulting_outcome = row.response.resulting_outcome == objData.operation.initial_outcome ? this.$t('crowdSourcingOperationsYes') : this.$t('crowdSourcingOperationsNo');
 				item.paid_out_amount = row.response.paid_out_amount;
 				item.paid_out_address = row.response.paid_out_address;
 				item.expected_reward = row.response.expected_reward;

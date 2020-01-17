@@ -12,7 +12,7 @@
 						v-model="stakeAmountGb" 
 						:min="min_stake_gb" 
 						:max="reversalStakeGb" 
-						:step="min_stake_gb/100"
+						:step="0.00000001"
 						class="px-1"
 						></b-slider>
 					</b-field>
@@ -48,6 +48,28 @@
 					</div>
 					<url-inputs @urls_updated="urls_updated" class="mt-1"/>
 				</div>
+							<b-collapse class="card mt-1" :open="false" aria-id="contentIdForA11y3">
+				<div
+						slot="trigger" 
+						slot-scope="props"
+						class="card-header"
+						role="button"
+						aria-controls="contentIdForA11y3">
+						<p class="card-header-title">
+							Operation history
+						</p>
+						<a class="card-header-icon">
+							<b-icon
+								:icon="props.open ? 'menu-down' : 'menu-up'">
+							</b-icon>
+						</a>
+				</div>
+				<div class="card-content">
+					<div v-if="operationItem" class="content">
+						<operation-history :propOperationId="operationItem.key" showTitle/>
+					</div>
+				</div>
+			</b-collapse>
 			</div>
 			<div class="container" v-if="link" fluid>
 				<div class="pt-3">
@@ -60,6 +82,7 @@
 					{{$t('editModalLinkFooter')}}
 				</div>
 			</div>
+
 		</section>
 		<footer class="modal-card-foot f-end">
 			<button class="button is-primary" v-if="link" @click="link=null">Back</button>
@@ -74,12 +97,14 @@ const conf = require("../../conf.js");
 import ByteAmount from './ByteAmount.vue';
 import UrlInputs from './UrlInputs.vue';
 import WalletLink from './WalletLink.vue'
+import OperationHistory from './OperationHistory.vue';
 
 export default {	
 	components: {
 		ByteAmount,
 		UrlInputs,
-		WalletLink
+		WalletLink,
+		OperationHistory
 	},
 	props: {
 		operationItem: {
@@ -94,7 +119,7 @@ export default {
 		return {
 			text_error: null,
 			conf: conf,
-			min_stake_gb: this.$store.state.aaParameters.min_stake/conf.gb_to_bytes,
+			min_stake_gb: 10001/conf.gb_to_bytes,
 			reversalStakeGb:0,
 			reversalStake: 0,
 			stakeAmountGb: 0,
@@ -107,37 +132,38 @@ export default {
 	},
 	created(){
 			this.operation_item = this.operationItem;
-			console.log(this.operationItem)
+			this.operation_item.isRemovingOperation = this.operation_item.outcome == 'out'
 			this.reversalStake = (conf.challenge_coeff*this.operation_item.staked_on_outcome - this.operation_item.staked_on_opposite);
 			this.reversalStakeGb = this.reversalStake/conf.gb_to_bytes;
 			this.stakeAmountGb = this.reversalStakeGb;
-			console.log(this.stakeAmountGb)
-			console.log(this.reversalStakeGb)
 
 	},
 	computed:{
 		getTitle:function(){
-			if (this.operation_item.isRemovingOperation)
-				return this.$t("contestModalTitleRemoving", {wallet: this.operation_item.wallet_id, exchange: this.operation_item.exchange});
-			else
-				return this.$t("contestModalTitleAdding", {wallet: this.operation_item.wallet_id, exchange: this.operation_item.exchange});
+			if (this.operation_item.initial_outcome == 'in' && this.operation_item.outcome == 'in')
+				return this.$t("contestModalTitleContestAdding", {wallet: this.operation_item.wallet_id, exchange: this.operation_item.exchange});
+			else if (this.operation_item.initial_outcome == 'out' && this.operation_item.outcome == 'out')
+				return this.$t("contestModalTitleContestRemoving", {wallet: this.operation_item.wallet_id, exchange: this.operation_item.exchange});
+			else if (this.operation_item.initial_outcome == 'in' && this.operation_item.outcome == 'out')
+				return this.$t("contestModalTitleConfirmAdding", {wallet: this.operation_item.wallet_id, exchange: this.operation_item.exchange});
+			else if (this.operation_item.initial_outcome == 'out' && this.operation_item.outcome == 'in')
+				return this.$t("contestModalTitleConfirmRemoving", {wallet: this.operation_item.wallet_id, exchange: this.operation_item.exchange});
 		},
 		amountLeftToReverse: function(){
 			return this.reversalStake - this.stakeAmount;
 		},
 		potentialGainAmount: function(){
 			return this.stakeAmount / conf.challenge_coeff;
-		}
+		},
+
 	},
 	watch:{
 		stakeAmountGb: function(){
-			console.log(this.reversalStakeGb)
 			if (this.stakeAmountGb > this.reversalStakeGb)
 				this.stakeAmountGb = this.reversalStakeGb;
-			if (this.stakeAmountGb < conf.challenge_min_stake_gb)
-				this.stakeAmountGb = conf.challenge_min_stake_gb;
+			if (this.stakeAmountGb < this.min_stake_gb)
+				this.stakeAmountGb =  this.min_stake_gb;
 			this.stakeAmount = this.stakeAmountGb * conf.gb_to_bytes;
-
 		}
 	},
 	methods:{

@@ -227,41 +227,28 @@
 				this.axios.get('/api/operations').then((response) => {
 					this.operations = []
 					response.data.forEach((row) => {
-						const operation = {}
-						operation.status = row.status
 						if (row.initial_outcome == 'in') {
-							operation.outcome_yes_or_no = row.outcome == 'in' ? this.$t('crowdSourcingOperationsYes') : this.$t(
+							row.outcome_yes_or_no = row.outcome == 'in' ? this.$t('crowdSourcingOperationsYes') : this.$t(
 								'crowdSourcingOperationsNo')
 						} else {
-							operation.outcome_yes_or_no = row.outcome == 'out' ? this.$t('crowdSourcingOperationsYes') : this.$t(
+							row.outcome_yes_or_no = row.outcome == 'out' ? this.$t('crowdSourcingOperationsYes') : this.$t(
 								'crowdSourcingOperationsNo')
 						}
-						operation.outcome = row.outcome
-						operation.isRemovingOperation = row.outcome == 'out'
-						operation.initial_outcome = row.initial_outcome
-						operation.staked_on_outcome = row.staked_on_outcome
-						operation.total_staked = row.total_staked
-						operation.wallet_id = row.wallet_id
-						operation.exchange = row.exchange
-						operation.key = row.key
-						operation.url_proofs_by_outcome = row.url_proofs_by_outcome
-						operation.countdown_start = row.countdown_start
-						operation.staked_on_opposite = row.staked_on_opposite
-						operation.end = moment.unix(conf.challenge_period_in_days * 24 * 3600 + row.countdown_start)
+						row.end = moment.unix(conf.challenge_period_in_days * 24 * 3600 + row.countdown_start)
 						if ((new Date().getTime() / 1000 - row.countdown_start) > conf.challenge_period_in_days * 24 * 3600)
-							operation.is_committable = true
-						if (operation.status == 'committed') {
-							operation.claimAddresses = []
+							row.is_committable = true
+						if (row.status == 'committed') {
+							row.claimAddresses = []
 							const assocStakedByAdress = row.staked_by_address
 							const outcome = row.outcome
 							for (var key in assocStakedByAdress) {
 								if (assocStakedByAdress[key][outcome])
-									operation.claimAddresses.push(key)
+									row.claimAddresses.push(key)
 							}
 						}
-						this.operations.push(operation)
-						this.totalRows = this.operations.length
 					})
+					this.operations = response.data
+					this.totalRows = this.operations.length
 					this.isSpinnerActive = false
 				})
 

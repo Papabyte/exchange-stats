@@ -5,14 +5,33 @@
 			<b-icon icon="menu-down"></b-icon>
 		</button>
 		<b-dropdown-item aria-role="listitem" @click="addAWallet(row.exchange_id)">
-			{{$t('rankingTableButtonAddWallet')}}
-			<div v-if="rewardAmount"><byte-amount :amount="rewardAmount" /></div>
+			<div>
+				<div class="is-inline-block">	{{$t('rankingTableButtonAddWallet')}}</div>
+				<div v-if="rewardAmount" class="is-inline-block ml-05"> - <byte-amount :amount="rewardAmount"  /> reward</div>
+			</div>
 		</b-dropdown-item>
-		<b-dropdown-item aria-role="listitem"
-											v-if="row.total_btc_wallet || row.nb_withdrawal_addresses"
-											@click="removeAWallet(row.exchange_id)">
+		<b-dropdown-item 
+			aria-role="listitem"
+			v-if="row.total_btc_wallet || row.nb_withdrawal_addresses"
+			@click="removeAWallet(row.exchange_id)">
 			{{$t('rankingTableButtonRemoveWallet')}} - {{ row.exchange_id }}
 		</b-dropdown-item>
+		<b-dropdown-item v-for="operation in operationsToContest" 
+			aria-role="listitem"
+			:key="operation.key"
+			@click="contestOperation(operation)">
+			<div>
+				<div class="is-inline-block">{{getContestField(operation)}}</div>
+				<div class="is-inline-block"> - potential gain: <byte-amount :amount="operation.staked_on_outcome - operation.staked_on_opposite/conf.challenge_coeff"  /> </div>
+			</div>
+		</b-dropdown-item>
+		<b-dropdown-item 
+			aria-role="listitem"
+			@click="donateReward(row.exchange_id)">
+			Post reward
+		</b-dropdown-item>
+
+		
 	</b-dropdown>
 </template>
 
@@ -21,15 +40,19 @@
 	const conf = require('../conf.js')
 	import { ModalProgrammatic } from 'buefy'
 	import EditWalletModal from './commons/EditWalletModal.vue'
+	import ContestOperationModal from './commons/ContestOperationModal.vue'
 	import ByteAmount from './commons/ByteAmount.vue'
+	import DonateRewardModal from './commons/DonateRewardModal.vue'
 
 	export default {
 		components: {
-ByteAmount
+			ByteAmount
 		},
 		data () {
 			return {
-				rewardAmount: 100000
+				rewardAmount: 100000,
+				operationsToContest: [],
+				conf: conf
 			}
 		},
 		props: {
@@ -45,7 +68,19 @@ ByteAmount
 
 		},
 		methods: {
-
+			getContestField: function(operation){
+				console.log(operation)
+				if (operation.initial_outcome == 'in' && operation.outcome == 'in')
+					return this.$t('rankingTableContributeContestFieldContestAdding', {wallet: operation.wallet_id})
+				else if (operation.initial_outcome == 'out' && operation.outcome == 'out')
+					return this.$t('rankingTableContributeContestFieldContestRemoving', {wallet: operation.wallet_id})
+				else if (operation.initial_outcome == 'in' && operation.outcome == 'out')
+					return this.$t('rankingTableContributeContestFieldConfirmAdding', {wallet: operation.wallet_id})
+				else if (operation.initial_outcome == 'out' && operation.outcome == 'in')
+					return this.$t('rankingTableContributeContestFieldConfirmRemoving', {wallet: operation.wallet_id})
+				else
+					return ''
+			},
 			onClick: function(isActive){
 				if (isActive){
 					this.axios.get('/api/pool/' + this.row.exchange_id).then((response) => {
@@ -53,15 +88,17 @@ ByteAmount
 					})
 
 					this.axios.get('/api/pending-operations-for-exchange/' + this.row.exchange_id).then((response) => {
-
-						console.log(response.data)
+						this.operationsToContest = []
+						response.data.forEach((row)=>{
+							if (row.status != 'onreview')
+								return
+							if ((new Date().getTime() / 1000 - row.countdown_start) < conf.challenge_period_in_days * 24 * 3600)
+								this.operationsToContest.push(row)
+						});
 					})
-
-
 				} else {
 					this.rewardAmount = 0
 				}
-
 			},
 			addAWallet (exchange) {
 				ModalProgrammatic.open({
@@ -77,6 +114,22 @@ ByteAmount
 					component: EditWalletModal,
 					hasModalCard: true,
 					props: { propExchange: exchange, isRemoving: true },
+				})
+			},
+			contestOperation (operation) {
+				ModalProgrammatic.open({
+					parent: this,
+					component: ContestOperationModal,
+					hasModalCard: true,
+					props: { operationItem: operation },
+				})
+			},
+			donateReward (exchange) {
+				ModalProgrammatic.open({
+					parent: this,
+					component: DonateRewardModal,
+					hasModalCard: true,
+					props: { propExchange: exchange },
 				})
 			},
 		}
