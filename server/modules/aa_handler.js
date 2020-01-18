@@ -50,22 +50,20 @@ function start(){
 		indexAaParameters();
 		indexFromStateVars();
 		refresh();
+		updateOperationsHistory();
 		setInterval(refresh, 60 * 1000);
 		eventBus.on('new_my_transactions', treatUnconfirmedEvents);
-		eventBus.on('my_transactions_became_stable', discardUnconfirmedEvents);
-		eventBus.on('sequence_became_bad', discardUnconfirmedEvents);
+		eventBus.on('my_transactions_became_stable', discardUnconfirmedEventsAndUpdate);
+		eventBus.on('sequence_became_bad', discardUnconfirmedEventsAndUpdate);
 	});
 }
 
 function refresh(){
 	lightWallet.refreshLightClientHistory();
-	catchUpOperationsHistory();
 }
 
 function indexAaParameters(){
 	getStateVarsForPrefixes(["min_stak","min_rewar"], function(error, objStateVars){
-		console.log("indexAaParameters")
-		console.log(objStateVars)
 		if (error)
 			throw Error("couldn't get AA parameters");
 			assocAaParameters.min_stake = Number(objStateVars['min_stake']);
@@ -74,13 +72,18 @@ function indexAaParameters(){
 }
 
 
-function indexFromStateVars(){
+function indexFromStateVars(handle){
+	if (!handle)
+		handle = ()=>{};
 	getStateVarsForPrefixes(["pool_","operation_","pair_", "nickname_"], function(error, objStateVars){
-		if (error)
-			return console.log(error);
-			indexOperations(objStateVars);
-			indexRewardPools(objStateVars);
-			indexNicknames(objStateVars);
+		if (error){
+			console.log(error);
+			return handle();
+		}
+		indexOperations(objStateVars);
+		indexRewardPools(objStateVars);
+		indexNicknames(objStateVars);
+		handle();
 	});
 }
 
@@ -135,18 +138,70 @@ function getStateVarsRangeForPrefix(prefix, start, end, handle){
 
 
 function treatUnconfirmedEvents(arrUnits){
-	indexFromStateVars();
+	//indexFromStateVars(updateOperationsHistory);
 }
 
 
-function discardUnconfirmedEvents(arrUnits){
-	indexFromStateVars();
+function discardUnconfirmedEventsAndUpdate(arrUnits){
+	indexFromStateVars(updateOperationsHistory);
 }
 
+
+function parseEvent(trigger, objResponse){
+
+	function attachProofUrls(){
+		for (var i=1; i<=5; i++){
+			if (trigger.data["url_" + i]){
+				if(!objEvent.proof_urls)
+				objEvent.proof_urls = [];
+				objEvent.proof_urls.push(trigger.data["url_" + i]);
+			}
+		}
+	}
+
+	const objEvent = {};
+	objEvent.event_data = {};
+	objEvent.paid_in = 0;
+	objEvent.paid_out = 0;
+
+	if (objResponse.operation_id){
+		objEvent.operation_id = objResponse.operation_id;
+		objEvent.pair = convertOperationKeyToPairKey(objResponse.operation_id);
+	}
+ if (objResponse.your_stake){
+		objEvent.event_type = (objResponse.staked_on_in == 0 && objResponse.staked_on_out > 0 || objResponse.staked_on_out == 0 && objResponse.staked_on_in > 0) 
+		? "stake" : "initial_stake";
+		objEvent.paid_in = objResponse.accepted_amount;
+		objEvent.concerned_address = trigger.address;
+		objEvent.event_data.staked_on_in = objResponse.staked_on_in;
+		objEvent.event_data.staked_on_out = objResponse.staked_on_out;
+		objEvent.event_data.expected_reward = objResponse.expected_reward;
+		objEvent.event_data.resulting_outcome = objResponse.resulting_outcome;
+		objEvent.event_data.initial_outcome = objResponse.initial_outcome;
+		attachProofUrls();
+	} else if (objResponse.committed_outcome){
+		objEvent.event_type = "commit";
+		objEvent.paid_out = objResponse.paid_out_amount;
+		objEvent.concerned_address = objResponse.paid_out_address;
+	} else if (objResponse.paid_out_amount){
+		objEvent.event_type = "withdraw";
+		objEvent.paid_out = objResponse.paid_out_amount;
+		objEvent.concerned_address = objResponse.paid_out_address;
+	} else if (objResponse.created_pool){
+		objEvent.event_type = "create_pool";
+		objEvent.paid_in = objResponse.amount;
+		objEvent.concerned_address = trigger.address;
+	} else if (objResponse.destroyed_pool){
+		objEvent.event_type = "destroy_pool";
+		objEvent.paid_out = objResponse.amount;
+		objEvent.concerned_address = trigger.address;
+	}
+	return objEvent;
+}
 
 //we push in an indexed table all information coming from aa responses
-function catchUpOperationsHistory(){
-	mutex.lock(["catchUpOperationsHistory"], function(unlock){
+function updateOperationsHistory(){
+	mutex.lockOrSkip(["updateOperationsHistory"], function(unlock){
 		//units table is joined to get trigger unit timestamp
 		db.query("SELECT * FROM aa_responses INNER JOIN units ON aa_responses.trigger_unit=units.unit WHERE mci >=(SELECT \n\
 			CASE WHEN mci IS NOT NULL THEN MAX(mci) \n\
@@ -164,58 +219,20 @@ function catchUpOperationsHistory(){
 						if(!objResponse)
 							return cb();
 
-						function attachProofUrls(){
-							for (var i=1; i<=5; i++){
-								if (trigger.data["url_" + i]){
-									if(!objResponse.proof_urls)
-										objResponse.proof_urls = [];
-										objResponse.proof_urls.push(trigger.data["url_" + i]);
-								}
-							}
-						}
+						 const objEvent = parseEvent(trigger, objResponse);
+						 console.log(objEvent);
 
-						var paid_in = 0;
-						var paid_out = 0;
-						if (objResponse.staked_on_in == 0 && objResponse.staked_on_out > 0 || objResponse.staked_on_out == 0 && objResponse.staked_on_in > 0){
-							var operation_type = "initial_stake";
-							paid_in = objResponse.your_stake;
-							concerned_address = trigger.address;
-							attachProofUrls();
-						} else if (objResponse.your_stake){
-							var operation_type = "stake";
-							paid_in = objResponse.your_stake;
-							concerned_address = trigger.address;
-							attachProofUrls();
-						} else if (objResponse.committed_outcome){
-							var operation_type = "commit";
-							paid_out = objResponse.paid_out_amount;
-							concerned_address = objResponse.paid_out_address;
-						} else if (objResponse.paid_out_amount){
-							var operation_type = "withdraw";
-							paid_out = objResponse.paid_out_amount;
-							concerned_address = objResponse.paid_out_address;
-						} else if (objResponse.created_pool){
-							var operation_type = "create_pool";
-							paid_in = objResponse.amount;
-							concerned_address = trigger.address;
-						} else if (objResponse.destroyed_pool){
-							var operation_type = "destroy_pool";
-							paid_out = objResponse.amount;
-							concerned_address = trigger.address;
-						}
-						if (operation_type){
-							var operation_id = objResponse.operation_id;
-							var pair = objResponse.pair;
-							db.query("INSERT "+db.getIgnore()+" INTO operations_history (operation_id, paid_in, paid_out, concerned_address, pair, operation_type, mci, aa_address, response, trigger_unit,timestamp) VALUES \n\
-							(?,?,?,?,?,?,?,?,?,?,?)",[operation_id, paid_in, paid_out, concerned_address, pair, operation_type, row.mci, row.aa_address, JSON.stringify(objResponse), row.trigger_unit, row.timestamp],
+						if (objEvent.event_type){
+							db.query("INSERT "+db.getIgnore()+" INTO operations_history (operation_id, paid_in, paid_out, concerned_address, pair, event_type, mci, aa_address, event_data, trigger_unit,timestamp) VALUES \n\
+							(?,?,?,?,?,?,?,?,?,?,?)",[objEvent.operation_id, objEvent.paid_in, objEvent.paid_out, objEvent.concerned_address, objEvent.pair, objEvent.event_type, row.mci, row.aa_address, JSON.stringify(objEvent.event_data), row.trigger_unit, row.timestamp],
 							function(result){
 								if (result.affectedRows === 1){
-									objResponse.exchange = exchanges.getExchangeName[objResponse.exchange];
+									objEvent.exchange = exchanges.getExchangeName[objResponse.exchange];
 									social_networks.notify(
-										operation_type, 
-										assocAllOperations[operation_id], 
-										assocNicknamesByAddress[concerned_address] || concerned_address, 
-										objResponse
+										objEvent.event_type, 
+										assocAllOperations[objEvent.operation_id], 
+										assocNicknamesByAddress[objEvent.concerned_address] || objEvent.concerned_address, 
+										objEvent.event_data
 									);
 								}
 								cb();
@@ -540,12 +557,19 @@ function getLastTransactionsToAA(handle){
 }
 
 function getOperationHistory(id, handle){
-	db.query("SELECT operation_type,timestamp,response FROM operations_history WHERE operation_id=? ORDER BY mci DESC",[id], function(rows){
+	db.query("SELECT event_type,timestamp,event_data,paid_in,paid_out,concerned_address FROM operations_history WHERE operation_id=? ORDER BY mci DESC",[id], function(rows){
 		rows = rows.map(function(row){
-			var objResponse = JSON.parse(row.response);
-			if (assocNicknamesByAddress[objResponse.your_address])
-				objResponse.nickname = assocNicknamesByAddress[objResponse.your_address];
-			return {operation_type: row.operation_type, response: objResponse, timestamp: row.timestamp};
+			var objEventData = JSON.parse(row.event_data);
+			const nickname = assocNicknamesByAddress[row.concerned_address] || null;
+			return {
+				event_type: row.event_type, 
+				event_data: objEventData, 
+				timestamp: row.timestamp, 
+				concerned_address: row.concerned_address,
+				paid_in: row.paid_in,
+				paid_out: row.paid_out,
+				nickname
+			};
 		})
 		return handle({history: rows, operation: assocAllOperations[id]});
 	});
@@ -562,12 +586,12 @@ function getContributorsRanking(handle){
 	income,s1.address FROM\n\
 	(SELECT concerned_address AS address FROM operations_history GROUP BY address)s1 \n\
 	LEFT JOIN\n\
-	(SELECT COUNT(*) AS successes, concerned_address AS address FROM operations_history WHERE operation_type='commit' GROUP BY address)s2 USING (address) \n\
+	(SELECT COUNT(*) AS successes, concerned_address AS address FROM operations_history WHERE event_type='commit' GROUP BY address)s2 USING (address) \n\
 	LEFT JOIN\n\
-	(SELECT COUNT(*) AS initiatives, concerned_address AS address FROM operations_history WHERE operation_type='initial_stake' GROUP BY address)s3 USING (address) \n\
+	(SELECT COUNT(*) AS initiatives, concerned_address AS address FROM operations_history WHERE event_type='initial_stake' GROUP BY address)s3 USING (address) \n\
 	LEFT JOIN\n\
 	(SELECT (SUM(paid_out) - SUM(paid_in)) as income, concerned_address AS address FROM operations_history \n\
-	WHERE (operation_type='initial_stake' OR operation_type='stake' OR operation_type='withdraw' OR operation_type='commit') GROUP BY address)s4 USING (address)",
+	WHERE (event_type='initial_stake' OR event_type='stake' OR event_type='withdraw' OR event_type='commit') GROUP BY address)s4 USING (address)",
 	function(rows){
 		rows.forEach(function(row){
 			if (assocNicknamesByAddress[row.address])
@@ -579,7 +603,7 @@ function getContributorsRanking(handle){
 
 function getDonorsRanking(handle){
 	db.query("SELECT (SUM(paid_in) - SUM(paid_out)) as amount, concerned_address AS address FROM operations_history \n\
-	WHERE (operation_type='create_pool' OR operation_type='destroyed_pool') \n\
+	WHERE (event_type='create_pool' OR event_type='destroyed_pool') \n\
 	GROUP BY concerned_address",function(rows){
 		rows.forEach(function(row){
 			if (assocNicknamesByAddress[row.address])
@@ -590,15 +614,15 @@ function getDonorsRanking(handle){
 }
 
 function getContributorsGreeting(handle){
-	db.query("SELECT operation_id,timestamp,response FROM operations_history WHERE operation_type='commit' ORDER BY mci DESC LIMIT 50", function(rows){
+	db.query("SELECT operation_id,timestamp,event_data FROM operations_history WHERE event_type='commit' ORDER BY mci DESC LIMIT 50", function(rows){
 		var arrGreetings = [];
 		for (var i = 0; i < rows.length; i++){
-			var objResponse = rows[i].response ? JSON.parse(rows[i].response) : null;
+			var objEvent = rows[i].event_data ? JSON.parse(rows[i].event_data) : null;
 			var objOperation = assocAllOperations[rows[i].operation_id];
-			if (objResponse && objOperation && objResponse.committed_outcome == objOperation.initial_outcome){
+			if (objEvent && objOperation && objEvent.committed_outcome == objOperation.initial_outcome){
 				var sponsorAddress = assocAllPoolsById[objOperation.pool_id] ? assocAllPoolsById[objOperation.pool_id].sponsor : null;
 				arrGreetings.push({
-					author: assocNicknamesByAddress[objResponse.paid_out_address] || objResponse.paid_out_address,
+					author: assocNicknamesByAddress[objEvent.paid_out_address] || objEvent.paid_out_address,
 					exchange: objOperation.exchange, 
 					outcome: objOperation.initial_outcome, 
 					sponsor: assocNicknamesByAddress[sponsorAddress] || sponsorAddress

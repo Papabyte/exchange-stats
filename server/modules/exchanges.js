@@ -35,50 +35,53 @@ function processNewRanking(){
 			return unlock();
 	
 		for (var key in exchanges){
-			var exchange = exchanges[key];
-			var total_24h_deposits = null;
-			var total_24h_withdrawals = null;
-			var total_btc_wallet = null;
-			var nb_deposit_addresses = null;
-			var nb_withdrawal_addresses = null;
-			var nb_addresses = null;
-			var monthly_volume = null;
-			var trendString = null;
-			var objInfo = null;
-
-			if (assocWalletIdsByExchange[key] && assocWalletIdsByExchange[key].length > 0){
-				var arrWalletIds = await explorer.getRedirections(assocWalletIdsByExchange[key]);
-				var lastHeight = await indexer.getLastProcessedHeight();
-				total_24h_deposits = await stats.getTotalDepositedToWallets(arrWalletIds, lastHeight - 6 * 24 , lastHeight);
-				total_24h_withdrawals = await stats.getTotalWithdrawnFromWallets(arrWalletIds, lastHeight - 6 * 24 , lastHeight);
-				total_btc_wallet = await stats.getTotalOnWallets(arrWalletIds);
-				nb_deposit_addresses = await stats.getTotalDepositAddresses(arrWalletIds);
-				nb_withdrawal_addresses= await stats.getTotalWithdrawalAddresses(arrWalletIds);
-				const volumeAndTrendObj = await createWeeklyHistoryForExchangeAndReturnMonthlyVolume(key, arrWalletIds);
-				monthly_volume = volumeAndTrendObj.monthly_volume;
-				trendString = volumeAndTrendObj.trend.join('@');
-				nb_addresses = await stats.getAddressesCount(arrWalletIds);
-			}
-			if (exchanges[key].gecko_id)
-				objInfo = await api.getExchangeInfo(exchanges[key].gecko_id);
-
-			db.query("REPLACE INTO last_exchanges_ranking (exchange_id,trend,last_month_volume,nb_addresses,total_btc_wallet,name,last_day_deposits, last_day_withdrawals, reported_volume,nb_deposit_addresses,nb_withdrawal_addresses) VALUES (?,?,?,?,?,?,?,?,?,?,?)", 
-			[
-				key,
-				trendString,
-				monthly_volume,
-				nb_addresses,
-				total_btc_wallet, 
-				exchange.name,
-				total_24h_deposits, 
-				total_24h_withdrawals,
-				objInfo && objInfo.trade_volume_24h_btc_normalized ? Math.round(objInfo.trade_volume_24h_btc_normalized * 100000000) : null,
-				nb_deposit_addresses,
-				nb_withdrawal_addresses
-			]);
+			if (!assocWalletIdsByExchange[key])
+				continue;
+			var arrWalletIds = await explorer.getRedirections(assocWalletIdsByExchange[key]);
+			updateRankingRow(key, arrWalletIds, await createWeeklyHistoryForExchangeAndReturnMonthlyVolume(key, arrWalletIds))
 		}
 		unlock();
 	});
+}
+
+async function updateRankingRow(key, arrWalletIds, {monthly_volume, trendString}){
+	var exchange = exchanges[key];
+	var total_24h_deposits = null;
+	var total_24h_withdrawals = null;
+	var total_btc_wallet = null;
+	var nb_deposit_addresses = null;
+	var nb_withdrawal_addresses = null;
+	var nb_addresses = null;
+	var monthly_volume = null;
+	var trendString = null;
+	var objInfo = null;
+
+	if (arrWalletIds.length === 0)
+		return;
+		var lastHeight = await indexer.getLastProcessedHeight();
+		total_24h_deposits = await stats.getTotalDepositedToWallets(arrWalletIds, lastHeight - 6 * 24 , lastHeight);
+		total_24h_withdrawals = await stats.getTotalWithdrawnFromWallets(arrWalletIds, lastHeight - 6 * 24 , lastHeight);
+		total_btc_wallet = await stats.getTotalOnWallets(arrWalletIds);
+		nb_deposit_addresses = await stats.getTotalDepositAddresses(arrWalletIds);
+		nb_withdrawal_addresses= await stats.getTotalWithdrawalAddresses(arrWalletIds);
+		nb_addresses = await stats.getAddressesCount(arrWalletIds);
+	if (exchanges[key].gecko_id)
+		objInfo = await api.getExchangeInfo(exchanges[key].gecko_id);
+
+	db.query("REPLACE INTO last_exchanges_ranking (exchange_id,trend,last_month_volume,nb_addresses,total_btc_wallet,name,last_day_deposits, last_day_withdrawals, reported_volume,nb_deposit_addresses,nb_withdrawal_addresses) VALUES (?,?,?,?,?,?,?,?,?,?,?)", 
+	[
+		key,
+		trendString || null,
+		monthly_volume || null,
+		nb_addresses,
+		total_btc_wallet, 
+		exchange.name,
+		total_24h_deposits, 
+		total_24h_withdrawals,
+		objInfo && objInfo.trade_volume_24h_btc_normalized ? Math.round(objInfo.trade_volume_24h_btc_normalized * 100000000) : null,
+		nb_deposit_addresses,
+		nb_withdrawal_addresses
+	]);
 }
 
 function createWeeklyHistoryForExchangeAndReturnMonthlyVolume(exchange, arrWalletIds){
@@ -130,7 +133,7 @@ function createWeeklyHistoryForExchangeAndReturnMonthlyVolume(exchange, arrWalle
 			conn.addQuery(arrQueries, "COMMIT");
 			async.series(arrQueries, function() {
 				conn.release();
-				return resolve({monthly_volume: monthly_volume, trend: trendArray.reverse()});
+				return resolve({monthly_volume: monthly_volume, trendString: trendArray.reverse().join('@')});
 			});
 		});
 	})
@@ -186,3 +189,4 @@ exports.getExchangesList = getExchangesList;
 exports.getExchangeName = getExchangeName;
 exports.setWalletIdsByExchange = setWalletIdsByExchange;
 exports.getExchangeHistory = getExchangeHistory;
+exports.updateRankingRow = updateRankingRow;

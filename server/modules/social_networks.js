@@ -58,17 +58,17 @@ function sendTweet(text){
 	});
 }
 
-function notify(operation_type, operation, author, objAaResponse){
+function notify(event_type, operation, author, objAaResponse){
 	if (!operation)
 		return console.log("cannot notify, no operation");
 
-	if (operation_type == "initial_stake"){
+	if (event_type == "initial_stake"){
 		if (operation.initial_outcome == 'in')
 			var message = "New operation initiated by " + author + ": Add wallet " + operation.wallet_id + " to exchange #" + operation.exchange+"?";
 		else
 			var message = "New operation initiated by " + author  + ": Remove wallet " + operation.wallet_id + " from exchange #" + operation.exchange+"?";
 
-	} else if (operation_type == "stake"){
+	} else if (event_type == "stake"){
 		if (operation.initial_outcome == 'in' && objAaResponse.proposed_outcome != 'in')
 			var message = "Counterstake! " + author + " staked " + displayInGb(objAaResponse.accepted_amount) + " for not adding wallet" + operation.wallet_id + " to exchange #" + operation.exchange;
 		else if (operation.initial_outcome == 'out' && objAaResponse.proposed_outcome != 'out')
@@ -77,7 +77,7 @@ function notify(operation_type, operation, author, objAaResponse){
 			var message = "Counterstake! " + author + " staked " + displayInGb(objAaResponse.accepted_amount) + " for adding wallet" + operation.wallet_id + " to exchange #" + operation.exchange;
 		else if (operation.initial_outcome == 'out' && objAaResponse.proposed_outcome == 'out')
 			var message = "Counterstake! " + author + " staked " + displayInGb(objAaResponse.accepted_amount) + " for removing wallet" + operation.wallet_id + " from exchange #" + operation.exchange;
-	} else if (operation_type == "commit"){
+	} else if (event_type == "commit"){
 		if (operation.initial_outcome == 'in' && objAaResponse.outcome == 'in')
 			var message = "Wallet " + operation.wallet_id + "is now added to exchange #" + operation.exchange;
 		else if (operation.initial_outcome == 'out' && objAaResponse.outcome == 'out')

@@ -78,13 +78,13 @@ exports.create = function(){
 		await db.query("CREATE TABLE IF NOT EXISTS operations_history (\n\
 			operation_id VARCHAR(60), \n\
 			pair VARCHAR(46), \n\
-			operation_type VARCHAR(30) NOT NULL, \n\
+			event_type VARCHAR(30) NOT NULL, \n\
 			concerned_address CHAR(32) NOT NULL, \n\
 			paid_in INTEGER DEFAULT 0,\n\
 			paid_out INTEGER DEFAULT 0,\n\
 			mci INT NOT NULL, \n\
 			aa_address CHAR(32) NOT NULL, \n\
-			response TEXT NULL, \n\
+			event_data TEXT NULL, \n\
 			trigger_unit CHAR(44) NOT NULL, \n\
 			timestamp INTEGER NOT NULL, \n\
 			UNIQUE (trigger_unit, aa_address) \n\
