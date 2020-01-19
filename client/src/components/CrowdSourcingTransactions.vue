@@ -89,6 +89,10 @@
 					this.totalRows = this.items.length
 					this.isSpinnerActive = false
 				})
+
+								this.axios.get('/api/last-events').then((response) => {
+				console.log(response.data)
+				})
 			},
 		},
 	}

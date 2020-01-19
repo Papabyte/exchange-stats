@@ -239,7 +239,13 @@ require('./modules/sqlite_tables.js').create().then(function(){
 			return response.status(400).send('Wrong exchange id');
 		return response.send(aa_handler.getPendingOperationsForExchange(exchange_id));
 	});
-
+	
+	app.get('/api/last-events', function(request, response){
+		aa_handler.getLastEvents(function(objLastEvents){
+			response.send(objLastEvents);
+		})
+	});
+	
 	app.listen(conf.api_port);
 
 });

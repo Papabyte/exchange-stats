@@ -55,6 +55,10 @@ async function updateRankingRow(key, arrWalletIds, {monthly_volume, trendString}
 	var monthly_volume = null;
 	var trendString = null;
 	var objInfo = null;
+	if (!assocWalletIdsByExchange[key])
+		return;
+	if (!arrWalletIds)
+		arrWalletIds = await explorer.getRedirections(assocWalletIdsByExchange[key]);
 
 	if (arrWalletIds.length === 0)
 		return;

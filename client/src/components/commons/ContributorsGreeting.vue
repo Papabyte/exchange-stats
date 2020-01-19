@@ -8,6 +8,7 @@
 		data () {
 			return {
 				greetingsText: '',
+				timerId: null
 			}
 		},
 		created () {

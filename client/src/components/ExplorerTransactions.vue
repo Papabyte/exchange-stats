@@ -106,7 +106,7 @@
 					<span class="has-text-weight-medium">{{count_total == 'over_10000' ? 'more than 10000' : count_total}}</span>
 				</div>
 
-				<div class="notification" v-if="wallet_id || exchange">
+				<div class="full-height notification" v-if="wallet_id || exchange">
 					<span class="title is-6">{{$t('explorerTransactionsAddressCount')}}</span>
 					<router-link :to="{name: 'explorerAddresses', params: { request_input: wallet_id} }">
 						{{addr_count || 0}}

@@ -1,5 +1,5 @@
 <template>
-	<div class="notification">
+	<div class="full-height notification">
 		<div v-if="label" class="title is-6 is-marginless">{{label}}</div>
 		<div class="row">
 			<span>{{address}}</span>

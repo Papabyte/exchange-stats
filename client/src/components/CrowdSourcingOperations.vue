@@ -1,7 +1,7 @@
 <template>
 
 	<div class="container">
-		<div class="notification is-warning">
+		<div class="full-height notification is-warning">
 			<contributors-greeting/>
 		</div>
 		<div class="box">

@@ -22,13 +22,14 @@
 	import ExchangeGraph from './ExchangeStatsGraph.vue'
 
 	const conf = require('../conf.js')
-
+	
 	export default {
 		name: 'ExchangesStats',
 		components: {
 			NavBar,
 			RankingTable,
-			ExchangeGraph,
+			ExchangeGraph
+			
 		},
 		props: {
 			exchange: {

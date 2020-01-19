@@ -31,6 +31,8 @@ var assocNicknamesByAddress = {};
 var assocWalletOnOperation = {};
 const assocAaParameters = {};
 
+const assocUnconfirmedEvents = {};
+
 const MAX_OPERATIONS = 200;
 
 myWitnesses.readMyWitnesses(function (arrWitnesses) {
@@ -50,7 +52,6 @@ function start(){
 		indexAaParameters();
 		indexFromStateVars();
 		refresh();
-		updateOperationsHistory();
 		setInterval(refresh, 60 * 1000);
 		eventBus.on('new_my_transactions', treatUnconfirmedEvents);
 		eventBus.on('my_transactions_became_stable', discardUnconfirmedEventsAndUpdate);
@@ -138,11 +139,41 @@ function getStateVarsRangeForPrefix(prefix, start, end, handle){
 
 
 function treatUnconfirmedEvents(arrUnits){
-	//indexFromStateVars(updateOperationsHistory);
+
+	db.query("SELECT unit,payload,amount,unit_authors.address,units.timestamp FROM messages CROSS JOIN outputs USING(unit) \n\
+	CROSS JOIN unit_authors USING(unit) \n\
+	CROSS JOIN units USING(unit) \n\
+	WHERE unit IN (?) AND app='data' AND outputs.address=? AND outputs.asset IS NULL GROUP BY messages.unit",
+	[arrUnits, conf.aa_address], function(rows){
+		rows.forEach(function(row){
+			const params = {};
+			params.trigger = {};
+			params.trigger.data = JSON.parse(row.payload);
+			params.trigger.address = row.address;
+			params.trigger.outputs = {};
+			params.trigger.outputs.base = row.amount;
+			params.address = conf.aa_address;
+			network.requestFromLightVendor('light/dry_run_aa',params, function(ws, request, arrResponses){
+				if (arrResponses.error)
+					return console.log(arrResponses.error);
+				else {
+					if (arrResponses[0] && arrResponses[0].response && arrResponses[0].response.responseVars){
+						assocUnconfirmedEvents[row.unit] = parseEvent(params.trigger, arrResponses[0].response.responseVars);
+						assocUnconfirmedEvents[row.unit].timestamp = row.timestamp;
+						assocUnconfirmedEvents[row.unit].trigger_unit = row.unit;
+						assocUnconfirmedEvents[row.unit].nickname = assocNicknamesByAddress[assocUnconfirmedEvents[row.unit].concerned_address] || null;
+					}
+				}
+			})
+		});
+	});
 }
 
 
 function discardUnconfirmedEventsAndUpdate(arrUnits){
+	arrUnits.forEach(function(unit){
+		delete assocUnconfirmedEvents[unit];
+	});
 	indexFromStateVars(updateOperationsHistory);
 }
 
@@ -170,14 +201,14 @@ function parseEvent(trigger, objResponse){
 	}
  if (objResponse.your_stake){
 		objEvent.event_type = (objResponse.staked_on_in == 0 && objResponse.staked_on_out > 0 || objResponse.staked_on_out == 0 && objResponse.staked_on_in > 0) 
-		? "stake" : "initial_stake";
+		? "initial_stake" : "stake";
 		objEvent.paid_in = objResponse.accepted_amount;
 		objEvent.concerned_address = trigger.address;
+		objEvent.proposed_outcome = trigger.data.remove_wallet_id ? 'out' : 'in';
 		objEvent.event_data.staked_on_in = objResponse.staked_on_in;
 		objEvent.event_data.staked_on_out = objResponse.staked_on_out;
 		objEvent.event_data.expected_reward = objResponse.expected_reward;
 		objEvent.event_data.resulting_outcome = objResponse.resulting_outcome;
-		objEvent.event_data.initial_outcome = objResponse.initial_outcome;
 		attachProofUrls();
 	} else if (objResponse.committed_outcome){
 		objEvent.event_type = "commit";
@@ -228,6 +259,9 @@ function updateOperationsHistory(){
 							function(result){
 								if (result.affectedRows === 1){
 									objEvent.exchange = exchanges.getExchangeName[objResponse.exchange];
+
+									exchanges.updateRankingRow(objEvent.operation_id,null, {});
+
 									social_networks.notify(
 										objEvent.event_type, 
 										assocAllOperations[objEvent.operation_id], 
@@ -530,7 +564,40 @@ function getBestPoolForExchange(exchange){
 			bestPool = assocAllPoolsByExchange["any"][key];
 	}
 	return bestPool;
+
+
 }
+
+function getLastEvents(handle){
+	db.query("SELECT event_type,timestamp,event_data,paid_in,paid_out,concerned_address,trigger_unit,operation_id FROM operations_history ORDER BY mci DESC LIMIT 20",
+	 function(rows){
+		const confirmed_events = rows.map(function(row){
+			var objEventData = JSON.parse(row.event_data);
+			return {
+				event_data: objEventData, 
+				timestamp: row.timestamp, 
+				paid_in: row.paid_in,
+				paid_out: row.paid_out,
+				concerned_address: row.concerned_address,
+				event_type: row.event_type,
+				trigger_unit: row.trigger_unit,
+				is_confirmed: true,
+				operation: assocAllOperations[row.operation_id],
+				nickname:  assocNicknamesByAddress[row.concerned_address] || null
+			};
+		})
+		const unconfirmed_events = Object.values(assocUnconfirmedEvents)
+		unconfirmed_events.forEach((event)=>{
+			event.operation = assocAllOperations[event.operation_id] || null;
+			event.nickname = assocNicknamesByAddress[event.concerned_address] || null;
+		});
+		const allEvents = confirmed_events.concat(unconfirmed_events).sort(function(a, b){
+			return a.timestamp - b.timestamp;
+		});
+		return handle(allEvents);
+	})
+}
+
 
 function getLastTransactionsToAA(handle){
 
@@ -562,16 +629,18 @@ function getOperationHistory(id, handle){
 			var objEventData = JSON.parse(row.event_data);
 			const nickname = assocNicknamesByAddress[row.concerned_address] || null;
 			return {
-				event_type: row.event_type, 
 				event_data: objEventData, 
 				timestamp: row.timestamp, 
-				concerned_address: row.concerned_address,
 				paid_in: row.paid_in,
 				paid_out: row.paid_out,
+				concerned_address: row.concerned_address,
+				event_type: row.event_type,
 				nickname
 			};
 		})
-		return handle({history: rows, operation: assocAllOperations[id]});
+		return handle({
+			history: rows, operation: assocAllOperations[id]
+		});
 	});
 }
 
@@ -649,3 +718,4 @@ exports.getPendingOperationsForWalletId = getPendingOperationsForWalletId;
 exports.getIsWalletOnOperation = getIsWalletOnOperation;
 exports.getUrlProofsForPair = getUrlProofsForPair;
 exports.getLastOperationHistoryForPair = getLastOperationHistoryForPair;
+exports.getLastEvents = getLastEvents;

@@ -11,9 +11,13 @@ export default new Vuex.Store({
 		aaParameters: {},
 		wasRankingWelcomeMessageClosed: false,
 		wasExplorerWelcomeMessageClosed: false,
-		wasCrowdSourcingWelcomeMessageClosed: false
+		wasCrowdSourcingWelcomeMessageClosed: false,
+		arrKnownEvents: []
 	},
 	mutations: {
+		setKnownEvents(state, data){
+			state.arrKnownEvents = data;
+		},
 		setExchangesByName(state, data) {
 			state.exchangesByName = data;
 		},

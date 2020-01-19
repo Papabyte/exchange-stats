@@ -1,11 +1,11 @@
 <template>
 	<div :class="{bordered: !no_border}" class="row mb-1">
-		<div class="notification columns transaction-headers is-paddingless">
+		<div class="full-height notification columns transaction-headers is-paddingless">
 			<div class="column is-9">
 				<TxId label="Transaction: " :tx_id="tx_id"/>
 			</div>
 			<div class="column is-3">
-				<div class="notification">
+				<div class="full-height notification">
 					<span class="title is-6">Time: </span>
 					<span class="title is-5 is-marginless">{{transaction.time}}</span>
 				</div>
