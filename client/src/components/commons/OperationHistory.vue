@@ -98,8 +98,7 @@ export default {
 	},
 	methods: {
 		formatHistory(objData){
-			console.log(objData.history)
-			console.log(objData.operation)
+
 			if (this.showTitle){
 				if (objData.operation.initial_outcome == 'in')
 					this.title = this.$t('crowdSourcingOperationsAddXToX', {wallet: objData.operation.wallet_id, exchange: objData.operation.exchange});
@@ -114,7 +113,6 @@ export default {
 				row.resulting_outcome = row.event_data.resulting_outcome == objData.operation.initial_outcome ? this.$t('crowdSourcingOperationsYes') : this.$t('crowdSourcingOperationsNo');
 			});
 			this.historyItems = objData.history
-			console.log(this.historyItems)
 			this.isSpinnerActive = false;
 		}
 	}

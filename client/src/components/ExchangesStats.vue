@@ -41,11 +41,36 @@
 			welcomeMessageShown () {
 				return !this.$store.state.wasRankingWelcomeMessageClosed
 			},
+			assocExchanges () {
+				return this.$store.state.exchangesById
+			},
 		},
-		created () {
-			document.title = this.$t('rankingPageTitle', { website_name: conf.website_name })
-			document.getElementsByName('description')[0].setAttribute('content', this.$t('rankingMetaDescription'))
+		watch: {
+			exchange: function () {
+				this.updateMeta();
+
+			},
 		},
+		mounted () {
+			this.updateMeta();
+			
+		},
+		methods: {
+			updateMeta: function(){
+
+			if (this.exchange){
+				document.title = this.$t('rankingGraphPageTitle',
+					{ exchange: this.assocExchanges[this.exchange].name, website_name: conf.website_name })
+				document.getElementsByName('description')[0].setAttribute('content',
+					this.$t('rankingGraphDescription', { exchange: this.assocExchanges[this.exchange].name }))
+			} else {
+				document.title = this.$t('rankingPageTitle', { website_name: conf.website_name })
+				document.getElementsByName('description')[0].setAttribute('content', this.$t('rankingMetaDescription'))
+			}
+
+
+			}
+		}
 	}
 </script>
 

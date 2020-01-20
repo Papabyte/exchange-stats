@@ -97,7 +97,8 @@
 				</div>
 
 				<div class="row" v-if="total_on_wallets">
-					<span class="title is-5">{{$t('explorerTransactionsTotalOnWallet')}}</span>
+					<span v-if="exchange" class="title is-5">{{$t('explorerTransactionsTotalOnWallets')}}</span>
+					<span v-if="wallet_id"  class="title is-5">{{$t('explorerTransactionsTotalOnWallet')}}</span>
 					<btc-amount :amount="total_on_wallets"/>
 				</div>
 
@@ -106,11 +107,12 @@
 					<span class="has-text-weight-medium">{{count_total == 'over_10000' ? 'more than 10000' : count_total}}</span>
 				</div>
 
-				<div class="full-height notification" v-if="wallet_id || exchange">
-					<span class="title is-6">{{$t('explorerTransactionsAddressCount')}}</span>
-					<router-link :to="{name: 'explorerAddresses', params: { request_input: wallet_id} }">
-						{{addr_count || 0}}
-					</router-link>
+				<div class="row" v-if="wallet_id || exchange">
+					<span class="title is-5">{{$t('explorerTransactionsAddressCount')}}</span>
+						<router-link v-if="wallet_id" :to="{name: 'explorerAddresses', params: { request_input: wallet_id} }">
+							<span class="has-text-weight-medium">{{addr_count || 0}}</span>
+						</router-link>
+							<span v-if="exchange" class="has-text-weight-medium">{{addr_count || 0}}</span>
 				</div>
 			</div>
 			<div v-else class="box">
@@ -126,9 +128,9 @@
 		<div v-if="!isSpinnerActive && transactions" class="box">
 			<div class="row mb-2">
 				<b-pagination
-						:total="count_total == 'over_10000' ? 10000 : count_total"
+						:total="txs_displayed"
 						:current.sync="currentPage"
-						:per-page="perPage"
+						:per-page="per_page"
 						range-before="3"
 						range-after="3"
 						@change="onPageChanged"
@@ -197,7 +199,8 @@
 				addr_count: null,
 				progressive_display_level: 1,
 				timerId: null,
-				perPage: 20,
+				per_page: 20,
+				txs_displayed: 1000
 			}
 		},
 		watch: {
@@ -216,61 +219,33 @@
 		beforeDestroy () {
 			clearInterval(this.timerId)
 		},
-		metaInfo () {
-			if (this.exchangeName) {
-				return {
-					title: this.$t('explorerTransactionsPageExchange', {
-						exchange: this.exchangeName,
-						website_name: conf.website_name,
-					}),
-					meta: [
-						{
-							name: 'description',
-							content: this.$t('explorerTransactionsMetaDescriptionExchange', { exchange: this.exchangeName }),
-						},
-					],
-				}
-			} else if (this.tx_id) {
-				return {
-					title: this.$t('explorerTransactionsPageTitleTxId', {
-						tx_id: this.tx_id,
-						website_name: conf.website_name,
-					}),
-					meta: [
-						{ name: 'description', content: this.$t('explorerTransactionsMetaDescriptionTxId', { tx_id: this.tx_id }) },
-					],
-				}
-			} else if (this.wallet_id) {
-				return {
-					title: this.$t('explorerTransactionsPageTitleWalletId', {
-						wallet_id: this.wallet_id,
-						website_name: conf.website_name,
-					}),
-					meta: [
-						{
-							name: 'description',
-							content: this.$t('explorerTransactionsMetaDescriptionWalletId', { wallet_id: this.wallet_id }),
-						},
-					],
-				}
-			} else if (this.wallet_id && this.walletOwner) {
-				return {
-					title: this.$t('explorerTransactionsPageTitleWalletId', {
-						wallet_id: this.wallet_id,
-						website_name: conf.website_name,
-					}),
-					meta: [
-						{
-							name: 'description', content: this.$t('explorerTransactionsMetaDescriptionWalletIdWithOwner', {
-								wallet_id: this.wallet_id,
-								exchange: this.walletOwner,
-							}),
-						},
-					],
-				}
-			}
-		},
 		methods: {
+			updateTitleAndDescription () {
+				if (this.exchangeName) {
+					document.title = this.$t('explorerTransactionsPageExchange',
+						{ exchange: this.exchangeName, website_name: conf.website_name })
+					var description = this.$t('explorerTransactionsMetaDescriptionExchange', { exchange: this.exchangeName })
+					document.getElementsByName('description')[0].setAttribute('content', description)
+				} else if (this.tx_id) {
+					document.title = this.$t('explorerTransactionsPageTitleTxId',
+						{ exchange: this.exchangeName, website_name: conf.website_name })
+					var description = this.$t('explorerTransactionsMetaDescriptionTxId', { wallet_id: this.wallet_id })
+					document.getElementsByName('description')[0].setAttribute('content', description)
+				} else if (this.wallet_id) {
+					document.title = this.$t('explorerTransactionsPageTitleWalletId',
+						{ wallet_id: this.wallet_id, website_name: conf.website_name })
+					var description = this.$t('explorerTransactionsMetaDescriptionWalletId', { wallet_id: this.wallet_id })
+					document.getElementsByName('description')[0].setAttribute('content', description)
+				} else if (this.wallet_id && this.walletOwner) {
+					document.title = this.$t('explorerTransactionsPageTitleWalletId',
+						{ wallet_id: this.wallet_id, website_name: conf.website_name })
+					var description = this.$t('explorerTransactionsMetaDescriptionWalletIdWithOwner', { 
+						exchange: this.walletOwner, 
+						wallet_id: this.wallet_id,
+					})
+					document.getElementsByName('description')[0].setAttribute('content', description)
+				}
+			},
 			addWalletToAnExchange(walletId) {
 				ModalProgrammatic.open({
 					parent: this,
@@ -303,9 +278,6 @@
 					props: {propExchange: exchange, propWalletId: walletId },
 				})
 			},
-
-
-			
 			onPageChanged (value) {
 				this.$router.push({ name: 'explorerInputPaged', params: { url_input: this.request_input, page: value } })
 			},
@@ -333,6 +305,8 @@
 						if (response.data.txs) {
 							this.transactions = response.data.txs.txs
 							this.count_total = response.data.txs.count_total
+							this.per_page = response.data.txs.per_page
+							this.txs_displayed = response.data.txs.txs_displayed
 							this.redirected_ids = [response.data.redirected_id]
 							this.total_on_wallets = response.data.txs.total_on_wallets
 							this.addr_count = response.data.txs.addr_count
@@ -342,6 +316,7 @@
 						this.wallet_id = Number(response.data.redirected_id)
 						this.walletOwner = response.data.exchange
 						this.isSpinnerActive = false
+						this.updateTitleAndDescription()
 					})
 				} else if (isTxId(this.request_input)) { // it's a tx id
 					this.blockTitle = 'Transaction ' + this.request_input
@@ -355,6 +330,7 @@
 							this.failoverText = this.$t('explorerTransactionsTransactionsNotFound',
 								{ transaction: this.request_input })
 						}
+						this.updateTitleAndDescription()
 					})
 
 				} else if (validate(this.request_input)) { // it's a BTC address
@@ -370,20 +346,25 @@
 						if (response.data.txs) {
 							this.transactions = response.data.txs.txs
 							this.count_total = response.data.txs.count_total
+							this.per_page = response.data.txs.per_page
+							this.txs_displayed = response.data.txs.txs_displayed
 							this.exchangeWallets = response.data.wallet_ids
 							this.redirected_ids = response.data.redirected_ids
 							this.total_on_wallets = response.data.txs.total_on_wallets
+							this.addr_count = response.data.txs.addr_count
 						} else if (response.data.wallet_ids.length == 0) {
 							this.failoverText = this.$t('explorerTransactionsNoWalletKnown', { exchange: response.data.name })
 						} else {
 							this.failoverText = this.$t('explorerTransactionsNoTransactionFound', { exchange: response.data.name })
 						}
-						console.log(this.request_input)
 						this.exchange = this.request_input
 						this.exchangeName = response.data.name
 						this.isSpinnerActive = false
+						this.updateTitleAndDescription()
 					})
+
 				}
+
 			},
 			expand_tx (tx_id) {
 				this.axios.get('/api/txid/' + tx_id).then((response) => {

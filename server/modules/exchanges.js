@@ -44,16 +44,17 @@ function processNewRanking(){
 	});
 }
 
+// update stats for 1 exchange, monthly_volume and trendString can be optionaly provided since they take time to be processed and we want to update
+// ranking as soon as a wallet is added or removed
 async function updateRankingRow(key, arrWalletIds, {monthly_volume, trendString}){
+	console.log("update ranking row for " + key);
 	var exchange = exchanges[key];
+	if (!exchange)
+		return;
 	var total_24h_deposits = null;
 	var total_24h_withdrawals = null;
 	var total_btc_wallet = null;
-	var nb_deposit_addresses = null;
-	var nb_withdrawal_addresses = null;
 	var nb_addresses = null;
-	var monthly_volume = null;
-	var trendString = null;
 	var objInfo = null;
 	if (!assocWalletIdsByExchange[key])
 		return;
@@ -66,13 +67,11 @@ async function updateRankingRow(key, arrWalletIds, {monthly_volume, trendString}
 		total_24h_deposits = await stats.getTotalDepositedToWallets(arrWalletIds, lastHeight - 6 * 24 , lastHeight);
 		total_24h_withdrawals = await stats.getTotalWithdrawnFromWallets(arrWalletIds, lastHeight - 6 * 24 , lastHeight);
 		total_btc_wallet = await stats.getTotalOnWallets(arrWalletIds);
-		nb_deposit_addresses = await stats.getTotalDepositAddresses(arrWalletIds);
-		nb_withdrawal_addresses= await stats.getTotalWithdrawalAddresses(arrWalletIds);
 		nb_addresses = await stats.getAddressesCount(arrWalletIds);
 	if (exchanges[key].gecko_id)
 		objInfo = await api.getExchangeInfo(exchanges[key].gecko_id);
 
-	db.query("REPLACE INTO last_exchanges_ranking (exchange_id,trend,last_month_volume,nb_addresses,total_btc_wallet,name,last_day_deposits, last_day_withdrawals, reported_volume,nb_deposit_addresses,nb_withdrawal_addresses) VALUES (?,?,?,?,?,?,?,?,?,?,?)", 
+	db.query("REPLACE INTO last_exchanges_ranking (exchange_id,trend,last_month_volume,nb_addresses,total_btc_wallet,name,last_day_deposits, last_day_withdrawals, reported_volume) VALUES (?,?,?,?,?,?,?,?,?)", 
 	[
 		key,
 		trendString || null,
@@ -83,13 +82,13 @@ async function updateRankingRow(key, arrWalletIds, {monthly_volume, trendString}
 		total_24h_deposits, 
 		total_24h_withdrawals,
 		objInfo && objInfo.trade_volume_24h_btc_normalized ? Math.round(objInfo.trade_volume_24h_btc_normalized * 100000000) : null,
-		nb_deposit_addresses,
-		nb_withdrawal_addresses
 	]);
 }
 
+// create a table for each exchange and store on chain history in order to draw graphs
 function createWeeklyHistoryForExchangeAndReturnMonthlyVolume(exchange, arrWalletIds){
 	return new Promise(async function(resolve){
+		console.log("create history for " + exchange);
 		var tableName = "history_" + exchange;
 		var tempTableName = "tmp_history_" + exchange;
 		await db.query("DROP TABLE IF EXISTS " + tempTableName);
@@ -111,7 +110,6 @@ function createWeeklyHistoryForExchangeAndReturnMonthlyVolume(exchange, arrWalle
 		var monthly_volume = 0;
 		var balance = await stats.getTotalOnWallets(arrWalletIds);
 		for (var i = lastHeight; i > year_start_block; i-= block_period_day){
-			console.log(exchange + " " + i);
 			var block_start = i - block_period_day + 1;
 			var total_deposited = await stats.getTotalDepositedToWallets(arrWalletIds, block_start, i );
 			var total_withdrawn = await stats.getTotalWithdrawnFromWallets(arrWalletIds, block_start , i );

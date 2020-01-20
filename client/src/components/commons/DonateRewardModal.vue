@@ -152,12 +152,9 @@
 		},
 		methods: {
 			onExchangeInput(option){
-				console.log(option)
 				if (!this.assocExchangesByName[option])
 					return
 				this.exchange = this.assocExchangesByName[option]
-								console.log(this.exchange)
-
 			},
 			handleOk (bvModalEvt) {
 				bvModalEvt.preventDefault()

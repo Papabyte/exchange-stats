@@ -4,8 +4,10 @@
 
 <script>
 	const conf = require('../../conf.js')
+	import getEventMessage from '../../mixins/eventMessage'
 
 	export default {
+		mixins:[getEventMessage],
 		props: {
 	
 		},
@@ -43,34 +45,21 @@
 			},
 			notify: function(event){
 				console.log('notify')
-								console.log(event)
+				console.log(event)
 
 			const type = event.is_confirmed ? 'is-success' : 'is-warning'
-			var message = event.is_confirmed ? 'Confirmed:' : 'Unconfirmed:'
-
-			if (event.event_type = 'initial_stake' && event.proposed_outcome == 'in')
-				message+= (event.nickname || event.concerned_address) + ' proposes to add wallet' + this.getWalletIdFromOperationId(event.operation_id) + ' to ' 
-				+ this.getExchangeNameFromOperationId(event.operation_id);
-			else if (event.event_type = 'initial_stake' && event.proposed_outcome == 'out')
-				message+= (event.nickname || event.concerned_address) + ' proposes to remove wallet'  + this.getWalletIdFromOperationId(event.operation_id) +' from ' 
-				+ this.getExchangeNameFromOperationId(event.operation_id);
-
-			console.log(message)
+			var message = event.is_confirmed ? 'Confirmed: ' : 'Unconfirmed: '
+			message+= this.getEventMessage(event)
 
 			this.$buefy.notification.open({
-					duration: 1000000,
+					duration: 6000000,
 					message: message,
 					position: 'is-bottom-right',
 					type: type,
+					queue: true
 					
 			})
 
-			},
-			getExchangeNameFromOperationId(operation_id){
-				return this.$store.state.exchangesById[operation_id.split('_')[1]].name
-			},
-			getWalletIdFromOperationId(operation_id){
-				return Number(operation_id.split('_')[2])
 			},
 		},
 

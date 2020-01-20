@@ -1,7 +1,7 @@
 <template>
 	<section class="section">
 		<div class="container">
-			<h3 class="title is-3 mb-2">{{$t('rankingGraphTitle', {exchange: assocExchanges[exchange]})}}</h3>
+			<h3 class="title is-3 mb-2">{{$t('rankingGraphTitle', {exchange: assocExchanges[exchange].name})}}</h3>
 		</div>
 		<div class="container box">
 				<highcharts :options="chartOptions"></highcharts>
@@ -106,10 +106,7 @@
 					name: 'Daily withdrawn',
 				})
 			})
-			document.title = this.$t('rankingGraphPageTitle',
-				{ exchange: this.assocExchanges[this.exchange], website_name: conf.website_name })
-			document.getElementsByName('description')[0].setAttribute('content',
-				this.$t('rankingGraphDescription', { exchange: this.assocExchanges[this.exchange] }))
+
 		},
 	}
 </script>

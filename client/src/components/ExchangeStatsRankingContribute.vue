@@ -69,7 +69,6 @@
 		},
 		methods: {
 			getContestField: function(operation){
-				console.log(operation)
 				if (operation.initial_outcome == 'in' && operation.outcome == 'in')
 					return this.$t('rankingTableContributeContestFieldContestAdding', {wallet: operation.wallet_id})
 				else if (operation.initial_outcome == 'out' && operation.outcome == 'out')

@@ -35,6 +35,7 @@ const assocUnconfirmedEvents = {};
 
 const MAX_OPERATIONS = 200;
 
+// we insert witnesses when node is started first time ever
 myWitnesses.readMyWitnesses(function (arrWitnesses) {
 	if (arrWitnesses.length > 0)
 		return start();
@@ -44,14 +45,15 @@ myWitnesses.readMyWitnesses(function (arrWitnesses) {
 
 function start(){
 	lightWallet.setLightVendorHost(conf.hub);
+	// the AA address is watched so we receive transactions implying it
 	wallet_general.addWatchedAddress(conf.aa_address, function(error){
 		if (error)
 			console.log(error)
 		else
 			console.log(conf.aa_address + " added as watched address")
-		indexAaParameters();
-		indexFromStateVars();
 		refresh();
+		indexAaParameters();
+		indexFromStateVars(updateOperationsHistory);
 		setInterval(refresh, 60 * 1000);
 		eventBus.on('new_my_transactions', treatUnconfirmedEvents);
 		eventBus.on('my_transactions_became_stable', discardUnconfirmedEventsAndUpdate);
@@ -63,6 +65,7 @@ function refresh(){
 	lightWallet.refreshLightClientHistory();
 }
 
+// we get the parameters that are set by control address, node is to be restarted when they are changed
 function indexAaParameters(){
 	getStateVarsForPrefixes(["min_stak","min_rewar"], function(error, objStateVars){
 		if (error)
@@ -71,7 +74,6 @@ function indexAaParameters(){
 			assocAaParameters.min_reward = Number(objStateVars['min_reward']);
 	});
 }
-
 
 function indexFromStateVars(handle){
 	if (!handle)
@@ -96,7 +98,6 @@ function getStateVarsForPrefixes(arrPrefixes, handle){
 				return cb(error);
 			else
 				return cb(null, Object.assign(memo, result));
-			
 		});
 	}, function(error, result){
 		if (error)
@@ -106,6 +107,7 @@ function getStateVarsForPrefixes(arrPrefixes, handle){
 	})
 }
 
+// since hub returns a limited number of state vars, this function read them by chunk when limit is reached
 function getStateVarsRangeForPrefix(prefix, start, end, handle){
 	const CHUNK_SIZE = 2000;
 	network.requestFromLightVendor('light/get_aa_state_vars', {
@@ -137,7 +139,7 @@ function getStateVarsRangeForPrefix(prefix, start, end, handle){
 	});
 }
 
-
+// we dry run AA with units just sent to it, parse unconfirmed events and store them in assocUnconfirmedEvents
 function treatUnconfirmedEvents(arrUnits){
 
 	db.query("SELECT unit,payload,amount,unit_authors.address,units.timestamp FROM messages CROSS JOIN outputs USING(unit) \n\
@@ -158,10 +160,11 @@ function treatUnconfirmedEvents(arrUnits){
 					return console.log(arrResponses.error);
 				else {
 					if (arrResponses[0] && arrResponses[0].response && arrResponses[0].response.responseVars){
-						assocUnconfirmedEvents[row.unit] = parseEvent(params.trigger, arrResponses[0].response.responseVars);
-						assocUnconfirmedEvents[row.unit].timestamp = row.timestamp;
-						assocUnconfirmedEvents[row.unit].trigger_unit = row.unit;
-						assocUnconfirmedEvents[row.unit].nickname = assocNicknamesByAddress[assocUnconfirmedEvents[row.unit].concerned_address] || null;
+						const objEvent = parseEvent(params.trigger, arrResponses[0].response.responseVars);
+						objEvent.timestamp = row.timestamp;
+						objEvent.trigger_unit = row.unit;
+						objEvent.nickname = assocNicknamesByAddress[objEvent.concerned_address] || null;
+						assocUnconfirmedEvents[row.unit] = objEvent;
 					}
 				}
 			})
@@ -169,15 +172,16 @@ function treatUnconfirmedEvents(arrUnits){
 	});
 }
 
-
+// once an unit is confirmed, the corresponding event isn't unconfirmed anymore so we remove it from assocUnconfirmedEvents
 function discardUnconfirmedEventsAndUpdate(arrUnits){
 	arrUnits.forEach(function(unit){
 		delete assocUnconfirmedEvents[unit];
 	});
+	// there must be something new since an unit concerning AA has been confirmed, so we read AA state vars and update global associative arrays
 	indexFromStateVars(updateOperationsHistory);
 }
 
-
+// this function returns an event object from an AA trigger and its response, it's used for both unconfirmed and confirmed events
 function parseEvent(trigger, objResponse){
 
 	function attachProofUrls(){
@@ -200,11 +204,10 @@ function parseEvent(trigger, objResponse){
 		objEvent.pair = convertOperationKeyToPairKey(objResponse.operation_id);
 	}
  if (objResponse.your_stake){
-		objEvent.event_type = (objResponse.staked_on_in == 0 && objResponse.staked_on_out > 0 || objResponse.staked_on_out == 0 && objResponse.staked_on_in > 0) 
-		? "initial_stake" : "stake";
+		objEvent.event_type = (objResponse.staked_on_in == 0 && objResponse.staked_on_out > 0 || objResponse.staked_on_out == 0 && objResponse.staked_on_in > 0) ? "initial_stake" : "stake";
 		objEvent.paid_in = objResponse.accepted_amount;
 		objEvent.concerned_address = trigger.address;
-		objEvent.proposed_outcome = trigger.data.remove_wallet_id ? 'out' : 'in';
+		objEvent.event_data.proposed_outcome = trigger.data.remove_wallet_id ? 'out' : 'in';
 		objEvent.event_data.staked_on_in = objResponse.staked_on_in;
 		objEvent.event_data.staked_on_out = objResponse.staked_on_out;
 		objEvent.event_data.expected_reward = objResponse.expected_reward;
@@ -230,7 +233,8 @@ function parseEvent(trigger, objResponse){
 	return objEvent;
 }
 
-//we push in an indexed table all information coming from aa responses
+// we push in a table all confirmed events, they can be sorted by operation_id, paid_in, paid_out, concerned_address, pair and event_type
+// operation histories are constructed from this table, as well as contributors/donors statistics 
 function updateOperationsHistory(){
 	mutex.lockOrSkip(["updateOperationsHistory"], function(unlock){
 		//units table is joined to get trigger unit timestamp
@@ -251,16 +255,14 @@ function updateOperationsHistory(){
 							return cb();
 
 						 const objEvent = parseEvent(trigger, objResponse);
-						 console.log(objEvent);
-
 						if (objEvent.event_type){
 							db.query("INSERT "+db.getIgnore()+" INTO operations_history (operation_id, paid_in, paid_out, concerned_address, pair, event_type, mci, aa_address, event_data, trigger_unit,timestamp) VALUES \n\
 							(?,?,?,?,?,?,?,?,?,?,?)",[objEvent.operation_id, objEvent.paid_in, objEvent.paid_out, objEvent.concerned_address, objEvent.pair, objEvent.event_type, row.mci, row.aa_address, JSON.stringify(objEvent.event_data), row.trigger_unit, row.timestamp],
 							function(result){
 								if (result.affectedRows === 1){
-									objEvent.exchange = exchanges.getExchangeName[objResponse.exchange];
-
-									exchanges.updateRankingRow(objEvent.operation_id,null, {});
+									//if the event is a commit, we update its ranking right
+									if (objEvent.event_type == 'commit')
+										exchanges.updateRankingRow(getExchangeFromOperationKey(objEvent.operation_id), null, {});
 
 									social_networks.notify(
 										objEvent.event_type, 
@@ -312,9 +314,8 @@ function indexRewardPools(objStateVars){
 
 //we read state vars to read all past and ongoing operations and sort them in different associative arrays
 function indexOperations(objStateVars){
-	console.log(JSON.stringify(objStateVars));
-	extractStakedByKeyAndAddress(objStateVars);
-	extractProofUrls(objStateVars);
+	indexStakedByKeyAndAddress(objStateVars);
+	indexProofUrls(objStateVars);
 	
 	const operationKeys = extractOperationKeys(objStateVars);
 	const assocOperations = {};
@@ -342,9 +343,9 @@ function indexOperations(objStateVars){
 		if(!assocWalletIdsByExchange[exchange])
 			assocWalletIdsByExchange[exchange] = [];
 		if (objStateVars[pairKey + "_committed_outcome"] == "in") {
-			if (assocWalletIdsByExchange[exchange].indexOf(wallet_id) === -1)
-				assocWalletIdsByExchange[exchange].push(Number(wallet_id));
-				_assocExchangeByWalletId[wallet_id] = exchange;
+			if (assocWalletIdsByExchange[exchange].indexOf(operation.wallet_id) === -1)
+				assocWalletIdsByExchange[exchange].push(operation.wallet_id);
+			_assocExchangeByWalletId[wallet_id] = exchange;
 		}
 		const outcome = objStateVars[key + "_outcome"]
 		operation.outcome = outcome;
@@ -370,9 +371,8 @@ function indexOperations(objStateVars){
 
 	arrOperations.sort(function(a, b) { return b.countdown_start - a.countdown_start});
 
-
 	arrOperations.slice(0, MAX_OPERATIONS).forEach(function(operation){
-		assocOperations[operation.key] = operation;
+		assocOperations[operation.key] = operation; // assocOperations is limited is size, so client receive only last ones 
 	});
 
 	arrOperations.forEach(function(operation){
@@ -395,8 +395,8 @@ function indexOperations(objStateVars){
 	exchanges.setWalletIdsByExchange(assocWalletIdsByExchange);
 }
 
-
-function extractProofUrls(objStateVars){
+// read state vars that are like 'operation_abcc_8094_1_url_proof_for_in_1' and index data in assocProofsByKeyAndOutcome and assocProofsByPairAndOutcome
+function indexProofUrls(objStateVars){
 	assocProofsByKeyAndOutcome = {};
 	assocProofsByPairAndOutcome = {};
 	for (var key in objStateVars){
@@ -423,6 +423,7 @@ function extractProofUrls(objStateVars){
 	}
 }
 
+// read state vars that are like 'nickname_CYPIJ2YETA6R6PWDY5XTXO2CABLZ4KVJ' and index data in assocNicknamesByAddress
 function indexNicknames(objStateVars){
 	for (var key in objStateVars){
 		if (key.indexOf("nickname_") == 0){
@@ -432,7 +433,8 @@ function indexNicknames(objStateVars){
 	}
 }
 
-function extractStakedByKeyAndAddress(objStateVars){
+// read state vars that are like 'operation_abcc_8094_1_total_staked_on_in_by_72VNGUBSFLCD2T6SA63AQKP5DFD77BKU' and index data in assocStakedByKeyAndAddress
+function indexStakedByKeyAndAddress(objStateVars){
 	assocStakedByKeyAndAddress = {};
 	for (var key in objStateVars){
 		if (key.indexOf("operation_") == 0){
@@ -451,7 +453,7 @@ function extractStakedByKeyAndAddress(objStateVars){
 	}
 }
 
-
+// return a set of all existing operation ids
 function extractOperationKeys(objStateVars){
 	const assocOperationKeys = {};
 	 for (var key in objStateVars){
@@ -537,19 +539,15 @@ function getUrlProofsForPair(wallet_id, exchange_id){
 
 function getLastOperationHistoryForPair(wallet_id, exchange_id, handle){
 	const pair = "pair_" + exchange_id + "_" + wallet_id;
-	console.log(pair)
-	console.log(assocLastOperationForPair)
-
 	if (!assocLastOperationForPair[pair])
 		return handle('no last operation found');
 	else
 	getOperationHistory(assocLastOperationForPair[pair].key, function(objHistory){
-		console.log(objHistory);
 		return handle(null, objHistory);
 	});
 }
 
-
+// we find greatest reward for a given exchange
 function getBestPoolForExchange(exchange){
 	var bestPool = {
 		reward_amount: 0
@@ -565,9 +563,9 @@ function getBestPoolForExchange(exchange){
 	}
 	return bestPool;
 
-
 }
 
+// returns all unconfirmed events and some last confirmed events
 function getLastEvents(handle){
 	db.query("SELECT event_type,timestamp,event_data,paid_in,paid_out,concerned_address,trigger_unit,operation_id FROM operations_history ORDER BY mci DESC LIMIT 20",
 	 function(rows){
@@ -582,6 +580,7 @@ function getLastEvents(handle){
 				event_type: row.event_type,
 				trigger_unit: row.trigger_unit,
 				is_confirmed: true,
+				operation_id: row.operation_id,
 				operation: assocAllOperations[row.operation_id],
 				nickname:  assocNicknamesByAddress[row.concerned_address] || null
 			};
@@ -623,6 +622,7 @@ function getLastTransactionsToAA(handle){
 	});
 }
 
+//get history for a given operation
 function getOperationHistory(id, handle){
 	db.query("SELECT event_type,timestamp,event_data,paid_in,paid_out,concerned_address FROM operations_history WHERE operation_id=? ORDER BY mci DESC",[id], function(rows){
 		rows = rows.map(function(row){

@@ -60,14 +60,14 @@
 						</div>
 					</div>
 				</div>
-				<div v-if="transaction.is_expandable" class="py-2">
+				<div v-if="transaction.expandable_rows" class="py-2">
 					<b-button
 							type="is-light"
 							size="is-medium"
 							icon-left="arrow-expand-down"
 							@click="loadMore(tx_id)"
 					>
-						Expand
+						Expand {{transaction.expandable_rows}} more outputs
 					</b-button>
 				</div>
 			</div>

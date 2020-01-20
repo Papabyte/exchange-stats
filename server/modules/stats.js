@@ -8,6 +8,7 @@ function clearCaches(){
 	assocTotalTransactionsCache = {}
 }
 
+// sum outputs to a set of wallets ignoring those having inputs in this set of wallets
 function getTotalDepositedToWallets(arrIds, from_block, to_block ){
 	return new Promise(async function(resolve){
 		if (arrIds.length ===0)
@@ -24,7 +25,7 @@ function getTotalDepositedToWallets(arrIds, from_block, to_block ){
 	})
 }
 
-
+// sum outputs having inputs matching a set of wallets while ignoring outpus to this set of wallets
 function getTotalWithdrawnFromWallets(arrIds, from_block, to_block ){
 	return new Promise(async function(resolve){
 		if (arrIds.length ===0)
@@ -41,6 +42,7 @@ function getTotalWithdrawnFromWallets(arrIds, from_block, to_block ){
 	})
 }
 
+// sum all outputs to a set of wallets
 function getSumOutputsToWallets(arrIds, from_block, to_block ){
 	return new Promise(async function(resolve){
 		if (arrIds.length ===0)
@@ -57,7 +59,7 @@ function getSumOutputsToWallets(arrIds, from_block, to_block ){
 	})
 }
 
-
+// sum all outputs from a set of wallets
 function getSumInputsFromWallets(arrIds, from_block, to_block ){
 	return new Promise(async function(resolve){
 		if (arrIds.length ===0)
@@ -74,6 +76,7 @@ function getSumInputsFromWallets(arrIds, from_block, to_block ){
 	})
 }
 
+// get total balances on a set of wallets
 function getTotalOnWallets(arrIds){
 	return new Promise(async function(resolve){
 		if (arrIds.length ===0)
@@ -89,6 +92,7 @@ function getTotalOnWallets(arrIds){
 	})
 }
 
+// get total addresses count of a set of wallets
 function getAddressesCount(arrIds){
 	return new Promise(async function(resolve){
 		if (arrIds.length ===0)
@@ -99,6 +103,7 @@ function getAddressesCount(arrIds){
 	});
 }
 
+// get total transactions involving a set of wallets, it is accurate only for transactions count below accurateTxsCountUpTo set in indexer
 function getTotalTransactions(arrIds){
 	return new Promise(async function(resolve){
 		if (arrIds.length ===0)
@@ -114,31 +119,10 @@ function getTotalTransactions(arrIds){
 	});
 }
 
-function getTotalDepositAddresses(arrIds){
-	return new Promise(async function(resolve){
-		if (arrIds.length ===0)
-			return resolve(0);
-		const idsSqlFilter = arrIds.join(",");
-		var rows = await db.query("SELECT SUM(addr_count) AS count FROM btc_wallets WHERE id IN("+ idsSqlFilter +")");
-		return resolve(rows[0] && rows[0].count ? rows[0].count : 0);
-	})
-}
-
-function getTotalWithdrawalAddresses(arrIds){
-	return new Promise(async function(resolve){
-		if (arrIds.length ===0)
-			return resolve(0);
-		const idsSqlFilter = arrIds.join(",");
-		return resolve(0);
-	})
-}
-
 
 exports.getTotalDepositedToWallets = getTotalDepositedToWallets;
 exports.getTotalWithdrawnFromWallets = getTotalWithdrawnFromWallets;
 exports.getTotalOnWallets = getTotalOnWallets;
-exports.getTotalDepositAddresses = getTotalDepositAddresses;
-exports.getTotalWithdrawalAddresses = getTotalWithdrawalAddresses;
 exports.getSumOutputsToWallets = getSumOutputsToWallets;
 exports.getSumInputsFromWallets = getSumInputsFromWallets;
 exports.getTotalTransactions = getTotalTransactions;

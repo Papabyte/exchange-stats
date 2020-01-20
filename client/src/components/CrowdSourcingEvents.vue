@@ -1,40 +1,33 @@
 <template>
 	<div class="container box">
 		<b-table
-				:sort-by.sync="sortBy"
-				:sort-desc.sync="defaultSortDirection"
-				:data="items"
+				:data="events"
 				ref="table"
 				hoverable
 				paginated
 				per-page="10"
 				:current-page.sync="currentPage"
 				pagination-position="bottom"
-				:default-sort-direction="defaultSortDirection"
+				default-sort-direction="desc"
+				sort-by='timestamp'
 				sort-icon="arrow-up"
 				sort-icon-size="is-small"
-				:default-sort="sortBy"
 				aria-next-label="Next page"
 				aria-previous-label="Previous page"
 				aria-page-label="Page"
 				aria-current-label="Current page"
 		>
 			<template slot-scope="props">
-				<b-table-column field="type" label="Type" sortable>
-					{{props.row.type}}
+				<b-table-column field="event" label="Event"  sortable>
+					{{props.row.message}}
 				</b-table-column>
-
-				<b-table-column field="unit" label="Unit" sortable>
-					<a target="_blank"
-									:href="(isTestnet ? 'https://testnetexplorer.obyte.org/#' : 'https://explorer.obyte.org/#')+props.row.unit">
-						{{props.row.unit}}
-					</a>
+				<b-table-column field="status" label="Status"  sortable>
+					<b-tag v-if="props.row.is_confirmed" type="is-success">confirmed</b-tag>
+					<b-tag v-else type="is-warning">unconfirmed</b-tag>
 				</b-table-column>
-
-				<b-table-column field="is_stable" label="Is Stable" sortable>
-					{{props.row.is_stable}}
+				<b-table-column field="time" label="time"  sortable>
+				{{moment().to(props.row.time)}}
 				</b-table-column>
-
 			</template>
 			<template slot="empty">
 				<section class="section">
@@ -56,8 +49,11 @@
 <script>
 
 	const conf = require('../conf.js')
+	import getEventMessage from '../mixins/eventMessage'
+	import moment from 'moment/src/moment'
 
 	export default {
+		mixins:[getEventMessage],
 		components: {},
 		data () {
 			return {
@@ -65,14 +61,8 @@
 				isSpinnerActive: true,
 				currentPage: 1,
 				totalRows: 0,
-				sortBy: 'type',
 				defaultSortDirection: 'desc',
-				fields: [
-					{ key: 'type', sortable: true },
-					{ key: 'unit', sortable: true },
-					{ key: 'is_stable', sortable: true },
-				],
-				items: [],
+				events: [],
 			}
 		},
 		created () {
@@ -83,15 +73,22 @@
 			clearInterval(this.timerId)
 		},
 		methods: {
+			moment: moment,
 			getData () {
-				this.axios.get('/api/aa_transactions').then((response) => {
-					this.items = response.data
-					this.totalRows = this.items.length
-					this.isSpinnerActive = false
-				})
 
-								this.axios.get('/api/last-events').then((response) => {
-				console.log(response.data)
+				this.axios.get('/api/last-events').then((response) => {
+					this.events = response.data.map((event)=>{
+						console.log(event)
+						return {
+							message: this.getEventMessage(event), 
+							is_confirmed: event.is_confirmed,
+							time: moment.unix(event.timestamp),
+							unit: event.trigger_unit
+						}
+					})
+					this.totalRows = this.events.length
+					console.log(this.events)
+
 				})
 			},
 		},

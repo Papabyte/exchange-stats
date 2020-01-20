@@ -37,9 +37,9 @@
 					</div>
 					<div class="column">
 						<div class="container">
-							<h3 class="title is-3 mb-2">{{$t('crowdSourcingLastTransactions')}}</h3>
+							<h3 class="title is-3 mb-2">{{$t('crowdSourcingLastEvents')}}</h3>
 						</div>
-						<last-transactions />
+						<last-events />
 					</div>
 				</div>
 			</div>
@@ -51,7 +51,7 @@
 import NavBar from './commons/NavBar.vue'
 import CurrentPools from './CrowdSourcingPools.vue'
 import CurrentOperations from './CrowdSourcingOperations.vue'
-import LastTransactions from './CrowdSourcingTransactions.vue'
+import LastEvents from './CrowdSourcingEvents.vue'
 import Rankings from './CrowdSourcingRankings.vue'
 const conf = require("../conf.js");
 
@@ -60,7 +60,7 @@ export default {
 		NavBar,
 		CurrentPools,
 		CurrentOperations,
-		LastTransactions,
+		LastEvents,
 		Rankings
 	},
 	computed:{

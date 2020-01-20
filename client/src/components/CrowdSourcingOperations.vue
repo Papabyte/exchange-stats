@@ -28,7 +28,7 @@
 					<template slot-scope="props">
 						
 						<b-table-column field="status" :label="$t('crowdSourcingOperationsTableColStatus')" sortable>
-							<b-tag type="is-primary">{{ props.row.status }}</b-tag>
+							<b-tag type="is-info">{{ props.row.status }}</b-tag>
 						</b-table-column>
 						<b-table-column field="operation" :label="$t('crowdSourcingOperationsTableColOperation')" sortable>
 							<i18n v-if="props.row.initial_outcome=='in'" tag="div" path="crowdSourcingOperationsAddXToX" id="action">
@@ -49,7 +49,7 @@
 							</i18n>
 						</b-table-column>
 						<b-table-column field="outcome_yes_or_no" :label="$t('crowdSourcingOperationsTableColOutcome')" sortable>
-							<b-tag type="is-info">{{ props.row.outcome_yes_or_no }}</b-tag>
+							<b-tag :type="props.row.outcome_label_type">{{ props.row.outcome_yes_or_no }}</b-tag>
 						</b-table-column>
 
 						<b-table-column field="staked_on_outcome" :label="$t('crowdSourcingOperationsTableColStakedOnOutcome')"
@@ -230,9 +230,11 @@
 						if (row.initial_outcome == 'in') {
 							row.outcome_yes_or_no = row.outcome == 'in' ? this.$t('crowdSourcingOperationsYes') : this.$t(
 								'crowdSourcingOperationsNo')
+							row.outcome_label_type = row.outcome == 'in' ? 'is-success' : 'is-danger'
 						} else {
 							row.outcome_yes_or_no = row.outcome == 'out' ? this.$t('crowdSourcingOperationsYes') : this.$t(
 								'crowdSourcingOperationsNo')
+							row.outcome_label_type = row.outcome == 'out' ? 'is-success' : 'is-danger'
 						}
 						row.end = moment.unix(conf.challenge_period_in_days * 24 * 3600 + row.countdown_start)
 						if ((new Date().getTime() / 1000 - row.countdown_start) > conf.challenge_period_in_days * 24 * 3600)

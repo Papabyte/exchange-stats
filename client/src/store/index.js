@@ -53,7 +53,6 @@ export default new Vuex.Store({
 		},
 		getAaParameters(context){
 			Axios.get('/api/aa-parameters').then((response) => {
-				console.log(response.data);
 				context.commit('setAaParameters', response.data);
 			});
 		}

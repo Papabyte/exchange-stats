@@ -82,7 +82,7 @@
 				required: false,
 			},
 			page: {
-				type: Number,
+				type: Number || String,
 				required: false,
 				default: 1,
 			},
@@ -114,18 +114,21 @@
 		},
 		watch: {
 			$route (route) {
+				this.updateTitleAndDescription()
 			},
 		},
 		created () {
-			console.log(this.show_addresses)
-			document.title = this.$t('explorerPageTitle', { website_name: conf.website_name })
-			document.getElementsByName('description')[0].setAttribute('content', this.$t('explorerMetaDescription'))
+			this.updateTitleAndDescription()
 		},
 		methods: {
 			onSubmit () {
-				console.log("onSubmit")
 				this.$router.push({ name: 'explorerInput', params: { url_input: this.user_input } })
 			},
+			updateTitleAndDescription(){
+				document.title = this.$t('explorerPageTitle', { website_name: conf.website_name })
+				document.getElementsByName('description')[0].setAttribute('content', this.$t('explorerMetaDescription'))
+			}
+
 		},
 	}
 </script>

@@ -82,17 +82,17 @@ async function processBlock(objBlock, start_tx_index, handle){
 			var outputs = [];
 			var value_out = 0;
 			tx.vout.forEach(function(output){
-					var output_value_out = Math.round(output.value*100000000);
-					value_out += output_value_out;
-					if (output.scriptPubKey && output.scriptPubKey.addresses){
-						if (output.scriptPubKey.addresses.length == 1){
-							outputs.push({address: output.scriptPubKey.addresses[0], value: output_value_out, n: output.n });
-						} else {
-							outputs.push({value: output_value_out, n: output.n }); // multisig address, we still keep them to sum value in
-						}
+				var output_value_out = Math.round(output.value*100000000);
+				value_out += output_value_out;
+				if (output.scriptPubKey && output.scriptPubKey.addresses){
+					if (output.scriptPubKey.addresses.length == 1){
+						outputs.push({address: output.scriptPubKey.addresses[0], value: output_value_out, n: output.n });
 					} else {
-						outputs.push({value: output_value_out, n: output.n }); // non standard address, we still keep them to sum value in
+						outputs.push({value: output_value_out, n: output.n }); // multisig address, we still keep them to sum value in
 					}
+				} else {
+					outputs.push({value: output_value_out, n: output.n }); // non standard address, we still keep them to sum value in
+				}
 			});
 
 			if (inputs.length == 0){ // coinbase

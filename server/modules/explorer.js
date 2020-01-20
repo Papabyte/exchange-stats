@@ -5,13 +5,14 @@ const stats = require("./stats.js");
 const TXS_PER_PAGE = 20;
 const ADDR_PER_PAGE = 100;
 const OUTPUTS_PER_TX = 10;
+const TXS_DISPLAYED = 2000;
 
 async function getTransactionsFromWallets(arrIds, page, handle){
 	const idsSqlFilter = arrIds.join(",");
 	var [idRows, total_on_wallets, transactions_count] = await Promise.all([
 		db.query("SELECT DISTINCT id FROM \n\
-		(SELECT id FROM (SELECT id FROM transactions_to WHERE wallet_id IN("+ idsSqlFilter +") ORDER BY id DESC LIMIT 1000)s1 \n\
-		UNION SELECT id FROM (SELECT id FROM transactions_from WHERE wallet_id IN("+ idsSqlFilter +") ORDER BY id DESC LIMIT 5000)s2)s ORDER BY id DESC LIMIT ?,?",[page*TXS_PER_PAGE,TXS_PER_PAGE]),
+		(SELECT id FROM (SELECT id FROM transactions_to WHERE wallet_id IN("+ idsSqlFilter +") ORDER BY id DESC LIMIT "+TXS_DISPLAYED+")s1 \n\
+		UNION SELECT id FROM (SELECT id FROM transactions_from WHERE wallet_id IN("+ idsSqlFilter +") ORDER BY id DESC LIMIT "+TXS_DISPLAYED+")s2)s ORDER BY id DESC LIMIT ?,?",[page*TXS_PER_PAGE,TXS_PER_PAGE]),
 		stats.getTotalOnWallets(arrIds),
 		stats.getTotalTransactions(arrIds)
 	]);
@@ -29,7 +30,9 @@ async function getTransactionsFromWallets(arrIds, page, handle){
 			addr_count: addr_count, 
 			total_on_wallets: total_on_wallets,
 			count_total: transactions_count > 10000 ? 'over_10000' : transactions_count, 
-			txs: assocTxsFromWallet});
+			txs: assocTxsFromWallet,
+			txs_displayed: TXS_DISPLAYED
+		});
 	});
 }
 
@@ -74,7 +77,7 @@ async function getTransactionsFromInternalIds(arrIds, handle){
 	INNER JOIN transactions_to USING(id) INNER JOIN processed_blocks USING(block_height) \n\
 	INNER JOIN btc_addresses ON btc_addresses.id=transactions_to.address_id \n\
 	LEFT JOIN transactions_from USING(id) \n\
-	WHERE transactions.id IN (" +idsSqlFilter +") AND transactions_to.n <= ? ORDER BY transactions.id DESC",[OUTPUTS_PER_TX]);
+	WHERE transactions.id IN (" +idsSqlFilter +") ORDER BY transactions.id DESC");
 	return handle(createTxsAssociativeArray(rows));
 }
 
@@ -82,8 +85,11 @@ function createTxsAssociativeArray(rows){
 
 	const assocTxsFromWallet = {};
 	rows.forEach(function(row){
-		if (row.n === OUTPUTS_PER_TX)
-			return assocTxsFromWallet[row.tx_id].is_expandable = true;
+		if (row.n >= OUTPUTS_PER_TX){
+			if (!assocTxsFromWallet[row.tx_id].expandable_rows)
+				assocTxsFromWallet[row.tx_id].expandable_rows = 0;
+			return assocTxsFromWallet[row.tx_id].expandable_rows++;
+		}
 		if (!assocTxsFromWallet[row.tx_id]) {
 			assocTxsFromWallet[row.tx_id] = {}
 			assocTxsFromWallet[row.tx_id].to = [];
