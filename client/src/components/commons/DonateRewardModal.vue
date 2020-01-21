@@ -72,13 +72,13 @@
 				</div>
 			</div>
 			<div class="container" v-if="link" fluid>
-				<div class="pt-3">
+				<div class="row">
 					{{$t('editModalLinkHeader')}}
 				</div>
-				<div class="pt-3">
+				<div class="row">
 					<wallet-link :link="link" />
 				</div>
-				<div class="py-3 test">
+				<div class="row">
 					{{$t('editModalLinkFooter')}}
 				</div>
 			</div>

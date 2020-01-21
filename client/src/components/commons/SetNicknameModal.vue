@@ -21,9 +21,7 @@
 					{{$t('setNicknameModalLinkHeader')}}
 				</div>
 				<div class="row">
-					<span class="text-break">
-						<a :href="link">{{link}}</a>
-					</span>
+					<wallet-link :link="link" />
 				</div>
 				<div class="row">
 					{{$t('setNicknameModalLinkFooter')}}
@@ -39,7 +37,12 @@
 
 <script>
 	const conf = require('../../conf.js')
+	import WalletLink from './WalletLink.vue'
+
 	export default {
+		components: {
+			WalletLink,
+		},
 		props: {},
 		data () {
 			return {

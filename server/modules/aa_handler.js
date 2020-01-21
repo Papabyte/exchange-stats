@@ -161,10 +161,12 @@ function treatUnconfirmedEvents(arrUnits){
 				else {
 					if (arrResponses[0] && arrResponses[0].response && arrResponses[0].response.responseVars){
 						const objEvent = parseEvent(params.trigger, arrResponses[0].response.responseVars);
-						objEvent.timestamp = row.timestamp;
-						objEvent.trigger_unit = row.unit;
-						objEvent.nickname = assocNicknamesByAddress[objEvent.concerned_address] || null;
-						assocUnconfirmedEvents[row.unit] = objEvent;
+						if(objEvent.event_type){
+							objEvent.timestamp = row.timestamp;
+							objEvent.trigger_unit = row.unit;
+							objEvent.nickname = assocNicknamesByAddress[objEvent.concerned_address] || null;
+							assocUnconfirmedEvents[row.unit] = objEvent;
+						}
 					}
 				}
 			})
