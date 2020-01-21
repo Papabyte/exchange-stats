@@ -1,4 +1,4 @@
-import {methods as utils} from './utils.js'
+const conf = require('../conf.js')
 
 export default {
 	methods: {
@@ -55,8 +55,24 @@ export default {
 			else if (event.event_type == 'withdraw' && event.operation.outcome == 'out')
 				message+= this.$t('eventMessageCommitRemovingWallet', {
 					contributor: event.nickname || event.concerned_address,
-					amount: utils.getByteAmountString(event.paid_out), 
+					amount: this.getByteAmountString(event.paid_out), 
 				})
+			else if (event.event_type == 'create_pool'){
+				if (event.event_data.exchange)
+					message+= this.$t('eventMessageCreatePoolForExchange', {
+						contributor: event.nickname || event.concerned_address,
+						amount: this.getByteAmountString(event.event_data.reward_amount),
+						number: event.event_data.number_of_rewards,
+						exchange: this.$store.state.exchangesById[event.event_data.exchange].name
+					})
+				else {
+					message+= this.$t('eventMessageCreatePoolForExchange', {
+						contributor: event.nickname || event.concerned_address,
+						amount: this.getByteAmountString(event.event_data.reward_amount),
+						number: event.event_data.number_of_rewards
+					})
+				}
+			}
 			return message;
 		},
 		getExchangeNameFromOperationId(operation_id){
@@ -65,5 +81,8 @@ export default {
 		getWalletIdFromOperationId(operation_id){
 			return Number(operation_id.split('_')[2])
 		},
+		getByteAmountString: function(amount){
+			return (amount/conf.gb_to_bytes >=1 ? ((amount/conf.gb_to_bytes).toPrecision(6)/1).toLocaleString(): ((amount/conf.gb_to_bytes).toPrecision(6)/1)) + 'GB'
+		}
   }
 };

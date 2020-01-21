@@ -225,6 +225,9 @@ function parseEvent(trigger, objResponse){
 		objEvent.event_type = "create_pool";
 		objEvent.paid_in = objResponse.amount;
 		objEvent.concerned_address = trigger.address;
+		objEvent.event_data.reward_amount = Number(trigger.data.reward_amount);
+		objEvent.event_data.number_of_rewards = Number(trigger.data.number_of_rewards);
+		objEvent.event_data.exchange = trigger.data.exchange;
 	} else if (objResponse.destroyed_pool){
 		objEvent.event_type = "destroy_pool";
 		objEvent.paid_out = objResponse.amount;
@@ -254,7 +257,7 @@ function updateOperationsHistory(){
 						if(!objResponse)
 							return cb();
 
-						 const objEvent = parseEvent(trigger, objResponse);
+						const objEvent = parseEvent(trigger, objResponse);
 						if (objEvent.event_type){
 							db.query("INSERT "+db.getIgnore()+" INTO operations_history (operation_id, paid_in, paid_out, concerned_address, pair, event_type, mci, aa_address, event_data, trigger_unit,timestamp) VALUES \n\
 							(?,?,?,?,?,?,?,?,?,?,?)",[objEvent.operation_id, objEvent.paid_in, objEvent.paid_out, objEvent.concerned_address, objEvent.pair, objEvent.event_type, row.mci, row.aa_address, JSON.stringify(objEvent.event_data), row.trigger_unit, row.timestamp],
@@ -317,7 +320,7 @@ function indexOperations(objStateVars){
 	indexStakedByKeyAndAddress(objStateVars);
 	indexProofUrls(objStateVars);
 	
-	const operationKeys = extractOperationKeys(objStateVars);
+	const operationIds = extractOperationKeys(objStateVars);
 	const assocOperations = {};
 	const arrOperations = [];
 
@@ -328,12 +331,12 @@ function indexOperations(objStateVars){
 	const _assocWalletOnOperation = {};
 	const _assocLastOperationForPair = {};
 
-	operationKeys.forEach(function(key){
+	operationIds.forEach(function(operation_id){
 		const operation = {};
-		operation.status = objStateVars[key];
-		const pairKey = convertOperationKeyToPairKey(key);
-		const exchange = getExchangeFromOperationKey(key);
-		const wallet_id = getWalletIdFromOperationKey(key);
+		operation.status = objStateVars[operation_id];
+		const pairKey = convertOperationKeyToPairKey(operation_id);
+		const exchange = getExchangeFromOperationKey(operation_id);
+		const wallet_id = getWalletIdFromOperationKey(operation_id);
 		operation.exchange = exchange;
 
 		operation.wallet_id = Number(wallet_id);
@@ -347,20 +350,20 @@ function indexOperations(objStateVars){
 				assocWalletIdsByExchange[exchange].push(operation.wallet_id);
 			_assocExchangeByWalletId[wallet_id] = exchange;
 		}
-		const outcome = objStateVars[key + "_outcome"]
+		const outcome = objStateVars[operation_id + "_outcome"]
 		operation.outcome = outcome;
 		if (operation.status == 'onreview')
 			_assocWalletOnOperation[wallet_id] = true;
 		operation.committed_outcome = objStateVars[pairKey + "_committed_outcome"];
-		operation.initial_outcome = objStateVars[key + "_initial_outcome"];
-		operation.staked_on_outcome = Number(objStateVars[key + "_total_staked_on_" + outcome]);
-		operation.staked_on_opposite = Number(objStateVars[key + "_total_staked_on_" + (outcome == "in" ? "out" :"in")] || 0);
-		operation.countdown_start= Number(objStateVars[key + "_countdown_start"]);
-		operation.total_staked = Number(objStateVars[key + "_total_staked_on_in"] || 0) + Number(objStateVars[key + "_total_staked_on_out"] || 0);
-		operation.pool_id = Number(objStateVars[key + "_pool_id"]);
-		operation.key = key;
-		operation.staked_by_address = assocStakedByKeyAndAddress[key];
-		operation.url_proofs_by_outcome = assocProofsByKeyAndOutcome[key]
+		operation.initial_outcome = objStateVars[operation_id + "_initial_outcome"];
+		operation.staked_on_outcome = Number(objStateVars[operation_id + "_total_staked_on_" + outcome]);
+		operation.staked_on_opposite = Number(objStateVars[operation_id + "_total_staked_on_" + (outcome == "in" ? "out" :"in")] || 0);
+		operation.countdown_start= Number(objStateVars[operation_id + "_countdown_start"]);
+		operation.total_staked = Number(objStateVars[operation_id + "_total_staked_on_in"] || 0) + Number(objStateVars[operation_id + "_total_staked_on_out"] || 0);
+		operation.pool_id = Number(objStateVars[operation_id + "_pool_id"]);
+		operation.operation_id = operation_id;
+		operation.staked_by_address = assocStakedByKeyAndAddress[operation_id];
+		operation.url_proofs_by_outcome = assocProofsByKeyAndOutcome[operation_id]
 		arrOperations.push(operation);
 		if (!_assocLastOperationForPair[pairKey])
 			_assocLastOperationForPair[pairKey] = operation;
@@ -372,7 +375,7 @@ function indexOperations(objStateVars){
 	arrOperations.sort(function(a, b) { return b.countdown_start - a.countdown_start});
 
 	arrOperations.slice(0, MAX_OPERATIONS).forEach(function(operation){
-		assocOperations[operation.key] = operation; // assocOperations is limited is size, so client receive only last ones 
+		assocOperations[operation.operation_id] = operation; // assocOperations is limited is size, so client receive only last ones 
 	});
 
 	arrOperations.forEach(function(operation){
@@ -542,7 +545,7 @@ function getLastOperationHistoryForPair(wallet_id, exchange_id, handle){
 	if (!assocLastOperationForPair[pair])
 		return handle('no last operation found');
 	else
-	getOperationHistory(assocLastOperationForPair[pair].key, function(objHistory){
+	getOperationHistory(assocLastOperationForPair[pair].operation_id, function(objHistory){
 		return handle(null, objHistory);
 	});
 }
@@ -598,33 +601,9 @@ function getLastEvents(handle){
 }
 
 
-function getLastTransactionsToAA(handle){
-
-	db.query("SELECT is_stable,payload,units.unit,timestamp FROM units INNER JOIN outputs USING(unit) INNER JOIN messages USING(unit) WHERE outputs.address=? ORDER BY main_chain_index DESC",[conf.aa_address],
-	function(rows){
-		var results = [];
-		rows.forEach(function(row){
-			if (!row.payload)
-				return null;
-			const payload = JSON.parse(row.payload);
-			if	(payload.withdraw)
-				return results.push({type:"withdrawal", unit: row.unit,timestamp: row.timestamp, is_stable: row.is_stable});
-			if	(payload.commit)
-				return results.push({type:"commit", unit: row.unit,timestamp: row.timestamp, is_stable: row.is_stable});
-			if	(payload.add_wallet_id)
-				return results.push({type:"add", unit: row.unit,timestamp: row.timestamp, is_stable: row.is_stable});
-			if	(payload.remove_wallet_id)
-				return results.push({type:"remove", unit: row.unit,timestamp: row.timestamp, is_stable: row.is_stable});
-			if	(payload.reward_amount)
-				return results.push({type:"donate", unit: row.unit,timestamp: row.timestamp, is_stable: row.is_stable});
-		});
-		return handle(results);
-	});
-}
-
 //get history for a given operation
 function getOperationHistory(id, handle){
-	db.query("SELECT event_type,timestamp,event_data,paid_in,paid_out,concerned_address FROM operations_history WHERE operation_id=? ORDER BY mci DESC",[id], function(rows){
+	db.query("SELECT event_type,timestamp,event_data,paid_in,paid_out,concerned_address,trigger_unit FROM operations_history WHERE operation_id=? ORDER BY mci DESC",[id], function(rows){
 		rows = rows.map(function(row){
 			var objEventData = JSON.parse(row.event_data);
 			const nickname = assocNicknamesByAddress[row.concerned_address] || null;
@@ -635,6 +614,7 @@ function getOperationHistory(id, handle){
 				paid_out: row.paid_out,
 				concerned_address: row.concerned_address,
 				event_type: row.event_type,
+				unit: row.trigger_unit,
 				nickname
 			};
 		})
@@ -707,7 +687,6 @@ exports.getAllOperations = getAllOperations;
 exports.getPendingOperationsForExchange = getPendingOperationsForExchange;
 exports.getBestPoolForExchange = getBestPoolForExchange;
 exports.getExchangeByWalletId = getExchangeByWalletId;
-exports.getLastTransactionsToAA = getLastTransactionsToAA;
 exports.getOperationHistory = getOperationHistory;
 exports.getContributorsRanking = getContributorsRanking;
 exports.getDonorsRanking = getDonorsRanking;

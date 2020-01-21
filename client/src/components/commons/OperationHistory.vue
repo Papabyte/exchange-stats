@@ -9,13 +9,17 @@
 			<div v-for="item in historyItems" class="row" :key="item.operation_id">
 				<div>
 					<div class="box" v-if="item.event_type =='stake' || item.event_type=='initial_stake'" >
-						<div class="title is-6"><b>{{item.event_type =='stake' ? 'Counter stake' : 'Initial stake'}} </b> - {{item.time}}</div>
+						<div class="title is-6"><b>{{item.event_type =='stake' ? 'Counter stake' : 'Initial stake'}} </b> - {{item.time}}
+							- Unit: <unit-link :unit="item.unit"/>
+						</div>
 
-						<div class="d-block text-break">
+						<div class="text-break">
 							<b><user :address="item.concerned_address" :nickname="item.nickname"/></b>
 							staked <b><byte-amount :amount="item.paid_in"/></b> on <b>{{item.stake_on}}</b>
 						</div>
-						<span class="d-block mr-05">Resulting outcome: <b>{{item.resulting_outcome}}</b></span>
+						<div>
+							<span class="mr-05">Resulting outcome: <b>{{item.resulting_outcome}}</b></span>
+						</div>
 
 						<div v-if="item.event_data.proof_urls">
 							<div>Provided proofs:</div>
@@ -24,7 +28,7 @@
 							</div>
 						</div>
 
-						<span v-if="item.event_data.expected_reward" class="d-block">Expected reward: <b><byte-amount :amount="item.event_data.expected_reward"/></b></span>
+						<span v-if="item.event_data.expected_reward" class="is-inline">Expected reward: <b><byte-amount :amount="item.event_data.expected_reward"/></b></span>
 						<div class="progress-stacked mt-1">
 							<div class="bar" :style="{ height: 15 + 'px', background: '#48c774', width: ( item.staked_on_yes * 100) / (item.staked_on_yes + item.staked_on_no) + '%' }">
 								<byte-amount :amount="item.staked_on_yes"/>
@@ -35,15 +39,19 @@
 						</div>
 					</div>
 					<div class="box" v-if="item.event_type =='commit'" >
-						<div class="title is-6"><b>Committed</b> - {{item.time}} </div>
-						<div class="d-block text-break">
-							<span v-if="item.paid_out" class="d-block"><b><byte-amount :amount="item.paid_out"/></b> paid to <b>{{item.concerned_address}}</b></span>
+						<div class="title is-6"><b>Committed</b> - {{item.time}} 
+						- Unit: <unit-link :unit="item.unit"/>
+						</div>
+						<div class="is-inline text-break">
+							<span v-if="item.paid_out" class="is-inline"><b><byte-amount :amount="item.paid_out"/></b> paid to <b>{{item.concerned_address}}</b></span>
 						</div>
 					</div>
 					<div class="box" v-if="item.event_type =='withdraw'" >
-						<div class="title is-6"><b>Withdraw</b> - {{item.time}} </div>
-						<div class="d-block text-break">
-							<span v-if="item.paid_out" class="d-block"><b><byte-amount :amount="item.paid_out"/></b> paid to <b>{{item.concerned_address}}</b></span>
+						<div class="title is-6"><b>Withdraw</b> - {{item.time}}
+							- Unit: <unit-link :unit="item.unit"/>
+						 </div>
+						<div class="is-inline text-break">
+							<span v-if="item.paid_out" class="is-inline"><b><byte-amount :amount="item.paid_out"/></b> paid to <b>{{item.concerned_address}}</b></span>
 						</div>
 					</div>
 				</div>
@@ -56,13 +64,15 @@
 <script>
 const conf = require("../../conf.js");
 import moment from 'moment/src/moment'
-import ByteAmount from './ByteAmount.vue';
+import ByteAmount from './ByteAmount.vue'
+import UnitLink from './UnitLink.vue'
 import User from './User.vue';
 
 export default {
 	components: {
 		ByteAmount,
-		User
+		User,
+		UnitLink
 	},
 	props: {
 		propOperationId: {

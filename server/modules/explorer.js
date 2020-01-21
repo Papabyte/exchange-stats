@@ -24,7 +24,7 @@ async function getTransactionsFromWallets(arrIds, page, handle){
 		return row.id;
 	});
 	const addr_count = await stats.getAddressesCount(arrIds);
-	getTransactionsFromInternalIds(idRows, function(assocTxsFromWallet){
+	getTransactionsFromTheirIds(idRows, function(assocTxsFromWallet){
 		return handle({
 			per_page: TXS_PER_PAGE, 
 			addr_count: addr_count, 
@@ -36,6 +36,7 @@ async function getTransactionsFromWallets(arrIds, page, handle){
 	});
 }
 
+// returns all addresses belonging to a wallet sorted by balance
 async function getAddressesFromWallet(id, page, handle){
 	var [addressesRows, addr_count] = await Promise.all([
 		db.query("SELECT address,balance FROM btc_addresses WHERE wallet_id=? ORDER BY balance DESC LIMIT ?,? ",[id,page*ADDR_PER_PAGE,ADDR_PER_PAGE]),
@@ -45,7 +46,7 @@ async function getAddressesFromWallet(id, page, handle){
 	return handle({per_page: ADDR_PER_PAGE,addr_count: addr_count, addresses: addressesRows});
 }
 
-
+// returns wallet input and all wallet outputs for a set of BTC transactions
 async function getTransactionFromTxId(tx_id, handle){
 	const rows = await db.query("SELECT transactions.block_height, datetime(block_time, 'unixepoch') as time,transactions.tx_id, transactions_from.amount AS amount_from,transactions_to.amount AS amount_to,\n\
 	transactions_from.wallet_id AS from_id, transactions_to.wallet_id AS to_id,btc_addresses.address FROM transactions  \n\
@@ -60,6 +61,7 @@ async function getTransactionFromTxId(tx_id, handle){
 		return handle(null);
 }
 
+// returns the wallet id of a BTC address
 async function getWalletIdFromAddress(address, handle){
 	const rows = await db.query("SELECT wallet_id FROM btc_addresses WHERE address=?",[address]);
 	if (rows[0])
@@ -68,8 +70,8 @@ async function getWalletIdFromAddress(address, handle){
 		return handle(null);
 }
 
-
-async function getTransactionsFromInternalIds(arrIds, handle){
+// returns all wallet outputs and wallet inputs for a set of BTC transactions
+async function getTransactionsFromTheirIds(arrIds, handle){
 	const idsSqlFilter = arrIds.join(",");
 	console.log(idsSqlFilter);
 	const rows = await db.query("SELECT transactions.block_height, datetime(block_time, 'unixepoch') as time,transactions.tx_id, transactions_from.amount AS amount_from,transactions_to.amount AS amount_to,\n\
@@ -81,6 +83,7 @@ async function getTransactionsFromInternalIds(arrIds, handle){
 	return handle(createTxsAssociativeArray(rows));
 }
 
+// constructs an object including wallet input and wallet outputs for each transaction and sort transactions in an associative array
 function createTxsAssociativeArray(rows){
 
 	const assocTxsFromWallet = {};
@@ -111,7 +114,8 @@ function createTxsAssociativeArray(rows){
 	return assocTxsFromWallet;
 }
 
-
+// when a wallet is merged into another, there is a redirection from the former to the latter
+// this function returns an array in which wallets having redirections have been replaced by the redirected id, wallets ids are unique in the returned array
 function getRedirections(arrIds){
 	return new Promise(async function(resolve){
 		if (arrIds.length == 0)

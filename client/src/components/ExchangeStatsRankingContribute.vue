@@ -18,7 +18,7 @@
 		</b-dropdown-item>
 		<b-dropdown-item v-for="operation in operationsToContest" 
 			aria-role="listitem"
-			:key="operation.key"
+			:key="operation.operation_id"
 			@click="contestOperation(operation)">
 			<div>
 				<div class="is-inline-block">{{getContestField(operation)}}</div>

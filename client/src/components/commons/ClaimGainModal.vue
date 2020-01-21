@@ -66,7 +66,7 @@
 				const base64url = require('base64url')
 				const data = {
 					withdraw: 1,
-					operation_id: this.operationItem.key,
+					operation_id: this.operationItem.operation_id,
 					address: address,
 				}
 

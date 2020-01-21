@@ -66,7 +66,7 @@
 				</div>
 				<div class="card-content">
 					<div v-if="operationItem" class="content">
-						<operation-history :propOperationId="operationItem.key" showTitle/>
+						<operation-history :propOperationId="operationItem.operation_id" showTitle/>
 					</div>
 				</div>
 			</b-collapse>

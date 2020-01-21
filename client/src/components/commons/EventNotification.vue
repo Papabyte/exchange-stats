@@ -44,22 +44,17 @@
 				})
 			},
 			notify: function(event){
-				console.log('notify')
-				console.log(event)
+				const type = event.is_confirmed ? 'is-success' : 'is-warning'
+				var message = event.is_confirmed ? 'Confirmed: ' : 'Unconfirmed: '
+				message+= this.getEventMessage(event)
 
-			const type = event.is_confirmed ? 'is-success' : 'is-warning'
-			var message = event.is_confirmed ? 'Confirmed: ' : 'Unconfirmed: '
-			message+= this.getEventMessage(event)
-
-			this.$buefy.notification.open({
-					duration: 6000000,
-					message: message,
-					position: 'is-bottom-right',
-					type: type,
-					queue: true
-					
-			})
-
+				this.$buefy.notification.open({
+						duration: 60000,
+						message: message,
+						position: 'is-bottom-right',
+						type: type,
+						queue: true
+				})
 			},
 		},
 

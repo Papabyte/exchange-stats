@@ -141,9 +141,13 @@
 				</b-pagination>
 			</div>
 			<div class="container" v-for="(transaction,key,index) in transactions" v-bind:key="key">
-				<transaction v-if="progressive_display_level>index" :tx_id="key" :transaction="transaction"
-										 :no_border="index == (Object.keys(transactions).length-1)" :about_wallet_ids="redirected_ids"
-										 @expand="expand_tx"/>
+				<transaction 
+					v-if="progressive_display_level>index" 
+					:tx_id="key" 
+					:transaction="transaction"
+					:no_border="index == (Object.keys(transactions).length-1)" :about_wallet_ids="redirected_ids"
+					@expand="expand_tx"
+				/>
 			</div>
 		</div>
 	</div>

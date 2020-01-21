@@ -8,8 +8,7 @@
 				per-page="10"
 				:current-page.sync="currentPage"
 				pagination-position="bottom"
-				default-sort-direction="desc"
-				sort-by='timestamp'
+				:default-sort="['time', 'desc']"
 				sort-icon="arrow-up"
 				sort-icon-size="is-small"
 				aria-next-label="Next page"
@@ -18,15 +17,18 @@
 				aria-current-label="Current page"
 		>
 			<template slot-scope="props">
-				<b-table-column field="event" label="Event"  sortable>
+				<b-table-column field="event" label="Event">
 					{{props.row.message}}
 				</b-table-column>
-				<b-table-column field="status" label="Status"  sortable>
+				<b-table-column field="status" label="Status"  >
 					<b-tag v-if="props.row.is_confirmed" type="is-success">confirmed</b-tag>
 					<b-tag v-else type="is-warning">unconfirmed</b-tag>
 				</b-table-column>
-				<b-table-column field="time" label="time"  sortable>
-				{{moment().to(props.row.time)}}
+				<b-table-column field="time" label="Time" sortable>
+					{{moment().to(props.row.time)}}
+				</b-table-column>
+				<b-table-column field="unit" label="Unit">
+					<unit-link :unit="props.row.unit"/>
 				</b-table-column>
 			</template>
 			<template slot="empty">
@@ -51,10 +53,13 @@
 	const conf = require('../conf.js')
 	import getEventMessage from '../mixins/eventMessage'
 	import moment from 'moment/src/moment'
+	import UnitLink from './commons/UnitLink.vue'
 
 	export default {
 		mixins:[getEventMessage],
-		components: {},
+		components: {
+			UnitLink
+		},
 		data () {
 			return {
 				isTestnet: conf.testnet,
@@ -75,10 +80,8 @@
 		methods: {
 			moment: moment,
 			getData () {
-
 				this.axios.get('/api/last-events').then((response) => {
 					this.events = response.data.map((event)=>{
-						console.log(event)
 						return {
 							message: this.getEventMessage(event), 
 							is_confirmed: event.is_confirmed,
@@ -87,8 +90,6 @@
 						}
 					})
 					this.totalRows = this.events.length
-					console.log(this.events)
-
 				})
 			},
 		},

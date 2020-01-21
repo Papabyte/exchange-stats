@@ -1,5 +1,5 @@
 <template>
-	<div class="d-inline">
+	<div class="is-inline">
 		<span v-if="nickname">
 			<b-tooltip 
 				:label="address"
