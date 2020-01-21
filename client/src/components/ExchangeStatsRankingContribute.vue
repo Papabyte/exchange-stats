@@ -14,7 +14,7 @@
 			aria-role="listitem"
 			v-if="row.total_btc_wallet || row.nb_withdrawal_addresses"
 			@click="removeAWallet(row.exchange_id)">
-			{{$t('rankingTableButtonRemoveWallet')}} - {{ row.exchange_id }}
+			{{$t('rankingTableButtonRemoveWallet')}}
 			<div v-if="rewardAmount" class="is-inline-block ml-05"> - <byte-amount :amount="rewardAmount"  /> reward</div>
 		</b-dropdown-item>
 		<b-dropdown-item v-for="operation in operationsToContest" 
@@ -23,13 +23,13 @@
 			@click="contestOperation(operation)">
 			<div>
 				<div class="is-inline-block">{{getContestField(operation)}}</div>
-				<div class="is-inline-block"> - potential gain: <byte-amount :amount="operation.staked_on_outcome - operation.staked_on_opposite/conf.challenge_coeff"  /> </div>
+				<div class="is-inline-block"> <byte-amount :amount="operation.staked_on_outcome - operation.staked_on_opposite/conf.challenge_coeff"  /> </div>
 			</div>
 		</b-dropdown-item>
 		<b-dropdown-item 
 			aria-role="listitem"
 			@click="donateReward(row.exchange_id)">
-			Post reward
+			{{$t('rankingTableButtonPostReward')}} 
 		</b-dropdown-item>
 	</b-dropdown>
 </template>

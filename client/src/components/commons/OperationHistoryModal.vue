@@ -25,7 +25,7 @@
 			<operation-history :propOperationId="operationItem.operation_id" />
 		</section>
 		<footer class="modal-card-foot f-end">
-			<button class="button" type="button" @click="$parent.close()">Close</button>
+			<button class="button" type="button" @click="$parent.close()">{{$t('commonButtonClose')}}</button>
 		</footer>
 	</div>
 </template>

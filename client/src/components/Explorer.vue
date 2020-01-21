@@ -25,7 +25,7 @@
 									v-model="user_input"
 									type="text"
 									required
-									:data="filteredDataObj"
+									:data="filteredExchangesObj"
 									placeholder="Enter BTC address, transaction id or wallet id."
 									@select="onSubmit">
 								</b-autocomplete>
@@ -98,7 +98,7 @@
 			}
 		},
 		computed: {
-			filteredDataObj () {
+			filteredExchangesObj () {
 				const data = this.assocExchangesByName
 				const options = Object.entries(data).map(([key, value]) => ({ key, value }))
 				return options.filter((option) => {

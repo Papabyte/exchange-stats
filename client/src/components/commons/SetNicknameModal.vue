@@ -31,8 +31,8 @@
 			</div>
 		</section>
 		<footer class="modal-card-foot f-end" v-show="!link">
-			<button class="button" type="button" @click="$parent.close()">Close</button>
-			<button class="button is-primary" :disabled="!isValidNickname(nickname)" @click="handleOk">Ok</button>
+			<button class="button" type="button" @click="$parent.close()">{{$t('commonButtonClose')}}</button>
+			<button class="button is-primary" :disabled="!isValidNickname(nickname)" @click="handleOk">{{$t('commonButtonOk')}}</button>
 		</footer>
 	</div>
 </template>

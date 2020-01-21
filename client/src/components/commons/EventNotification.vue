@@ -45,7 +45,7 @@
 			},
 			notify: function(event){
 				const type = event.is_confirmed ? 'is-success' : 'is-warning'
-				var message = event.is_confirmed ? 'Confirmed: ' : 'Unconfirmed: '
+				var message = event.is_confirmed ? this.$t('eventNotificationConfirmed') : this.$t('eventNotificationUnconfirmed')
 				message+= this.getEventMessage(event)
 
 				this.$buefy.notification.open({

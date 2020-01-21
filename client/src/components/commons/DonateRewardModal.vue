@@ -15,7 +15,7 @@
 									@input="onExchangeInput"
 									:keep-first="false"
 									:open-on-focus="true"
-									:data="filteredDataObj"
+									:data="filteredExchangesObj"
 									:disabled="isForAny || propExchange"
 									field="exchange_form_input">
 								<template slot-scope="props">
@@ -84,9 +84,9 @@
 			</div>
 		</section>
 		<footer class="modal-card-foot f-end">
-			<button class="button is-primary" v-if="link" @click="link=null">Back</button>
-			<button class="button" type="button" @click="$parent.close()">Close</button>
-			<button class="button is-primary" v-if="!link" :disabled="!validExchange && !isForAny &&!propExchange" @click="handleOk">Ok</button>
+			<button class="button is-primary" v-if="link" @click="link=null">{{$t('commonButtonBack')}}</button>
+			<button class="button" type="button" @click="$parent.close()">{{$t('commonButtonClose')}}</button>
+			<button class="button is-primary" v-if="!link" :disabled="!validExchange && !isForAny &&!propExchange" @click="handleOk">{{$t('commonButtonOk')}}</button>
 		</footer>
 	</div>
 </template>
@@ -136,7 +136,7 @@
 					return null
 				return !!this.assocExchangesById[this.exchange]
 			},
-			filteredDataObj () {
+			filteredExchangesObj () {
 				const data = this.assocExchangesByName
 				const options = Object.entries(data).map(([exchange_form_input, value]) => ({ exchange_form_input, value }))
 				return options.filter((option) => {

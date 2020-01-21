@@ -8,7 +8,7 @@
 			<div class="container" v-show="!link">
 
 				<div class="row" v-if="!propWalletId">
-					<strong class="d-flex mb-05">Select wallet to be removed</strong>
+					<strong class="d-flex mb-05">{{$t('editModalSelectWalletToBeRemoved')}}</strong>
 					<div class="d-grid d-grid-4-col is-marginless">
 						<b-loading :is-full-page="false" :active.sync="isSpinnerActive" :can-cancel="true"></b-loading>
 						<div class="field" v-for="wallet_id in wallet_choices" :key="wallet_id">
@@ -101,9 +101,9 @@
 			</div>
 		</section>
 		<footer class="modal-card-foot f-end">
-			<button class="button is-primary" v-if="link" @click="link=null">Back</button>
-			<button class="button" type="button" @click="$parent.close()">Close</button>
-			<button class="button is-primary" v-if="!link" :disabled="isOkDisabled" @click="handleOk">Ok</button>
+			<button class="button is-primary" v-if="link" @click="link=null">{{$t('commonButtonBack')}}</button>
+			<button class="button" type="button" @click="$parent.close()">{{$t('commonButtonClose')}}</button>
+			<button class="button is-primary" v-if="!link" :disabled="isOkDisabled" @click="handleOk">{{$t('commonButtonOk')}}</button>
 		</footer>
 	</div>
 </template>

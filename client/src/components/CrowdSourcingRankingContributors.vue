@@ -1,23 +1,23 @@
 <template>
 	<div class="container">
 		<b-table
-				:sort-by.sync="sortBy"
-				:sort-desc.sync="defaultSortDirection"
-				:data="items"
-				ref="table"
-				hoverable
-				paginated
-				per-page="10"
-				:current-page.sync="currentPage"
-				pagination-position="bottom"
-				:default-sort-direction="defaultSortDirection"
-				sort-icon="arrow-up"
-				sort-icon-size="is-small"
-				:default-sort="sortBy"
-				aria-next-label="Next page"
-				aria-previous-label="Previous page"
-				aria-page-label="Page"
-				aria-current-label="Current page"
+			:sort-by.sync="sortBy"
+			:sort-desc.sync="defaultSortDirection"
+			:data="items"
+			ref="table"
+			hoverable
+			paginated
+			per-page="10"
+			:current-page.sync="currentPage"
+			pagination-position="bottom"
+			:default-sort-direction="defaultSortDirection"
+			sort-icon="arrow-up"
+			sort-icon-size="is-small"
+			:default-sort="sortBy"
+			aria-next-label="Next page"
+			aria-previous-label="Previous page"
+			aria-page-label="Page"
+			aria-current-label="Current page"
 		>
 			<template slot-scope="props">
 				<b-table-column field="address" :label="$t('crowdSourcingContributorsTableColAddress')" sortable>

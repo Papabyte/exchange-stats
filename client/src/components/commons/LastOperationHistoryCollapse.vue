@@ -9,7 +9,7 @@
 						role="button"
 						aria-controls="contentIdForA11y3">
 						<p class="card-header-title">
-							Last operation for this pair
+							{{$t('LastOperationHistoryCollapseLastOperationForThisPair')}}
 						</p>
 						<a class="card-header-icon">
 								<b-icon
@@ -60,9 +60,6 @@ import OperationHistory from './OperationHistory.vue';
 				}
 				else
 					return this.$t('crowdSourcingOperationsRemoveXFromX', {wallet: this.walletId, exchange: this.exchange});
-
-				
-
 			}
 		},
 		created () {

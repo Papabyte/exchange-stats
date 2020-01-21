@@ -95,9 +95,9 @@
 			</div>
 		</section>
 		<footer class="modal-card-foot f-end">
-			<button class="button is-primary" v-if="link" @click="link=null">Back</button>
-			<button class="button" type="button" @click="$parent.close()">Close</button>
-			<button class="button is-primary" v-if="!link" :disabled="isOkDisabled" @click="handleOk">Ok</button>
+			<button class="button is-primary" v-if="link" @click="link=null">{{$t('commonButtonBack')}}</button>
+			<button class="button" type="button" @click="$parent.close()">{{$t('commonButtonClose')}}</button>
+			<button class="button is-primary" v-if="!link" :disabled="isOkDisabled" @click="handleOk">{{$t('commonButtonOk')}}</button>
 		</footer>
 	</div>
 </template>

@@ -18,7 +18,7 @@
 							staked <b><byte-amount :amount="item.paid_in"/></b> on <b>{{item.stake_on}}</b>
 						</div>
 						<div>
-							<span class="mr-05">Resulting outcome: <b>{{item.resulting_outcome}}</b></span>
+							<span class="mr-05">{{$t('operationHistoryResultingOutcome')}}<b>{{item.resulting_outcome}}</b></span>
 						</div>
 
 						<div v-if="item.event_data.proof_urls">
@@ -28,7 +28,7 @@
 							</div>
 						</div>
 
-						<span v-if="item.event_data.expected_reward" class="is-inline">Expected reward: <b><byte-amount :amount="item.event_data.expected_reward"/></b></span>
+						<span v-if="item.event_data.expected_reward" class="is-inline">{{$t('operationHistoryExpectedReward')}}<b><byte-amount :amount="item.event_data.expected_reward"/></b></span>
 						<div class="progress-stacked mt-1">
 							<div class="bar" :style="{ height: 15 + 'px', background: '#48c774', width: ( item.staked_on_yes * 100) / (item.staked_on_yes + item.staked_on_no) + '%' }">
 								<byte-amount :amount="item.staked_on_yes"/>
@@ -39,7 +39,7 @@
 						</div>
 					</div>
 					<div class="box" v-if="item.event_type =='commit'" >
-						<div class="title is-6"><b>Committed</b> - {{item.time}} 
+						<div class="title is-6"><b>{{$t('operationHistoryCommit')}}</b> - {{item.time}} 
 						- Unit: <unit-link :unit="item.unit"/>
 						</div>
 						<div class="is-inline text-break">
@@ -47,9 +47,9 @@
 						</div>
 					</div>
 					<div class="box" v-if="item.event_type =='withdraw'" >
-						<div class="title is-6"><b>Withdraw</b> - {{item.time}}
+						<div class="title is-6"><b>{{$t('operationHistoryWithdraw')}}</b> - {{item.time}}
 							- Unit: <unit-link :unit="item.unit"/>
-						 </div>
+						</div>
 						<div class="is-inline text-break">
 							<span v-if="item.paid_out" class="is-inline"><b><byte-amount :amount="item.paid_out"/></b> paid to <b>{{item.concerned_address}}</b></span>
 						</div>
