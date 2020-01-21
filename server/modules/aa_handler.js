@@ -217,6 +217,7 @@ function parseEvent(trigger, objResponse){
 		objEvent.event_type = "commit";
 		objEvent.paid_out = objResponse.paid_out_amount;
 		objEvent.concerned_address = objResponse.paid_out_address;
+		objEvent.event_data.committed_outcome = objResponse.committed_outcome;
 	} else if (objResponse.paid_out_amount){
 		objEvent.event_type = "withdraw";
 		objEvent.paid_out = objResponse.paid_out_amount;
