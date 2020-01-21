@@ -26,8 +26,16 @@
 									type="text"
 									required
 									:data="filteredExchangesObj"
-									placeholder="Enter BTC address, transaction id or wallet id."
-									@select="onSubmit">
+									:placeholder="$t('ExplorerUserInputPlaceholder')"
+									field="key"
+									@select="onSelect">
+								<template slot-scope="props">
+									<b>{{ props.option.value }}</b>
+									<br>
+									<small>
+										{{ props.option.key }}
+									</small>
+								</template>
 								</b-autocomplete>
 						</div>
 						<div class="column">
@@ -43,10 +51,12 @@
 					<div class="container">
 						<h6 class="title is-6 mt-1 mb-2">{{$t('explorerOrBrowseExchanges')}}</h6>
 						<span class="exchange-wrapper">
-							<exchange v-for="key in assocExchangesByName" 
-								v-bind:key="key"
+							<div v-for="exchange in assocExchangesHavingWallet" :key="exchange" >
+								<exchange 
+								v-bind:key="exchange"
 								:showIcon="false"
-								:id="key"/>
+								:id="exchange"/>
+								</div>
 						</span>
 					</div>
 				</div>
@@ -108,6 +118,9 @@
 			assocExchangesByName: function () {
 				return this.$store.state.exchangesByName
 			},
+			assocExchangesHavingWallet () {
+				return Object.values(this.$store.state.exchangesById).filter(value => value.has_wallet).map(value=>this.assocExchangesByName[value.name])
+			},
 			welcomeMessageShow () {
 				return !this.$store.state.wasExplorerWelcomeMessageClosed
 			},
@@ -123,6 +136,10 @@
 		methods: {
 			onSubmit () {
 				this.$router.push({ name: 'explorerInput', params: { url_input: this.user_input } })
+			},
+			onSelect(option){
+				this.$router.push({ name: 'explorerInput', params: { url_input: option.value } })
+
 			},
 			updateTitleAndDescription(){
 				document.title = this.$t('explorerPageTitle', { website_name: conf.website_name })
@@ -144,7 +161,7 @@
 		justify-content: flex-start;
 		margin: -0.75rem;
 
-		& > span {
+		& > div {
 			margin: 0.75rem;
 		}
 	}

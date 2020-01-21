@@ -9,15 +9,15 @@ const async = require('async');
 const db = require('ocore/db.js');
 var assocWalletIdsByExchange = null;
 
-const exchanges = {};
+const assocExchanges = {};
 
-// we sort exchanges by name
+// we sort assocExchanges by name
  Object.entries(unsortedExchanges)
 .sort(function (a, b) {
 	return a[1].name > b[1].name ? 1 : -1;
 })
 .forEach(function(arrKeyValue){
-	exchanges[arrKeyValue[0]] = arrKeyValue[1];
+	assocExchanges[arrKeyValue[0]] = arrKeyValue[1];
 });
 
 
@@ -34,7 +34,7 @@ function processNewRanking(){
 		if (process.env.no_ranking_process)
 			return unlock();
 	
-		for (var key in exchanges){
+		for (var key in assocExchanges){
 			if (!assocWalletIdsByExchange[key])
 				continue;
 			var arrWalletIds = await explorer.getRedirections(assocWalletIdsByExchange[key]);
@@ -48,7 +48,7 @@ function processNewRanking(){
 // ranking as soon as a wallet is added or removed
 async function updateRankingRow(key, arrWalletIds, {monthly_volume, trendString}){
 	console.log("update ranking row for " + key);
-	var exchange = exchanges[key];
+	var exchange = assocExchanges[key];
 	if (!exchange)
 		return;
 	var total_24h_deposits = null;
@@ -68,8 +68,8 @@ async function updateRankingRow(key, arrWalletIds, {monthly_volume, trendString}
 		total_24h_withdrawals = await stats.getTotalWithdrawnFromWallets(arrWalletIds, lastHeight - 6 * 24 , lastHeight);
 		total_btc_wallet = await stats.getTotalOnWallets(arrWalletIds);
 		nb_addresses = await stats.getAddressesCount(arrWalletIds);
-	if (exchanges[key].gecko_id)
-		objInfo = await api.getExchangeInfo(exchanges[key].gecko_id);
+	if (assocExchanges[key].gecko_id)
+		objInfo = await api.getExchangeInfo(assocExchanges[key].gecko_id);
 
 	db.query("REPLACE INTO last_exchanges_ranking (exchange_id,trend,last_month_volume,nb_addresses,total_btc_wallet,name,last_day_deposits, last_day_withdrawals, reported_volume) VALUES (?,?,?,?,?,?,?,?,?)", 
 	[
@@ -168,20 +168,24 @@ function getExchangeWalletIds(exchange){
 }
 
 function getExchangeName(exchange){
-	if (exchanges[exchange] && exchanges[exchange].name)
-		return exchanges[exchange].name;
+	if (assocExchanges[exchange] && assocExchanges[exchange].name)
+		return assocExchanges[exchange].name;
 	else
 		return null;
 }
 
 
 function getExchangesList(){
-	return exchanges;
+	return assocExchanges;
 }
 
 
 function setWalletIdsByExchange(obj){
 	assocWalletIdsByExchange = obj;
+	for (var key in assocWalletIdsByExchange){
+		if (assocExchanges[key])
+			assocExchanges[key].has_wallet = true
+	}
 }
 
 

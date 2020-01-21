@@ -17,12 +17,12 @@
 									:open-on-focus="true"
 									:data="filteredExchangesObj"
 									:disabled="isForAny || propExchange"
-									field="exchange_form_input">
+									field="key">
 								<template slot-scope="props">
 									<b>{{ props.option.value }}</b>
 									<br>
 									<small>
-										{{ props.option.exchange_form_input }}
+										{{ props.option.key }}
 									</small>
 								</template>
 							</b-autocomplete>
@@ -138,9 +138,9 @@
 			},
 			filteredExchangesObj () {
 				const data = this.assocExchangesByName
-				const options = Object.entries(data).map(([exchange_form_input, value]) => ({ exchange_form_input, value }))
+				const options = Object.entries(data).map(([key, value]) => ({ key, value }))
 				return options.filter((option) => {
-					return option.exchange_form_input.toString().toLowerCase().indexOf(this.exchange_form_input.toLowerCase()) >= 0
+					return option.key.toString().toLowerCase().indexOf(this.exchange_form_input.toLowerCase()) >= 0
 				})
 			},
 			assocExchangesByName () {
