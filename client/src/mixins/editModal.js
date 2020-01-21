@@ -29,7 +29,7 @@ export default {
 			isRedirected: false,
 			rewardAmount: false,
 			wallet_digest: null,
-			stakeAmount: conf.challenge_min_stake_gb * conf.gb_to_bytes,
+			stakeAmount: this.$store.state.aaParameters.min_reward * conf.gb_to_bytes,
 			link: false,
 			urls: [],
 			bAreUrlsValid: false,
@@ -154,7 +154,7 @@ export default {
 		isNotificationActive(){
 			return !!this.notification_text
 		},
-			assocExchangesById () {
+		assocExchangesById () {
 			return this.$store.state.exchangesById
 		},
 		assocExchangesByName () {
