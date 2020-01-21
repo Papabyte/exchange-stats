@@ -346,9 +346,10 @@ function indexOperations(objStateVars){
 		operation.exchange = exchange;
 		operation.number = Number(objStateVars[pairKey + "_number"]);
 
-		if(!assocWalletIdsByExchange[exchange])
-			assocWalletIdsByExchange[exchange] = [];
+
 		if (objStateVars[pairKey + "_committed_outcome"] == "in") {
+			if(!assocWalletIdsByExchange[exchange])
+				assocWalletIdsByExchange[exchange] = [];
 			if (assocWalletIdsByExchange[exchange].indexOf(operation.wallet_id) === -1)
 				assocWalletIdsByExchange[exchange].push(operation.wallet_id);
 			_assocExchangeByWalletId[wallet_id] = exchange;
