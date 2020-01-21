@@ -15,6 +15,7 @@
 			v-if="row.total_btc_wallet || row.nb_withdrawal_addresses"
 			@click="removeAWallet(row.exchange_id)">
 			{{$t('rankingTableButtonRemoveWallet')}} - {{ row.exchange_id }}
+			<div v-if="rewardAmount" class="is-inline-block ml-05"> - <byte-amount :amount="rewardAmount"  /> reward</div>
 		</b-dropdown-item>
 		<b-dropdown-item v-for="operation in operationsToContest" 
 			aria-role="listitem"
@@ -30,8 +31,6 @@
 			@click="donateReward(row.exchange_id)">
 			Post reward
 		</b-dropdown-item>
-
-		
 	</b-dropdown>
 </template>
 
@@ -39,10 +38,11 @@
 
 	const conf = require('../conf.js')
 	import { ModalProgrammatic } from 'buefy'
-	import EditWalletModal from './commons/EditWalletModal.vue'
 	import ContestOperationModal from './commons/ContestOperationModal.vue'
 	import ByteAmount from './commons/ByteAmount.vue'
 	import DonateRewardModal from './commons/DonateRewardModal.vue'
+	import EditModalAddWallet from './commons/EditModalAddWallet.vue'
+	import EditModalRemoveWallet from './commons/EditModalRemoveWallet.vue'
 
 	export default {
 		components: {
@@ -102,17 +102,17 @@
 			addAWallet (exchange) {
 				ModalProgrammatic.open({
 					parent: this,
-					component: EditWalletModal,
+					component: EditModalAddWallet,
 					hasModalCard: true,
-					props: { propExchange: exchange, isRemoving: false },
+					props: { propExchange: exchange},
 				})
 			},
 			removeAWallet (exchange) {
 				ModalProgrammatic.open({
 					parent: this,
-					component: EditWalletModal,
+					component: EditModalRemoveWallet,
 					hasModalCard: true,
-					props: { propExchange: exchange, isRemoving: true },
+					props: { propExchange: exchange},
 				})
 			},
 			contestOperation (operation) {

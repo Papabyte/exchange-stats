@@ -105,10 +105,8 @@
 
 <script>
 	import BtcAmount from './commons/BtcAmount.vue'
-	import EditWalletModal from './commons/EditWalletModal.vue'
 	import ExchangeTrend from './commons/ExchangeTrend.vue'
 	import Contribute from './ExchangeStatsRankingContribute.vue'
-	import { ModalProgrammatic } from 'buefy'
 
 	export default {
 		components: {
@@ -119,7 +117,6 @@
 		data () {
 			return {
 				data: [],
-				isRemoving: false,
 				clicked_exchange: null,
 				isPaginated: true,
 				isPaginationSimple: false,
@@ -152,22 +149,6 @@
 				})
 
 				this.isLoading = false
-			},
-			addAWallet (exchange) {
-				ModalProgrammatic.open({
-					parent: this,
-					component: EditWalletModal,
-					hasModalCard: true,
-					props: { propExchange: exchange, isRemoving: false },
-				})
-			},
-			removeAWallet (exchange) {
-				ModalProgrammatic.open({
-					parent: this,
-					component: EditWalletModal,
-					hasModalCard: true,
-					props: { propExchange: exchange, isRemoving: true },
-				})
 			},
 			onPageChange (page) {
 				this.page = page

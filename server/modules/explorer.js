@@ -88,16 +88,18 @@ function createTxsAssociativeArray(rows){
 
 	const assocTxsFromWallet = {};
 	rows.forEach(function(row){
-		if (row.n >= OUTPUTS_PER_TX){
-			if (!assocTxsFromWallet[row.tx_id].expandable_rows)
-				assocTxsFromWallet[row.tx_id].expandable_rows = 0;
-			return assocTxsFromWallet[row.tx_id].expandable_rows++;
-		}
+
 		if (!assocTxsFromWallet[row.tx_id]) {
 			assocTxsFromWallet[row.tx_id] = {}
 			assocTxsFromWallet[row.tx_id].to = [];
 			assocTxsFromWallet[row.tx_id].height = row.block_height;
 			assocTxsFromWallet[row.tx_id].time = row.time;
+		}
+		
+		if (row.n >= OUTPUTS_PER_TX){
+			if (!assocTxsFromWallet[row.tx_id].expandable_rows)
+				assocTxsFromWallet[row.tx_id].expandable_rows = 0;
+			return assocTxsFromWallet[row.tx_id].expandable_rows++;
 		}
 
 		assocTxsFromWallet[row.tx_id].from = {

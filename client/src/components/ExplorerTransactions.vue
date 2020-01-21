@@ -156,7 +156,10 @@
 <script>
 	import Transaction from './ExplorerTransaction.vue'
 	import validate from 'bitcoin-address-validation'
-	import EditWalletModal from './commons/EditWalletModal.vue'
+	import EditModalAddExchange from './commons/EditModalAddExchange.vue'
+	import EditModalAddWallet from './commons/EditModalAddWallet.vue'
+	import EditModalRemoveWallet from './commons/EditModalRemoveWallet.vue'
+
 	import Exchange from './commons/Exchange.vue'
 	import BtcAmount from './commons/BtcAmount.vue'
 	import WalletId from './commons/WalletId.vue'
@@ -196,7 +199,6 @@
 				isSpinnerActive: true,
 				failoverText: null,
 				redirected_ids: [],
-				isRemoving: null,
 				walletOwner: null,
 				tx_id: null,
 				total_on_wallets: null,
@@ -253,25 +255,25 @@
 			addWalletToAnExchange(walletId) {
 				ModalProgrammatic.open({
 					parent: this,
-					component: EditWalletModal,
+					component: EditModalAddExchange,
 					hasModalCard: true,
-					props: {propWalletId: walletId, isRemoving: false },
+					props: { propWalletId: walletId },
 				})
 			},
 			removeWalletFromExchange (walletId, exchange) {
 				ModalProgrammatic.open({
 					parent: this,
-					component: EditWalletModal,
+					component: EditModalRemoveWallet,
 					hasModalCard: true,
-					props: {propExchange: exchange, propWalletId: walletId, isRemoving: true },
+					props: { propExchange: exchange, propWalletId: walletId },
 				})
 			},
 			addAWalletToExchange (exchange) {
 				ModalProgrammatic.open({
 					parent: this,
-					component: EditWalletModal,
+					component: EditModalAddWallet,
 					hasModalCard: true,
-					props: {propExchange: exchange, isRemoving: false },
+					props: { propExchange: exchange },
 				})
 			},
 			viewAddingUrlProofs (walletId,exchange) {

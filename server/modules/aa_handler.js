@@ -187,9 +187,9 @@ function parseEvent(trigger, objResponse){
 	function attachProofUrls(){
 		for (var i=1; i<=5; i++){
 			if (trigger.data["url_" + i]){
-				if(!objEvent.proof_urls)
-				objEvent.proof_urls = [];
-				objEvent.proof_urls.push(trigger.data["url_" + i]);
+				if(!objEvent.event_data.proof_urls)
+				objEvent.event_data.proof_urls = [];
+				objEvent.event_data.proof_urls.push(trigger.data["url_" + i]);
 			}
 		}
 	}

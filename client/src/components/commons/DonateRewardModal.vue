@@ -11,18 +11,18 @@
 
 						<b-field :label="$t('donateModalSelectExchange')">
 							<b-autocomplete
-									v-model="key"
+									v-model="exchange_form_input"
 									@input="onExchangeInput"
 									:keep-first="false"
 									:open-on-focus="true"
 									:data="filteredDataObj"
 									:disabled="isForAny || propExchange"
-									field="key">
+									field="exchange_form_input">
 								<template slot-scope="props">
 									<b>{{ props.option.value }}</b>
 									<br>
 									<small>
-										{{ props.option.key }}
+										{{ props.option.exchange_form_input }}
 									</small>
 								</template>
 							</b-autocomplete>
@@ -33,7 +33,7 @@
 							<b-checkbox
 									v-model="isForAny"
 									:disabled="propExchange"
-									@input="exchange ='';key=''">
+									@input="exchange ='';exchange_form_input=''">
 								{{$t('donateModalDonateForAny')}}
 							</b-checkbox>
 						</div>
@@ -116,7 +116,7 @@
 				isForAny: false,
 				amount: this.$store.state.aaParameters.min_reward/conf.gb_to_bytes,
 				exchange: '',
-				key: '',
+				exchange_form_input: '',
 				nb_reward: 1,
 				link: false,
 				gb_to_bytes: conf.gb_to_bytes,
@@ -138,9 +138,9 @@
 			},
 			filteredDataObj () {
 				const data = this.assocExchangesByName
-				const options = Object.entries(data).map(([key, value]) => ({ key, value }))
+				const options = Object.entries(data).map(([exchange_form_input, value]) => ({ exchange_form_input, value }))
 				return options.filter((option) => {
-					return option.key.toString().toLowerCase().indexOf(this.key.toLowerCase()) >= 0
+					return option.exchange_form_input.toString().toLowerCase().indexOf(this.exchange_form_input.toLowerCase()) >= 0
 				})
 			},
 			assocExchangesByName () {

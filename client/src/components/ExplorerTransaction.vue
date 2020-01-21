@@ -37,11 +37,9 @@
 					<div class="column is-4">
 						<wallet-id v-if="t_out.id" label="Wallet: " :id="t_out.id"/>
 						<span v-else>
-
 							<div class="button is-warning is-unknown">
 								{{$t('explorerTransactionUnknownWallet')}}
 							</div>
-
 						</span>
 					</div>
 					<div class="column is-4" v-if="t_out.exchange">
@@ -113,7 +111,7 @@
 
 	.destination {
 		.columns {
-			border-top: 1px dashed gainsboro;
+			border-top: 1px dashed rgb(80, 79, 79);
 
 			&:first-child {
 				border-top: 0

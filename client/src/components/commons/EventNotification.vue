@@ -49,11 +49,11 @@
 				message+= this.getEventMessage(event)
 
 				this.$buefy.notification.open({
-						duration: 60000,
-						message: message,
-						position: 'is-bottom-right',
-						type: type,
-						queue: true
+					duration: 60000,
+					message: message,
+					position: 'is-bottom-right',
+					type: type,
+					queue: true
 				})
 			},
 		},

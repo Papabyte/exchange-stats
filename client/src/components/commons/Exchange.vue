@@ -8,11 +8,11 @@
 		</div>
 		<span class="wallet-link">
 			<b-button
-					size="is-medium"
-					type="is-warning"
-					tag="router-link"
-					:to="'/explorer/'+id"
-					:target="target"
+				size="is-medium"
+				type="is-warning"
+				tag="router-link"
+				:to="'/explorer/'+id"
+				:target="target"
 			>
 				<v-icon v-if="showIcon" name='trending-up' class="exchange-icon"/>
 				{{exchangeName}}
