@@ -29,7 +29,7 @@ export default {
 			isRedirected: false,
 			rewardAmount: false,
 			wallet_digest: null,
-			stakeAmount: this.$store.state.aaParameters.min_reward * conf.gb_to_bytes,
+			stakeAmount: this.$store.state.aaParameters.min_reward,
 			link: false,
 			urls: [],
 			bAreUrlsValid: false,
