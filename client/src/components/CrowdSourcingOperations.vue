@@ -66,7 +66,7 @@
 							<b-tag v-else  type="is-warning">{{ $t('crowdSourcingOperationsTableEnded') }}</b-tag>
 						</b-table-column>
 
-						<b-table-column field="actions" :label="$t('crowdSourcingOperationsTableColAction')">
+						<b-table-column class="btn-group" field="actions" :label="$t('crowdSourcingOperationsTableColAction')">
 
 								<b-tooltip type="is-info" :label="$t('crowdSourcingOperationsButtonContestTip')">
 									<b-button
@@ -94,23 +94,19 @@
 											{{$t('crowdSourcingOperationsButtonClaim')}}
 									</b-button>
 								</b-tooltip>
-								<b-dropdown aria-role="list">
-									<button class="button is-info is-outlined" slot="trigger">
-										<span>{{ $t('crowdSourcingOperationsButtonView') }}</span>
-										<b-icon icon="menu-down"></b-icon>
-									</button>
-
-									<b-dropdown-item
-											aria-role="listitem"
+								<b-tooltip type="is-info" :label="$t('crowdSourcingOperationsButtonViewProofsTip')">
+									<b-button class="button is-info is-outlined"
 											@click="viewUrlProofs(props.row)">
 										{{$t('crowdSourcingOperationsButtonViewProofs')}}
-									</b-dropdown-item>
-									<b-dropdown-item
+									</b-button>
+								</b-tooltip>
+								<b-tooltip type="is-info" :label="$t('crowdSourcingOperationsButtonHistoryTip')">
+									<b-button class="button is-info is-outlined"
 											@click="viewOperationHistory(props.row)"
 											aria-role="listitem">
 										{{$t('crowdSourcingOperationsButtonHistory')}}
-									</b-dropdown-item>
-								</b-dropdown>
+									</b-button>
+								</b-tooltip>
 						</b-table-column>
 					</template>
 					<template slot="empty">

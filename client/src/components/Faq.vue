@@ -49,33 +49,31 @@
 			return {
 				conf: conf,
 				isOpen: 0,
-				collapses: [
-					{
-						title: this.$t('faqQuestion1'),
-						text: this.$t('faqAnswer1'),
-					}, {
-						title: this.$t('faqQuestion2'),
-						text: this.$t('faqAnswer2'),
-					}, {
-						title: this.$t('faqQuestion3'),
-						text: this.$t('faqAnswer3'),
-					}, {
-						title: this.$t('faqQuestion4'),
-						text: this.$t('faqAnswer4'),
-					}, {
-						title: this.$t('faqQuestion5'),
-						text: this.$t('faqAnswer5'),
-					}, {
-						title: this.$t('faqQuestion6'),
-						text: this.$t('faqAnswer6'),
-					},
-				],
+				collapses:[]
 			}
 		},
 		created () {
 			document.title = this.$t('faqPageTitle', { website_name: conf.website_name })
 			document.getElementsByName('description')[0].setAttribute('content', this.$t('faqMetaDescription'))
+			this.loadFaq()
 		},
+		methods:{
+
+			loadFaq: function(){
+				this.collapses= []
+				for (var i=0; i < this.$t('faq').length; i++)
+					this.collapses.push({
+						title: this.$t('faq['+i+'].title'),
+						text: this.$t('faq['+i+'].text', {
+							github: conf.github,
+							coeff: conf.challenge_coeff,
+							min_stake: this.$store.state.aaParameters.min_reward/conf.gb_to_bytes
+						}),
+					})
+				if (!this.$store.state.aaParameters.min_reward)
+					setTimeout(this.loadFaq, 100)
+			}
+		}
 	}
 </script>
 

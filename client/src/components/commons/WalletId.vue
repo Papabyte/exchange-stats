@@ -4,18 +4,22 @@
 	</span>
 	<span v-else>
 		<div v-if="label" class="title is-6 mb-05">{{label}}</div>
-		<span class="wallet-link">
+					<b-tooltip 
+				:label="$t('walletTip')"
+				position="is-right">
+			<span class="wallet-link">
 			<b-button
-					size="is-medium"
-					type="is-warning"
-					icon-left="wallet"
-					tag="router-link"
-					:to="'/explorer/'+id"
-					:target="target"
+				size="is-medium"
+				type="is-warning"
+				icon-left="wallet"
+				tag="router-link"
+				:to="'/explorer/'+id"
+				:target="target"
 			>
 				{{id}}
 			</b-button>
 		</span>
+				</b-tooltip>
 	</span>
 </template>
 

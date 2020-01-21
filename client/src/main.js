@@ -8,7 +8,6 @@ import 'buefy/dist/buefy.css'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import feather from 'vue-icon'
-import VueMeta from 'vue-meta'
 
 import "@/assets/custom.scss"
 import i18n from './i18n'
@@ -19,7 +18,6 @@ Vue.use(feather, 'v-icon');
 Vue.use(VueAxios, axios);
 
 Vue.use(Buefy);
-Vue.use(VueMeta);
 
 Vue.config.productionTip = false;
 

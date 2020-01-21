@@ -12,6 +12,10 @@
 					:active.sync="isSpinnerActive"
 					:can-cancel="false" >
 				</b-loading>
+
+				<div class="row py-1">
+					The simplest way to find a wallet used by an exchange is to look for your own deposit address.
+				</div>
 				<div class="row" v-if="!propWalletId && !isRemoving">
 					<b-input
 							v-on:input="onWalletInputChanged"
