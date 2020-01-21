@@ -156,12 +156,6 @@ require('./modules/sqlite_tables.js').create().then(function(){
 		return response.send(aa_handler.getAllOperations());
 	});
 
-	app.get('/api/aa_transactions', function(request, response){
-		aa_handler.getLastTransactionsToAA(function(transactions){
-			return response.send(transactions);
-		});
-	});
-
 	app.get('/api/redirection/:id', async function(request, response){
 		const id = Number(request.params.id);
 		const address = request.params.id;
@@ -245,7 +239,7 @@ require('./modules/sqlite_tables.js').create().then(function(){
 			response.send(objLastEvents);
 		})
 	});
-	
+
 	app.listen(conf.api_port);
 
 });
