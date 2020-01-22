@@ -60,7 +60,7 @@
 						</b-table-column>
 
 						<b-table-column field="nb_addresses" :label="$t('rankingTableColNbAddresses')" sortable>
-							{{ props.row.nb_addresses }}
+							{{ props.row.nb_addresses ? props.row.nb_addresses.toLocaleString() : '' }}
 						</b-table-column>
 
 						<b-table-column field="total_btc_wallet" :label="$t('rankingTableColTotalBtcWallet')" sortable>

@@ -121,7 +121,7 @@
 	"crowdSourcingPoolsRewardAmount" : "Reward amount",
 	"crowdSourcingPoolsExchange" : "For exchange",
 	"crowdSourcingDonorsTitle" : "Donors",
-	"crowdSourcingDonorsTableColAddress" : "Donator",
+	"crowdSourcingDonorsTableColAddress" : "Donor",
 	"crowdSourcingDonorsTableColAmount" : "Amount",
 	"crowdSourcingContributorsTitle" : "Contributors",
 	"crowdSourcingContributorsTableColAddress": "Contributor",
