@@ -71,6 +71,8 @@ export default {
 	created(){
 		document.title = this.$t("crowdSourcingPageTitle", {website_name: conf.website_name});
 		document.getElementsByName('description')[0].setAttribute('content',this.$t("crowdSourcingMetaDescription"));
+		document.getElementsByName('robots')[0].setAttribute('content', 'all')
+
 	}
 }
 </script>

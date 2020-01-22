@@ -6,11 +6,33 @@
 				<h5 class="title is-5 d-inline-block is-marginless mr-05">
 					{{$t('explorerAddressesCountInWallet',{count:count_total})}}</h5>
 				<wallet-id :id="Number(request_input)"/>
+
+
+				
 			</div>
+						<div class="row" v-if="walletOwner">
+					<h5 class="title is-5">{{$t('explorerAddressesBelongTo')}}</h5>
+					<div class="field has-addons">
+						<span class="control">
+							<Exchange :id="walletOwner"/>
+						</span>
+						<span class="control">
+							<b-tooltip type="is-info" :label="$t('explorerTransactionsButtonRemoveFromExchangeTip')">
+								<b-button
+										v-if="wallet_id"
+										type="is-warning"
+										icon-right="close"
+										size="is-medium"
+										@click="removeWalletFromExchange(wallet_id, walletOwner)"
+								/>
+							</b-tooltip>
+						</span>
+					</div>
+				</div>
 		</div>
 
 		<div class="box" v-if="!isSpinnerActive">
-
+	
 			<div class="row mb-2">
 				<b-pagination
 						:total="count_total"
@@ -59,11 +81,15 @@
 	const conf = require('../conf.js')
 	import WalletId from './commons/WalletId.vue'
 	import BtcAmount from './commons/BtcAmount.vue'
+	import Exchange from './commons/Exchange.vue'
+	import EditModalRemoveWallet from './commons/EditModalRemoveWallet.vue'
+	import { ModalProgrammatic } from 'buefy'
 
 	export default {
 		components: {
 			WalletId,
 			BtcAmount,
+			Exchange
 		},
 		props: {
 			request_input: {
@@ -81,6 +107,8 @@
 				addresses: [],
 				isSpinnerActive: true,
 				perPage: 100,
+				walletOwner: null,
+				wallet_id: Number(this.request_input)
 			}
 		},
 		watch: {
@@ -97,23 +125,37 @@
 			clearInterval(this.timerId)
 		},
 		methods: {
-			updateTitleAndDescription () {
-				document.title = this.$t('explorerTransactionsPageExchange',
-					{ exchange: this.exchangeName, website_name: conf.website_name })
-				var description = this.$t('explorerTransactionsMetaDescriptionExchange', { exchange: this.exchangeName })
+			updateMeta () {
+				document.title = this.$t('explorerAddressesAddressesInWallet',
+					{ wallet: this.wallet_id, website_name: conf.website_name })
+				var description = this.$t('explorerAddressesMetaDescriptionAddresses', { wallet: this.wallet_id })
 				document.getElementsByName('description')[0].setAttribute('content', description)
+				if (this.walletOwner)
+					document.getElementsByName('robots')[0].setAttribute('content', 'nofollow')
+				else
+					document.getElementsByName('robots')[0].setAttribute('content', 'none')
 			},
 			onPageChanged (value) {
-				this.$router.push({ name: 'explorerAddressesPaged', params: { url_input: this.request_input, page: value } })
+				this.$router.push({ name: 'explorerAddressesPaged', params: { url_input: this.wallet_id, page: value } })
 			},
 			getAddresses () {
 				this.isSpinnerActive = true
 				this.count_total = null
-				this.axios.get('/api/wallet-addresses/' + this.request_input + '/' + (this.currentPage - 1)).
+				this.axios.get('/api/wallet-addresses/' + this.wallet_id + '/' + (this.currentPage - 1)).
 				then((response) => {
 					this.addresses = response.data.addresses
+					this.walletOwner = response.data.exchange
 					this.count_total = Number(response.data.addr_count)
 					this.isSpinnerActive = false
+					this.updateMeta ()
+				})
+			},
+			removeWalletFromExchange (walletId, exchange) {
+				ModalProgrammatic.open({
+					parent: this,
+					component: EditModalRemoveWallet,
+					hasModalCard: true,
+					props: { propExchange: exchange, propWalletId: walletId },
 				})
 			},
 		},

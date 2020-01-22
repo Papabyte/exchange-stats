@@ -55,6 +55,7 @@
 		created () {
 			document.title = this.$t('faqPageTitle', { website_name: conf.website_name })
 			document.getElementsByName('description')[0].setAttribute('content', this.$t('faqMetaDescription'))
+			document.getElementsByName('robots')[0].setAttribute('content', 'all')
 			this.loadFaq()
 		},
 		methods:{

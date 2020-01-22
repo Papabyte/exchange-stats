@@ -215,6 +215,7 @@
 	"explorerAddressesTableHeaderAddress" : "Address:",
 	"explorerAddressesTableHeaderBalance" : "Balance:",
 	"explorerAddressesTableHeaderViewOn" : "View on:",
+	"explorerAddressesBelongTo": "Belong to exchange:",
 	"explorerAddressesCountInWallet": "{count} addresses in wallet ",
 	"explorerWelcomeMessage" : "You can explore the BTC blockchain here with transactions sorted by wallets or exchanges.",
 	"crowdSourcingWelcomeMessage" : "Help us to identify wallets used by exchanges and earn rewards.",

@@ -43,7 +43,12 @@ async function getAddressesFromWallet(id, page, handle){
 		stats.getAddressesCount([id])
 	]);
 
-	return handle({per_page: ADDR_PER_PAGE,addr_count: addr_count, addresses: addressesRows});
+	return handle({
+		per_page: ADDR_PER_PAGE,
+		addr_count: addr_count, 
+		addresses: addressesRows,
+		exchange: aa_handler.getExchangeByWalletId(id) || null
+	});
 }
 
 // returns wallet input and all wallet outputs for a set of BTC transactions
@@ -95,7 +100,7 @@ function createTxsAssociativeArray(rows){
 			assocTxsFromWallet[row.tx_id].height = row.block_height;
 			assocTxsFromWallet[row.tx_id].time = row.time;
 		}
-		
+
 		if (row.n >= OUTPUTS_PER_TX){
 			if (!assocTxsFromWallet[row.tx_id].expandable_rows)
 				assocTxsFromWallet[row.tx_id].expandable_rows = 0;

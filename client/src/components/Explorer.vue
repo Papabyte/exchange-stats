@@ -127,11 +127,11 @@
 		},
 		watch: {
 			$route (route) {
-				this.updateTitleAndDescription()
+				this.updateMeta()
 			},
 		},
 		created () {
-			this.updateTitleAndDescription()
+			this.updateMeta()
 		},
 		methods: {
 			onSubmit () {
@@ -141,9 +141,10 @@
 				this.$router.push({ name: 'explorerInput', params: { url_input: option.value } })
 
 			},
-			updateTitleAndDescription(){
+			updateMeta(){
 				document.title = this.$t('explorerPageTitle', { website_name: conf.website_name })
 				document.getElementsByName('description')[0].setAttribute('content', this.$t('explorerMetaDescription'))
+				document.getElementsByName('robots')[0].setAttribute('content', 'all')
 			}
 
 		},

@@ -226,23 +226,23 @@
 			clearInterval(this.timerId)
 		},
 		methods: {
-			updateTitleAndDescription () {
+			updateMeta () {
 				if (this.exchangeName) {
 					document.title = this.$t('explorerTransactionsPageExchange',
 						{ exchange: this.exchangeName, website_name: conf.website_name })
 					var description = this.$t('explorerTransactionsMetaDescriptionExchange', { exchange: this.exchangeName })
 					document.getElementsByName('description')[0].setAttribute('content', description)
+					if (this.currentPage == 1)
+						document.getElementsByName('robots')[0].setAttribute('content', 'nofollow')
+					else
+						document.getElementsByName('robots')[0].setAttribute('content', 'none')
 				} else if (this.tx_id) {
 					document.title = this.$t('explorerTransactionsPageTitleTxId',
 						{ exchange: this.exchangeName, website_name: conf.website_name })
 					var description = this.$t('explorerTransactionsMetaDescriptionTxId', { wallet_id: this.wallet_id })
-					document.getElementsByName('description')[0].setAttribute('content', description)
-				} else if (this.wallet_id) {
-					document.title = this.$t('explorerTransactionsPageTitleWalletId',
-						{ wallet_id: this.wallet_id, website_name: conf.website_name })
-					var description = this.$t('explorerTransactionsMetaDescriptionWalletId', { wallet_id: this.wallet_id })
-					document.getElementsByName('description')[0].setAttribute('content', description)
-				} else if (this.wallet_id && this.walletOwner) {
+					document.getElementsByName('robots')[0].setAttribute('content', description)
+					document.getElementsByName('robots')[0].setAttribute('content', 'nofollow')
+ 				} else if (this.wallet_id && this.walletOwner) {
 					document.title = this.$t('explorerTransactionsPageTitleWalletId',
 						{ wallet_id: this.wallet_id, website_name: conf.website_name })
 					var description = this.$t('explorerTransactionsMetaDescriptionWalletIdWithOwner', { 
@@ -250,6 +250,16 @@
 						wallet_id: this.wallet_id,
 					})
 					document.getElementsByName('description')[0].setAttribute('content', description)
+					if (this.currentPage == 1)
+						document.getElementsByName('robots')[0].setAttribute('content', 'nofollow')
+					else
+						document.getElementsByName('robots')[0].setAttribute('content', 'none')
+				} else if (this.wallet_id) {
+					document.title = this.$t('explorerTransactionsPageTitleWalletId',
+						{ wallet_id: this.wallet_id, website_name: conf.website_name })
+					var description = this.$t('explorerTransactionsMetaDescriptionWalletId', { wallet_id: this.wallet_id })
+					document.getElementsByName('description')[0].setAttribute('content', description)
+					document.getElementsByName('robots')[0].setAttribute('content', 'none')
 				}
 			},
 			addWalletToAnExchange(walletId) {
@@ -322,7 +332,7 @@
 						this.wallet_id = Number(response.data.redirected_id)
 						this.walletOwner = response.data.exchange
 						this.isSpinnerActive = false
-						this.updateTitleAndDescription()
+						this.updateMeta()
 					})
 				} else if (isTxId(this.request_input)) { // it's a tx id
 					this.blockTitle = 'Transaction ' + this.request_input
@@ -336,7 +346,7 @@
 							this.failoverText = this.$t('explorerTransactionsTransactionsNotFound',
 								{ transaction: this.request_input })
 						}
-						this.updateTitleAndDescription()
+						this.updateMeta()
 					})
 
 				} else if (validate(this.request_input)) { // it's a BTC address
@@ -366,7 +376,7 @@
 						this.exchange = this.request_input
 						this.exchangeName = response.data.name
 						this.isSpinnerActive = false
-						this.updateTitleAndDescription()
+						this.updateMeta()
 					})
 
 				}

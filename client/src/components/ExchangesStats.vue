@@ -57,7 +57,7 @@
 		},
 		methods: {
 			updateMeta: function(){
-
+			document.getElementsByName('robots')[0].setAttribute('content', 'all')
 			if (this.exchange){
 				document.title = this.$t('rankingGraphPageTitle',
 					{ exchange: this.assocExchanges[this.exchange].name, website_name: conf.website_name })
