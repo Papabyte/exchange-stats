@@ -66,7 +66,7 @@ export default {
 						exchange: this.$store.state.exchangesById[event.event_data.exchange].name
 					})
 				else {
-					message+= this.$t('eventMessageCreatePoolForExchange', {
+					message+= this.$t('eventMessageCreatePool', {
 						contributor: event.nickname || event.concerned_address,
 						amount: this.getByteAmountString(event.event_data.reward_amount),
 						number: event.event_data.number_of_rewards
