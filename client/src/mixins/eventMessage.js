@@ -42,7 +42,7 @@ export default {
 				})
 			else if (event.event_type == 'commit' && event.operation.outcome == 'in')
 				message+= this.$t('eventMessageCommitAddingWallet', {
-					contributor:event.nickname || event.concerned_address,
+					contributor:event.event_data.author_nickname || event.event_data.author,
 					wallet: this.getWalletIdFromOperationId(event.operation_id), 
 					exchange:this.getExchangeNameFromOperationId(event.operation_id)
 				})

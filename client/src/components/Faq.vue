@@ -4,7 +4,7 @@
 
 		<section class="section">
 			<div class="container">
-				<h3 class="title is-3 mb-2">Faq</h3>
+				<h3 class="title is-3 mb-2">FAQ</h3>
 			</div>
 
 			<div class="container">

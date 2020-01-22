@@ -165,6 +165,7 @@ function treatUnconfirmedEvents(arrUnits){
 							objEvent.timestamp = row.timestamp;
 							objEvent.trigger_unit = row.unit;
 							objEvent.nickname = assocNicknamesByAddress[objEvent.concerned_address] || null;
+							objEvent.event_data.author_nickname = assocNicknamesByAddress[objEvent.event_data.author] || null;
 							assocUnconfirmedEvents[row.unit] = objEvent;
 						}
 					}
@@ -220,6 +221,7 @@ function parseEvent(trigger, objResponse){
 		objEvent.paid_out = objResponse.paid_out_amount;
 		objEvent.concerned_address = objResponse.paid_out_address;
 		objEvent.event_data.committed_outcome = objResponse.committed_outcome;
+		objEvent.event_data.author = trigger.address;
 	} else if (objResponse.paid_out_amount){
 		objEvent.event_type = "withdraw";
 		objEvent.paid_out = objResponse.paid_out_amount;
@@ -268,7 +270,7 @@ function updateOperationsHistory(){
 								if (result.affectedRows === 1){
 									//if the event is a commit, we update its ranking right
 									if (objEvent.event_type == 'commit')
-										exchanges.updateRankingRow(getExchangeFromOperationKey(objEvent.operation_id), null, {});
+										exchanges.updateRankingRow(getExchangeFromOperationKey(objEvent.operation_id), {});
 
 									social_networks.notify(
 										objEvent.event_type, 
@@ -578,6 +580,8 @@ function getLastEvents(handle){
 	 function(rows){
 		const confirmed_events = rows.map(function(row){
 			var objEventData = JSON.parse(row.event_data);
+			objEventData.author_nickname = assocNicknamesByAddress[objEventData.author] || null;
+
 			return {
 				event_data: objEventData, 
 				timestamp: row.timestamp, 
@@ -611,6 +615,7 @@ function getOperationHistory(id, handle){
 		rows = rows.map(function(row){
 			var objEventData = JSON.parse(row.event_data);
 			const nickname = assocNicknamesByAddress[row.concerned_address] || null;
+			objEventData.author_nickname = assocNicknamesByAddress[objEventData.author] || null;
 			return {
 				event_data: objEventData, 
 				timestamp: row.timestamp, 
@@ -667,15 +672,16 @@ function getDonorsRanking(handle){
 }
 
 function getContributorsGreeting(handle){
-	db.query("SELECT operation_id,timestamp,event_data FROM operations_history WHERE event_type='commit' ORDER BY mci DESC LIMIT 50", function(rows){
+	db.query("SELECT operation_id,timestamp,event_data,concerned_address FROM operations_history WHERE event_type='commit' ORDER BY mci DESC LIMIT 50", function(rows){
 		var arrGreetings = [];
 		for (var i = 0; i < rows.length; i++){
-			var objEvent = rows[i].event_data ? JSON.parse(rows[i].event_data) : null;
+			var objEventData = JSON.parse(rows[i].event_data);
 			var objOperation = assocAllOperations[rows[i].operation_id];
-			if (objEvent && objOperation && objEvent.committed_outcome == objOperation.initial_outcome){
+			console.log(objEventData)
+			if (objEventData && objOperation && objEventData.committed_outcome == objOperation.initial_outcome){
 				var sponsorAddress = assocAllPoolsById[objOperation.pool_id] ? assocAllPoolsById[objOperation.pool_id].sponsor : null;
 				arrGreetings.push({
-					author: assocNicknamesByAddress[objEvent.paid_out_address] || objEvent.paid_out_address,
+					author: assocNicknamesByAddress[rows[i].concerned_address] || rows[i].concerned_address,
 					exchange: objOperation.exchange, 
 					outcome: objOperation.initial_outcome, 
 					sponsor: assocNicknamesByAddress[sponsorAddress] || sponsorAddress

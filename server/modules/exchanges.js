@@ -35,10 +35,13 @@ function processNewRanking(){
 			return unlock();
 	
 		for (var key in assocExchanges){
-			if (!assocWalletIdsByExchange[key])
-				continue;
-			var arrWalletIds = await explorer.getRedirections(assocWalletIdsByExchange[key]);
-			updateRankingRow(key, arrWalletIds, await createWeeklyHistoryForExchangeAndReturnMonthlyVolume(key, arrWalletIds))
+			if(assocWalletIdsByExchange[key]){
+				var arrWalletIds = await explorer.getRedirections(assocWalletIdsByExchange[key]);
+				// we await updateRankingRow to avoid to call coingecko API in parallel since that would trigger rate limiting
+				await updateRankingRow(key, await createWeeklyHistoryForExchangeAndReturnMonthlyVolume(key, arrWalletIds));
+			} else {
+				await updateRankingRow(key, {});
+			}
 		}
 		unlock();
 	});
@@ -46,7 +49,7 @@ function processNewRanking(){
 
 // update stats for 1 exchange, monthly_volume and trendString can be optionaly provided since they take time to be processed and we want to update
 // ranking as soon as a wallet is added or removed
-async function updateRankingRow(key, arrWalletIds, {monthly_volume, trendString}){
+async function updateRankingRow(key, {monthly_volume, trendString}){
 	console.log("update ranking row for " + key);
 	var exchange = assocExchanges[key];
 	if (!exchange)
@@ -56,18 +59,17 @@ async function updateRankingRow(key, arrWalletIds, {monthly_volume, trendString}
 	var total_btc_wallet = null;
 	var nb_addresses = null;
 	var objInfo = null;
-	if (!assocWalletIdsByExchange[key])
-		return;
-	if (!arrWalletIds)
-		arrWalletIds = await explorer.getRedirections(assocWalletIdsByExchange[key]);
 
-	if (arrWalletIds.length === 0)
-		return;
+	if (assocWalletIdsByExchange[key])
+		var arrWalletIds = await explorer.getRedirections(assocWalletIdsByExchange[key]);
+
+	if (arrWalletIds && arrWalletIds.length > 0){
 		var lastHeight = await indexer.getLastProcessedHeight();
 		total_24h_deposits = await stats.getTotalDepositedToWallets(arrWalletIds, lastHeight - 6 * 24 , lastHeight);
 		total_24h_withdrawals = await stats.getTotalWithdrawnFromWallets(arrWalletIds, lastHeight - 6 * 24 , lastHeight);
 		total_btc_wallet = await stats.getTotalOnWallets(arrWalletIds);
 		nb_addresses = await stats.getAddressesCount(arrWalletIds);
+	}
 	if (assocExchanges[key].gecko_id)
 		objInfo = await api.getExchangeInfo(assocExchanges[key].gecko_id);
 
