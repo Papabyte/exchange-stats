@@ -126,14 +126,23 @@
 		},
 		methods: {
 			updateMeta () {
-				document.title = this.$t('explorerAddressesAddressesInWallet',
+				document.title = this.$t('explorerAddressesPageTitle',
 					{ wallet: this.wallet_id, website_name: conf.website_name })
-				var description = this.$t('explorerAddressesMetaDescriptionAddresses', { wallet: this.wallet_id })
-				document.getElementsByName('description')[0].setAttribute('content', description)
-				if (this.walletOwner)
+				if (this.walletOwner){
+					var description = this.$t('explorerAddressesMetaDescriptionWithExchange', { 
+						number: this.count_total, 
+						wallet: this.wallet_id,  
+						exchange: this.$store.state.exchangesById[this.walletOwner].name
+					})
 					document.getElementsByName('robots')[0].setAttribute('content', 'nofollow')
-				else
+				}
+				else {
+				var description = this.$t('explorerAddressesMetaDescription', { number: this.count_total, wallet: this.wallet_id })
+				document.getElementsByName('description')[0].setAttribute('content', description)
 					document.getElementsByName('robots')[0].setAttribute('content', 'none')
+				}
+				document.getElementsByName('description')[0].setAttribute('content', description)
+
 			},
 			onPageChanged (value) {
 				this.$router.push({ name: 'explorerAddressesPaged', params: { url_input: this.wallet_id, page: value } })
@@ -147,7 +156,7 @@
 					this.walletOwner = response.data.exchange
 					this.count_total = Number(response.data.addr_count)
 					this.isSpinnerActive = false
-					this.updateMeta ()
+					this.updateMeta()
 				})
 			},
 			removeWalletFromExchange (walletId, exchange) {

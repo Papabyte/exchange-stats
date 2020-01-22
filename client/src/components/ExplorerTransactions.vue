@@ -231,7 +231,6 @@
 					document.title = this.$t('explorerTransactionsPageExchange',
 						{ exchange: this.exchangeName, website_name: conf.website_name })
 					var description = this.$t('explorerTransactionsMetaDescriptionExchange', { exchange: this.exchangeName })
-					document.getElementsByName('description')[0].setAttribute('content', description)
 					if (this.currentPage == 1)
 						document.getElementsByName('robots')[0].setAttribute('content', 'nofollow')
 					else
@@ -240,16 +239,14 @@
 					document.title = this.$t('explorerTransactionsPageTitleTxId',
 						{ exchange: this.exchangeName, website_name: conf.website_name })
 					var description = this.$t('explorerTransactionsMetaDescriptionTxId', { wallet_id: this.wallet_id })
-					document.getElementsByName('robots')[0].setAttribute('content', description)
 					document.getElementsByName('robots')[0].setAttribute('content', 'nofollow')
  				} else if (this.wallet_id && this.walletOwner) {
 					document.title = this.$t('explorerTransactionsPageTitleWalletId',
 						{ wallet_id: this.wallet_id, website_name: conf.website_name })
 					var description = this.$t('explorerTransactionsMetaDescriptionWalletIdWithOwner', { 
-						exchange: this.walletOwner, 
+						exchange: this.$store.state.exchangesById[this.walletOwner].name, 
 						wallet_id: this.wallet_id,
 					})
-					document.getElementsByName('description')[0].setAttribute('content', description)
 					if (this.currentPage == 1)
 						document.getElementsByName('robots')[0].setAttribute('content', 'nofollow')
 					else
@@ -258,9 +255,10 @@
 					document.title = this.$t('explorerTransactionsPageTitleWalletId',
 						{ wallet_id: this.wallet_id, website_name: conf.website_name })
 					var description = this.$t('explorerTransactionsMetaDescriptionWalletId', { wallet_id: this.wallet_id })
-					document.getElementsByName('description')[0].setAttribute('content', description)
 					document.getElementsByName('robots')[0].setAttribute('content', 'none')
 				}
+					document.getElementsByName('description')[0].setAttribute('content', description)
+
 			},
 			addWalletToAnExchange(walletId) {
 				ModalProgrammatic.open({
