@@ -164,7 +164,7 @@
 	"rankingTableColTrend" : "Trend",
 	"rankingTableColTrendTip" : "Last week daily volume, click on preview for 1-year history",
 	"rankingTableColReportedReportedRatio": "Reported/Onchain ratio",
-	"rankingTableColReportedReportedRatioTip":"Reported volumes divided by average of deposits and withdrawals, higher is better.",
+	"rankingTableColReportedReportedRatioTip":"Reported volumes divided by average of deposits and withdrawals, lower is better.",
 	"rankingTableColAction" : "Action",
 	"rankingGraphPageTitle" : "{exchange} history - {website_name}",
 	"rankingGraphDescription" : "1-year historical graph for {exchange} onchain activity.",
