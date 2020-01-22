@@ -128,7 +128,7 @@
 		<div v-if="!isSpinnerActive && transactions" class="box">
 			<div class="row mb-2">
 				<b-pagination
-						:total="txs_displayed"
+						:total="total_txs_displayed"
 						:current.sync="currentPage"
 						:per-page="per_page"
 						range-before="3"
@@ -206,9 +206,16 @@
 				progressive_display_level: 1,
 				timerId: null,
 				per_page: 20,
-				txs_displayed: 1000
 			}
 		},
+	computed:{
+		total_txs_displayed:function(){
+			if (typeof this.count_total == 'string' || this.count_total > this.txs_displayed)
+				return this.txs_displayed
+			else
+			return this.count_total
+		}
+	},
 		watch: {
 			$route (route) {
 				this.currentPage = this.page || 1
