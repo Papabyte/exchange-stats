@@ -30,7 +30,6 @@
 
 					<template slot-scope="props">
 
-
 						<b-table-column field="name" :label="$t('rankingTableColName')" sortable>
 							{{ props.row.name }}
 						</b-table-column>
@@ -157,7 +156,7 @@
 								return Number(value)
 							})
 
-						row.reported_ratio = (row.last_day_deposits + row.last_day_withdrawals)/2/row.reported_volume
+						row.reported_ratio = row.reported_volume/((row.last_day_deposits + row.last_day_withdrawals)/2)
 					})
 					this.data = response.data
 				})
