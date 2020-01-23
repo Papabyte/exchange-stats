@@ -49,15 +49,29 @@
 							</i18n>
 						</b-table-column>
 						<b-table-column field="outcome_yes_or_no" :label="$t('crowdSourcingOperationsTableColOutcome')" sortable>
+							<template slot="header" slot-scope="{ column }">
+								<b-tooltip :label="$t('crowdSourcingOperationsTableColOutcomeTip')">
+									{{ column.label }} <v-icon name='help-circle' class="tip-icon"/>
+								</b-tooltip>
+							</template> 
 							<b-tag :type="props.row.outcome_label_type">{{ props.row.outcome_yes_or_no }}</b-tag>
 						</b-table-column>
 
-						<b-table-column field="staked_on_outcome" :label="$t('crowdSourcingOperationsTableColStakedOnOutcome')"
-														sortable>
+						<b-table-column field="staked_on_outcome" :label="$t('crowdSourcingOperationsTableColStakedOnOutcome')"	sortable>
+							<template slot="header" slot-scope="{ column }">
+								<b-tooltip :label="$t('crowdSourcingOperationsTableColStakedOnOutcomeTip')">
+									{{ column.label }} <v-icon name='help-circle' class="tip-icon"/>
+								</b-tooltip>
+							</template> 
 							<byte-amount :amount="props.row.staked_on_outcome"/>
 						</b-table-column>
 
 						<b-table-column field="total_staked" :label="$t('crowdSourcingOperationsTableColTotalStaked')" sortable>
+							<template slot="header" slot-scope="{ column }">
+								<b-tooltip :label="$t('crowdSourcingOperationsTableColOutcomeTip')">
+									{{ column.label }} <v-icon name='help-circle' class="tip-icon"/>
+								</b-tooltip>
+							</template> 
 							<byte-amount :amount="props.row.total_staked"/>
 						</b-table-column>
 
@@ -275,6 +289,10 @@
 		td {
 			vertical-align: middle;
 		}
+	}
+
+	.tip-icon{
+		padding-bottom: 5px;
 	}
 
 </style>

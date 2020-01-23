@@ -50,7 +50,7 @@
 		},
 		data () {
 			return {
-				rewardAmount: 100000,
+				rewardAmount: 0,
 				operationsToContest: [],
 				conf: conf
 			}

@@ -37,7 +37,7 @@
 						<b-table-column field="reported_volume" :label="$t('rankingTableColReportedVolume')" sortable>
 							<template slot="header" slot-scope="{ column }">
 								<b-tooltip :label="$t('rankingTableColReportedVolumeTip')">
-									{{ column.label }}
+									{{ column.label }} <v-icon name='help-circle' class="tip-icon"/>
 								</b-tooltip>
 							</template> 
 							<BtcAmount :amount="props.row.reported_volume"/>
@@ -46,7 +46,7 @@
 							<b-table-column field="reported_ratio" :label="$t('rankingTableColReportedReportedRatio')" sortable>
 							<template slot="header" slot-scope="{ column }">
 								<b-tooltip :label="$t('rankingTableColReportedReportedRatioTip')">
-									{{ column.label }}
+									{{ column.label }}<v-icon name='help-circle' class="tip-icon"/>
 								</b-tooltip>
 							</template> 
 								<span v-if="props.row.last_day_deposits||props.row.last_day_withdrawals">
@@ -199,6 +199,12 @@
 				text-decoration: none;
 			}
 		}
+	}
+
+	.tip-icon{
+		margin-right: 5px;
+
+		padding-bottom: 5px;
 	}
 
 </style>
