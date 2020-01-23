@@ -3,7 +3,9 @@
 		<span v-if="nickname">
 			<b-tooltip 
 				:label="address"
-				position="is-right">
+				position="is-right"
+				type="is-info"
+				>
 					{{nickname}}
 			</b-tooltip></span>
 		<span v-else>{{address}}</span>

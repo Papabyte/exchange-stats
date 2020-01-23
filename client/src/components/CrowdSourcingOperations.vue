@@ -50,7 +50,7 @@
 						</b-table-column>
 						<b-table-column field="outcome_yes_or_no" :label="$t('crowdSourcingOperationsTableColOutcome')" sortable>
 							<template slot="header" slot-scope="{ column }">
-								<b-tooltip :label="$t('crowdSourcingOperationsTableColOutcomeTip')">
+								<b-tooltip type="is-info" :label="$t('crowdSourcingOperationsTableColOutcomeTip')" >
 									{{ column.label }} <v-icon name='help-circle' class="tip-icon"/>
 								</b-tooltip>
 							</template> 
@@ -59,7 +59,7 @@
 
 						<b-table-column field="staked_on_outcome" :label="$t('crowdSourcingOperationsTableColStakedOnOutcome')"	sortable>
 							<template slot="header" slot-scope="{ column }">
-								<b-tooltip :label="$t('crowdSourcingOperationsTableColStakedOnOutcomeTip')">
+								<b-tooltip type="is-info" :label="$t('crowdSourcingOperationsTableColStakedOnOutcomeTip')">
 									{{ column.label }} <v-icon name='help-circle' class="tip-icon"/>
 								</b-tooltip>
 							</template> 
@@ -68,7 +68,7 @@
 
 						<b-table-column field="total_staked" :label="$t('crowdSourcingOperationsTableColTotalStaked')" sortable>
 							<template slot="header" slot-scope="{ column }">
-								<b-tooltip :label="$t('crowdSourcingOperationsTableColOutcomeTip')">
+								<b-tooltip type="is-info" :label="$t('crowdSourcingOperationsTableColOutcomeTip')">
 									{{ column.label }} <v-icon name='help-circle' class="tip-icon"/>
 								</b-tooltip>
 							</template> 

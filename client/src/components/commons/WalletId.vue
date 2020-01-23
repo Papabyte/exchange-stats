@@ -6,7 +6,9 @@
 		<div v-if="label" class="title is-6 mb-05">{{label}}</div>
 					<b-tooltip 
 				:label="$t('walletTip')"
-				position="is-right">
+				position="is-right"
+				type="is-info"
+				>
 			<span class="wallet-link">
 			<b-button
 				size="is-medium"

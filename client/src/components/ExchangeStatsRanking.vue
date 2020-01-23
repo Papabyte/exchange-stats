@@ -36,7 +36,7 @@
 
 						<b-table-column field="reported_volume" :label="$t('rankingTableColReportedVolume')" sortable>
 							<template slot="header" slot-scope="{ column }">
-								<b-tooltip :label="$t('rankingTableColReportedVolumeTip')">
+								<b-tooltip type="is-info" :label="$t('rankingTableColReportedVolumeTip')">
 									{{ column.label }} <v-icon name='help-circle' class="tip-icon"/>
 								</b-tooltip>
 							</template> 
@@ -45,7 +45,7 @@
 
 							<b-table-column field="reported_ratio" :label="$t('rankingTableColReportedReportedRatio')" sortable>
 							<template slot="header" slot-scope="{ column }">
-								<b-tooltip :label="$t('rankingTableColReportedReportedRatioTip')">
+								<b-tooltip type="is-info" :label="$t('rankingTableColReportedReportedRatioTip')">
 									{{ column.label }}<v-icon name='help-circle' class="tip-icon"/>
 								</b-tooltip>
 							</template> 
@@ -59,7 +59,10 @@
 						</b-table-column>
 
 						<b-table-column field="total_btc_wallet" :label="$t('rankingTableColTotalBtcWallet')" sortable>
-							<BtcAmount v-if="props.row.total_btc_wallet" :amount="props.row.total_btc_wallet"/>
+							<router-link v-if="props.row.total_btc_wallet"
+											:to="'/explorer/'+ props.row.exchange_id">
+								<BtcAmount v-if="props.row.total_btc_wallet" :amount="props.row.total_btc_wallet"/>
+							</router-link>
 						</b-table-column>
 
 						<b-table-column field="last_day_deposits" :label="$t('rankingTableColLastDayDeposits')" sortable>
@@ -77,13 +80,6 @@
 						</b-table-column>
 
 						<b-table-column field="actions" :label="$t('rankingTableColAction')">
-							<router-link v-if="props.row.total_btc_wallet || props.row.nb_withdrawal_addresses"
-											:to="'/explorer/'+ props.row.exchange_id">
-								<b-button type="is-info" outlined class="text-nowrap">
-									{{$t('rankingTableButtonExploreWallet')}}
-								</b-button>
-							</router-link>
-
 							<contribute :row="props.row" />
 						</b-table-column>
 					</template>
@@ -203,7 +199,6 @@
 
 	.tip-icon{
 		margin-right: 5px;
-
 		padding-bottom: 5px;
 	}
 
