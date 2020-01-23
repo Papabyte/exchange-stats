@@ -64,7 +64,7 @@ async function updateRankingRow(key, {monthly_volume, trendString}){
 		var arrWalletIds = await explorer.getRedirections(assocWalletIdsByExchange[key]);
 
 	if (arrWalletIds && arrWalletIds.length > 0){
-		var lastHeight = await indexer.getLastProcessedHeight();
+		var lastHeight = await getYesterdayMidnightBlockHeight();
 		total_24h_deposits = await stats.getTotalDepositedToWallets(arrWalletIds, lastHeight - 6 * 24 , lastHeight);
 		total_24h_withdrawals = await stats.getTotalWithdrawnFromWallets(arrWalletIds, lastHeight - 6 * 24 , lastHeight);
 		total_btc_wallet = await stats.getTotalOnWallets(arrWalletIds);
@@ -87,6 +87,21 @@ async function updateRankingRow(key, {monthly_volume, trendString}){
 	]);
 }
 
+function getYesterdayMidnightBlockHeight(){
+	return new Promise(async function(resolve){
+		const rows = await db.query("SELECT MAX(block_height) as height FROM processed_blocks WHERE block_time<=strftime('%s', DATE('now', 'start of day', '-1 day'))");
+		if (!rows[0]){
+			console.log("yesterday midnight block not available, will process from last known block");
+			var lastHeight = await indexer.getLastProcessedHeight();
+		} else {
+			var lastHeight = 	rows[0].height
+			console.log("yesterday midnight height: " + lastHeight);
+		}
+		resolve(lastHeight);
+	})
+}
+
+
 // create a table for each exchange and store on chain history in order to draw graphs
 function createWeeklyHistoryForExchangeAndReturnMonthlyVolume(exchange, arrWalletIds){
 	return new Promise(async function(resolve){
@@ -101,15 +116,9 @@ function createWeeklyHistoryForExchangeAndReturnMonthlyVolume(exchange, arrWalle
 		total_deposited INTEGER NOT NULL,\n\
 		total_withdrawn INTEGER NOT NULL,\n\
 		balance INTEGER NOT NULL)");
-		
-		const rows = await db.query("SELECT MAX(block_height) as height FROM processed_blocks WHERE block_time<=strftime('%s', DATE('now', 'start of day', '-1 day'))");
-		if (!rows[0]){
-			console.log("yesterday midnight block not available, will process from last known block");
-			var lastHeight = await indexer.getLastProcessedHeight();
-		} else {
-			var lastHeight = 	rows[0].height
-			console.log("yesterday midnight height: " + lastHeight);
-		}
+
+	
+		var lastHeight = await getYesterdayMidnightBlockHeight();
 			
 		const start_ts = Date.now();
 		const block_period_day = 6*24;
