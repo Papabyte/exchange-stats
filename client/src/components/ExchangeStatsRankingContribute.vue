@@ -23,7 +23,7 @@
 			@click="contestOperation(operation)">
 			<div>
 				<div class="is-inline-block">{{getContestField(operation)}}</div>
-				<div class="is-inline-block"> <byte-amount :amount="operation.staked_on_outcome - operation.staked_on_opposite/conf.challenge_coeff"  /> </div>
+				<div class="is-inline-block ml-05"> - <byte-amount :amount="operation.staked_on_outcome - operation.staked_on_opposite/conf.challenge_coeff"  /> </div>
 			</div>
 		</b-dropdown-item>
 		<b-dropdown-item 
