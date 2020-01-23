@@ -52,6 +52,7 @@ exports.create = function(){
 			block_height INTEGER  PRIMARY KEY, \n\
 			block_time INTEGER,\n\
 			tx_index INTEGER NOT NULL )")
+		await db.query("CREATE INDEX IF NOT EXISTS processedBlocksByBlockTime ON processed_blocks(block_time)");
 		await db.query("INSERT OR IGNORE INTO processed_blocks (block_height,tx_index) VALUES (0,-1)");
 
 

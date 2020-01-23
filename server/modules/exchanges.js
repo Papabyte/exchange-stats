@@ -101,8 +101,16 @@ function createWeeklyHistoryForExchangeAndReturnMonthlyVolume(exchange, arrWalle
 		total_deposited INTEGER NOT NULL,\n\
 		total_withdrawn INTEGER NOT NULL,\n\
 		balance INTEGER NOT NULL)");
-
-		var lastHeight = await indexer.getLastProcessedHeight();
+		
+		const rows = await db.query("SELECT MAX(block_height) as height FROM processed_blocks WHERE block_time<=strftime('%s', DATE('now', 'start of day', '-1 day'))");
+		if (!rows[0]){
+			console.log("yesterday midnight block not available, will process from last known block");
+			var lastHeight = await indexer.getLastProcessedHeight();
+		} else {
+			var lastHeight = 	rows[0].height
+			console.log("yesterday midnight height: " + lastHeight);
+		}
+			
 		const start_ts = Date.now();
 		const block_period_day = 6*24;
 		const year_start_block = lastHeight - 365*6*24;

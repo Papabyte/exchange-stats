@@ -54,11 +54,6 @@
 								</span>
 						</b-table-column>
 
-
-						<b-table-column field="last_month_volume" :label="$t('rankingTableColMonthlyVolume')" sortable>
-							<BtcAmount v-if="props.row.last_month_volume" :amount="props.row.last_month_volume"/>
-						</b-table-column>
-
 						<b-table-column field="nb_addresses" :label="$t('rankingTableColNbAddresses')" sortable>
 							{{ props.row.nb_addresses ? props.row.nb_addresses.toLocaleString() : '' }}
 						</b-table-column>
