@@ -36,10 +36,6 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 
-	.navbar {
-		box-shadow: 0 1px 10px rgba(151, 164, 175, .1)
-	}
-
 	.router-link-active {
 		font-weight: 600;
 	}
