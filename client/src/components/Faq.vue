@@ -38,10 +38,12 @@
 
 <script>
 	import NavBar from './commons/NavBar.vue'
+	import meta from '../mixins/meta'
 
 	const conf = require('../conf.js')
 
 	export default {
+		mixins:[meta],
 		components: {
 			NavBar,
 		},
@@ -53,9 +55,9 @@
 			}
 		},
 		created () {
-			document.title = this.$t('faqPageTitle', { website_name: conf.website_name })
-			document.getElementsByName('description')[0].setAttribute('content', this.$t('faqMetaDescription'))
-			document.getElementsByName('robots')[0].setAttribute('content', 'all')
+			this.setTitle(this.$t("faqPageTitle", {website_name: conf.website_name}))
+			this.setMetaDescription(this.$t("faqMetaDescription"))
+			this.setRobotDirective('all')
 			this.loadFaq()
 		},
 		methods:{

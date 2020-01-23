@@ -53,9 +53,12 @@ import CurrentPools from './CrowdSourcingPools.vue'
 import CurrentOperations from './CrowdSourcingOperations.vue'
 import LastEvents from './CrowdSourcingEvents.vue'
 import Rankings from './CrowdSourcingRankings.vue'
+import meta from '../mixins/meta'
+
 const conf = require("../conf.js");
 
 export default {
+	mixins:[meta],
 	components: {
 		NavBar,
 		CurrentPools,
@@ -69,10 +72,9 @@ export default {
 		}
 	},
 	created(){
-		document.title = this.$t("crowdSourcingPageTitle", {website_name: conf.website_name});
-		document.getElementsByName('description')[0].setAttribute('content',this.$t("crowdSourcingMetaDescription"));
-		document.getElementsByName('robots')[0].setAttribute('content', 'all')
-
+		this.setTitle(this.$t("crowdSourcingPageTitle", {website_name: conf.website_name}))
+		this.setMetaDescription(this.$t("crowdSourcingMetaDescription"))
+		this.setRobotDirective('all')
 	}
 }
 </script>

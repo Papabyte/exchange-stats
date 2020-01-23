@@ -164,12 +164,14 @@
 	import BtcAmount from './commons/BtcAmount.vue'
 	import WalletId from './commons/WalletId.vue'
 	import ViewAddingUrlProofs from './commons/ViewUrlProofForAddingModal.vue'
+	import meta from '../mixins/meta'
 
 	import { ModalProgrammatic } from 'buefy'
 
 	const conf = require('../conf.js')
 
 	export default {
+		mixins:[meta],
 		components: {
 			Transaction,
 			Exchange,
@@ -235,37 +237,35 @@
 		methods: {
 			updateMeta () {
 				if (this.exchangeName) {
-					document.title = this.$t('explorerTransactionsPageExchange',
-						{ exchange: this.exchangeName, website_name: conf.website_name })
-					var description = this.$t('explorerTransactionsMetaDescriptionExchange', { exchange: this.exchangeName })
+					this.setTitle(this.$t('explorerTransactionsPageExchange',
+						{ exchange: this.exchangeName, website_name: conf.website_name }))
+					this.setMetaDescription(this.$t('explorerTransactionsMetaDescriptionExchange', { exchange: this.exchangeName }))
 					if (this.currentPage == 1)
-						document.getElementsByName('robots')[0].setAttribute('content', 'nofollow')
+						this.setRobotDirective('nofollow')
 					else
-						document.getElementsByName('robots')[0].setAttribute('content', 'none')
+						this.setRobotDirective('none')
 				} else if (this.tx_id) {
-					document.title = this.$t('explorerTransactionsPageTitleTxId',
-						{ exchange: this.exchangeName, website_name: conf.website_name })
-					var description = this.$t('explorerTransactionsMetaDescriptionTxId', { wallet_id: this.wallet_id })
-					document.getElementsByName('robots')[0].setAttribute('content', 'nofollow')
+					this.setTitle(this.$t('explorerTransactionsPageTitleTxId',
+						{ exchange: this.exchangeName, website_name: conf.website_name }))
+					this.setMetaDescription(this.$t('explorerTransactionsMetaDescriptionTxId', { wallet_id: this.wallet_id }))
+					this.setRobotDirective('nofollow')
  				} else if (this.wallet_id && this.walletOwner) {
-					document.title = this.$t('explorerTransactionsPageTitleWalletId',
-						{ wallet_id: this.wallet_id, website_name: conf.website_name })
-					var description = this.$t('explorerTransactionsMetaDescriptionWalletIdWithOwner', { 
+					this.setTitle(this.$t('explorerTransactionsPageTitleWalletId',
+						{ wallet_id: this.wallet_id, website_name: conf.website_name }))
+					this.setMetaDescription(this.$t('explorerTransactionsMetaDescriptionWalletIdWithOwner', { 
 						exchange: this.$store.state.exchangesById[this.walletOwner].name, 
 						wallet_id: this.wallet_id,
-					})
+					}))
 					if (this.currentPage == 1)
-						document.getElementsByName('robots')[0].setAttribute('content', 'nofollow')
+						this.setRobotDirective('nofollow')
 					else
-						document.getElementsByName('robots')[0].setAttribute('content', 'none')
+						this.setRobotDirective('none')
 				} else if (this.wallet_id) {
-					document.title = this.$t('explorerTransactionsPageTitleWalletId',
-						{ wallet_id: this.wallet_id, website_name: conf.website_name })
-					var description = this.$t('explorerTransactionsMetaDescriptionWalletId', { wallet_id: this.wallet_id })
-					document.getElementsByName('robots')[0].setAttribute('content', 'none')
+					this.setTitle(this.$t('explorerTransactionsPageTitleWalletId',
+						{ wallet_id: this.wallet_id, website_name: conf.website_name }))
+					this.setMetaDescription(this.$t('explorerTransactionsMetaDescriptionWalletId', { wallet_id: this.wallet_id }))
+					this.setRobotDirective('none')
 				}
-					document.getElementsByName('description')[0].setAttribute('content', description)
-
 			},
 			addWalletToAnExchange(walletId) {
 				ModalProgrammatic.open({

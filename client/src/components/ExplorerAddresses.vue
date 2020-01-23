@@ -84,8 +84,10 @@
 	import Exchange from './commons/Exchange.vue'
 	import EditModalRemoveWallet from './commons/EditModalRemoveWallet.vue'
 	import { ModalProgrammatic } from 'buefy'
+	import meta from '../mixins/meta'
 
 	export default {
+		mixins:[meta],
 		components: {
 			WalletId,
 			BtcAmount,
@@ -126,23 +128,23 @@
 		},
 		methods: {
 			updateMeta () {
-				document.title = this.$t('explorerAddressesPageTitle',
-					{ wallet: this.wallet_id, website_name: conf.website_name })
+				this.setTitle(this.$t('explorerAddressesPageTitle',
+					{ wallet: this.wallet_id, website_name: conf.website_name }))
 				if (this.walletOwner){
-					var description = this.$t('explorerAddressesMetaDescriptionWithExchange', { 
+					this.setMetaDescription(this.$t('explorerAddressesMetaDescriptionWithExchange', { 
 						number: this.count_total, 
 						wallet: this.wallet_id,  
 						exchange: this.$store.state.exchangesById[this.walletOwner].name
-					})
-					document.getElementsByName('robots')[0].setAttribute('content', 'nofollow')
+					}))
+					if(this.page == 1)
+						this.setRobotDirective('nofollow')
+					else
+						this.setRobotDirective('none')
 				}
 				else {
-				var description = this.$t('explorerAddressesMetaDescription', { number: this.count_total, wallet: this.wallet_id })
-				document.getElementsByName('description')[0].setAttribute('content', description)
-					document.getElementsByName('robots')[0].setAttribute('content', 'none')
+					this.setMetaDescription(this.$t('explorerAddressesMetaDescription', { number: this.count_total, wallet: this.wallet_id }))
+					this.setRobotDirective('none')
 				}
-				document.getElementsByName('description')[0].setAttribute('content', description)
-
 			},
 			onPageChanged (value) {
 				this.$router.push({ name: 'explorerAddressesPaged', params: { url_input: this.wallet_id, page: value } })

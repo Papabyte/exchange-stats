@@ -20,11 +20,12 @@
 	import RankingTable from './ExchangeStatsRanking.vue'
 	import BtcAmount from './commons/BtcAmount.vue'
 	import ExchangeGraph from './ExchangeStatsGraph.vue'
+	import meta from '../mixins/meta'
 
 	const conf = require('../conf.js')
 	
 	export default {
-		name: 'ExchangesStats',
+		mixins:[meta],
 		components: {
 			NavBar,
 			RankingTable,
@@ -57,18 +58,14 @@
 		},
 		methods: {
 			updateMeta: function(){
-			document.getElementsByName('robots')[0].setAttribute('content', 'all')
-			if (this.exchange){
-				document.title = this.$t('rankingGraphPageTitle',
-					{ exchange: this.assocExchanges[this.exchange].name, website_name: conf.website_name })
-				document.getElementsByName('description')[0].setAttribute('content',
-					this.$t('rankingGraphDescription', { exchange: this.assocExchanges[this.exchange].name }))
-			} else {
-				document.title = this.$t('rankingPageTitle', { website_name: conf.website_name })
-				document.getElementsByName('description')[0].setAttribute('content', this.$t('rankingMetaDescription'))
-			}
-
-
+				this.setRobotDirective('all')
+				if (this.exchange){
+					this.setTitle(this.$t('rankingGraphPageTitle', { exchange: this.assocExchanges[this.exchange].name, website_name: conf.website_name }))
+				this.setMetaDescription(this.$t('rankingGraphDescription', { exchange: this.assocExchanges[this.exchange].name }))
+				} else {
+					this.setTitle(this.$t('rankingPageTitle', { website_name: conf.website_name }))
+					this.setMetaDescription(this.$t('rankingMetaDescription'))
+				}
 			}
 		}
 	}

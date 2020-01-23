@@ -77,9 +77,11 @@
 	import Transactions from './ExplorerTransactions.vue'
 	import Addresses from './ExplorerAddresses.vue'
 	import Exchange from './commons/Exchange.vue'
+	import meta from '../mixins/meta'
 
 	const conf = require('../conf.js')
 	export default {
+		mixins:[meta],
 		components: {
 			NavBar,
 			Transactions,
@@ -142,9 +144,9 @@
 
 			},
 			updateMeta(){
-				document.title = this.$t('explorerPageTitle', { website_name: conf.website_name })
-				document.getElementsByName('description')[0].setAttribute('content', this.$t('explorerMetaDescription'))
-				document.getElementsByName('robots')[0].setAttribute('content', 'all')
+				this.setTitle(this.$t("explorerPageTitle", {website_name: conf.website_name}))
+				this.setMetaDescription(this.$t("explorerMetaDescription"))
+				this.setRobotDirective('all')
 			}
 
 		},

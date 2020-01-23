@@ -2,20 +2,6 @@
 @import url('https://cdn.materialdesignicons.com/2.5.94/css/materialdesignicons.min.css');
 @import "~bulma/sass/utilities/_all";
 
-$theme-colors: (
-		"primary": hsl(204, 71%, 53%),
-		"bar-yes": #2c8f31,
-		"bar-no" : #c21a23,
-		"welcome-message" : #a07373,
-		"main-block" : white
-);
-
-$background: $white-ter;
-$btn-border-radius: .25rem;
-$dark: #363636;
-$light: #ffffff;
-$info: #3298dc;
-
 //import must be after variables overrides
 @import '../../node_modules/bulma/bulma.sass';
 @import '../../node_modules/buefy/src/scss/buefy.scss';
@@ -38,6 +24,8 @@ body {
 	background: $white;
 	box-shadow: 0 1px 10px rgba(151, 164, 175, .1)
 }
+
+
 
 .pn-75 {
 	padding: 0.75rem;
