@@ -13,13 +13,13 @@
 		</div>
 		<div class="columns is-marginless">
 			<div class="column is-3">
-				<div class="columns">
+				<div class="columns is-multiline">
 					<div class="column">
 						<wallet-id v-if="transaction.from && transaction.from.id" :label="$t('explorerTransactionLabelWallet')"
 											 :id="transaction.from.id"/>
 					</div>
 					<div class="column" v-if="transaction.from.exchange">
-						<Exchange :label="$t('explorerTransactionLabelExchange')" :id="transaction.from.exchange"/>
+						<exchange :label="$t('explorerTransactionLabelExchange')" :id="transaction.from.exchange"/>
 					</div>
 				</div>
 				<div class="mt-1">
@@ -43,7 +43,7 @@
 						</span>
 					</div>
 					<div class="column is-4" v-if="t_out.exchange">
-						<Exchange :label="$t('explorerTransactionLabelExchange')" :id="t_out.exchange"/>
+						<exchange :label="$t('explorerTransactionLabelExchange')" :id="t_out.exchange"/>
 					</div>
 					<div class="column is-4">
 						<btc-amount :label="$t('explorerTransactionLabelAmount')" :amount="t_out.amount"
@@ -51,7 +51,7 @@
 					</div>
 					<div class="row pn-75">
 						<div class="columns">
-							<div class="column">
+							<div class="column ">
 								<btc-address v-if="t_out.address" :label="$t('explorerTransactionLabelAddress')"
 														 :address="t_out.address"/>
 							</div>

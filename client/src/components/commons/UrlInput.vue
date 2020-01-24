@@ -14,7 +14,7 @@
 
 <script>
 
-	const maxLength = 64
+	const maxLength = 256
 	const isUrl = require('is-url')
 
 	export default {
@@ -53,13 +53,16 @@
 				const domain = /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)/.exec(this.url);
 				if (this.url.length >= maxLength) {
 					this.text_error = this.$t('urlInputsOversized', { max: maxLength })
+					this.isUrlValid = false
 				} else if (domain && this.$store.state.arrBlacklistedDomains.indexOf(domain[1]) > -1){
 					this.text_error =  this.$t('urlInputsBlacklistedDomain')
+					this.isUrlValid = false
 				} else {
 					this.text_error = null
 					this.isUrlValid = this.isRequired ? isUrl(this.url) : (this.url ? isUrl(this.url) : (isUrl(this.url) || null))
-					this.$emit('url_updated', this.isUrlValid ? this.url : this.isUrlValid, this.index)
 				}
+				this.$emit('url_updated', this.isUrlValid ? this.url : this.isUrlValid, this.index)
+
 			}
 		},
 		created () {

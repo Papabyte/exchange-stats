@@ -8,6 +8,7 @@
 				:label="$t('walletTip')"
 				position="is-right"
 				type="is-info"
+				multilined
 				>
 			<span class="wallet-link">
 			<b-button
