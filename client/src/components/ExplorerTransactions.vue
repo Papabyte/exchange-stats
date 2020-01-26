@@ -55,7 +55,8 @@
 					<h5 class="title is-5">{{$t('explorerTransactionsWalletsForExchange')}}</h5>
 					<div class="columns">
 						<div class="column">
-							<span class="wallet-wrapper" v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
+								<div class="columns is-multiline">
+							<div class="column" v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
 								<div class="field has-addons">
 									<span class="control">
 										<wallet-id :id="Number(wallet)"/>
@@ -81,10 +82,11 @@
 										</b-tooltip>
 									</span>
 								</div>
-								<div class="is-inline" v-if="redirections_from[wallet]">
-								{{$t('explorerTransactionsRedirectedTo')}}<wallet-id :id="Number(redirections_from[wallet])" />
+								<div v-if="redirections_from[wallet] && wallet != redirections_from[wallet]">
+									{{$t('explorerTransactionsRedirectedTo')}}<wallet-id :id="Number(redirections_from[wallet])" />
 								</div>
-							</span>
+							</div>
+						</div>
 						</div>
 						<div class="column has-text-right" v-if="exchange">
 							<b-button
@@ -410,15 +412,6 @@
 </script>
 
 <style lang="scss">
-	.wallet-wrapper {
-		display: inline-block;
-		margin-left: 15px;
-
-		&:first-child {
-			margin-left: 0;
-		}
-	}
-
 	.x-icon {
 		height: 20px;
 		width: 20px;

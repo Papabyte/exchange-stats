@@ -49,7 +49,7 @@
 			</div>
 
 			<div class="box" v-for="(wallet,key) in wallets" :key="key">
-				<div class="row" v-if="wallet.from_id">
+				<div class="row" v-if="wallet.from_id && key != wallet.from_id">
 					<div class="columns">
 					<div class="column">
 						<span class="title is-5 mr-2">{{$t('explorerWalletsForExchangeWalletWallet')}}</span>
