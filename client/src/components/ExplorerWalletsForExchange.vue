@@ -78,20 +78,19 @@
 				</div>
 				<div class="row" v-else>
 					<div class="row">
-							<span class="title is-5 mr-2">Wallet:  </span>
+							<span class="title is-5 mr-2">{{$t('explorerWalletsForExchangeWalletWallet')}} </span>
 						<wallet-id :id="key" />
 					</div>
 				</div>
-				<div class="row" v-if="wallet.from_id">
+				<div class="row">
 					<span  class="title is-5">{{$t('explorerWalletsForExchangeBtcBalance')}}</span> 
 					<span class="has-text-weight-medium"><btc-amount :amount="wallet.balance" /></span>
 				</div>
-				<div class="row" v-if="wallet.from_id">
+				<div class="row">
 					<span class="title is-5">{{$t('explorerWalletsForExchangeTotalAddresses')}}</span> 
-						<router-link  :to="{name: 'explorerAddresses', params: { request_input: key} }">
-							<span class="has-text-weight-medium">{{wallet.addr_count || 0}}</span>
-						</router-link>
-					
+					<router-link  :to="{name: 'explorerAddresses', params: { url_input: key}}">
+						<span class="has-text-weight-medium">{{wallet.addr_count || 0}}</span>
+					</router-link>
 				</div>
 			</div>
 		</div>

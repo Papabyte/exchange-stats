@@ -47,8 +47,7 @@ async function getAddressesFromWallet(id, page, handle){
 		per_page: ADDR_PER_PAGE,
 		addr_count: addr_count, 
 		addresses: addressesRows,
-		exchange: aa_handler.getExchangeByRedirectedWalletId(id) || null,
-		exchange: aa_handler.getExchangeByRedirectedWalletId(id) || null
+		exchange: aa_handler.getExchangeByWalletId(id) || null,
 
 	});
 }
