@@ -55,38 +55,38 @@
 					<h5 class="title is-5">{{$t('explorerTransactionsWalletsForExchange')}}</h5>
 					<div class="columns">
 						<div class="column">
-								<div class="columns is-multiline">
-							<div class="column" v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
-								<div class="field has-addons">
-									<span class="control">
-										<wallet-id :id="Number(wallet)"/>
-									</span>
-									<span class="control">
-										<b-tooltip type="is-info" :label="$t('explorerTransactionsButtonViewProofsTip')">
-											<b-button
-													type="is-warning"
-													icon-right="magnify"
-													size="is-medium"
-													@click="viewAddingUrlProofs(wallet, exchange)"
-											/>
-										</b-tooltip>
-									</span>
-									<span class="control">
-										<b-tooltip type="is-info" :label="$t('explorerTransactionsButtonRemoveFromExchangeTip')">
-											<b-button
-													type="is-warning"
-													icon-right="close"
-													size="is-medium"
-													@click="removeWalletFromExchange(wallet, exchange)"
-											/>
-										</b-tooltip>
-									</span>
-								</div>
-								<div v-if="redirections_from[wallet] && wallet != redirections_from[wallet]">
-									{{$t('explorerTransactionsRedirectedTo')}}<wallet-id :id="Number(redirections_from[wallet])" />
+							<div class="columns is-multiline">
+								<div class="column" v-for="(wallet,index) in exchangeWallets" v-bind:key="index">
+									<div class="field has-addons">
+										<span class="control">
+											<wallet-id :id="Number(wallet)"/>
+										</span>
+										<span class="control">
+											<b-tooltip type="is-info" :label="$t('explorerTransactionsButtonViewProofsTip')">
+												<b-button
+														type="is-warning"
+														icon-right="magnify"
+														size="is-medium"
+														@click="viewAddingUrlProofs(wallet, exchange)"
+												/>
+											</b-tooltip>
+										</span>
+										<span class="control">
+											<b-tooltip type="is-info" :label="$t('explorerTransactionsButtonRemoveFromExchangeTip')">
+												<b-button
+														type="is-warning"
+														icon-right="close"
+														size="is-medium"
+														@click="removeWalletFromExchange(wallet, exchange)"
+												/>
+											</b-tooltip>
+										</span>
+									</div>
+									<div v-if="redirections_from[wallet] && wallet != redirections_from[wallet]">
+										{{$t('explorerTransactionsRedirectedTo')}}<wallet-id :id="Number(redirections_from[wallet])" />
+									</div>
 								</div>
 							</div>
-						</div>
 						</div>
 						<div class="column has-text-right" v-if="exchange">
 							<b-button
