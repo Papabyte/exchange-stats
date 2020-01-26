@@ -36,7 +36,7 @@ function processNewRanking(){
 	
 		for (var key in assocExchanges){
 			if(assocWalletIdsByExchange[key]){
-				var arrWalletIds = await explorer.getRedirections(assocWalletIdsByExchange[key]);
+				var arrWalletIds = await explorer.getUniqueRedirections(assocWalletIdsByExchange[key]);
 				// we await updateRankingRow to avoid to call coingecko API in parallel since that would trigger rate limiting
 				await updateRankingRow(key, await createWeeklyHistoryForExchangeAndReturnMonthlyVolume(key, arrWalletIds));
 			} else {
@@ -61,7 +61,7 @@ async function updateRankingRow(key, {monthly_volume, trendString}){
 	var objInfo = null;
 
 	if (assocWalletIdsByExchange[key])
-		var arrWalletIds = await explorer.getRedirections(assocWalletIdsByExchange[key]);
+		var arrWalletIds = await explorer.getUniqueRedirections(assocWalletIdsByExchange[key]);
 
 	if (arrWalletIds && arrWalletIds.length > 0){
 		var lastHeight = await getYesterdayMidnightBlockHeight();

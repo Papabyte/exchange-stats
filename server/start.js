@@ -34,11 +34,12 @@ require('./modules/sqlite_tables.js').create().then(function(){
 			return response.status(400).send('Wrong wallet id');
 		if (!validationUtils.isNonnegativeInteger(page))
 			return response.status(400).send('Wrong page');
-		const redirected_ids = await explorer.getRedirections([id]);
+		const redirected_ids = await explorer.getUniqueRedirections([id]);
+		const redirections_from = await explorer.getRedirectionsFrom([id]);
 		explorer.getTransactionsFromWallets(redirected_ids, page, function(assocTxsFromWallet){
 				return response.send({
 					txs: assocTxsFromWallet, 
-					redirected_id: redirected_ids[0], 
+					redirections_from: redirections_from, 
 					exchange: aa_handler.getExchangeByWalletId(id),
 					isOnOperation: aa_handler.getIsWalletOnOperation(id),
 				});
@@ -50,9 +51,7 @@ require('./modules/sqlite_tables.js').create().then(function(){
 		if (!validate(address))
 			return response.status(400).send('Wrong BTC address');
 		explorer.getWalletIdFromAddress(address, function(wallet_id){
-			explorer.getTransactionsFromWallets([wallet_id], 0, function(assocTxsFromWallet){
-				return response.send({txs: assocTxsFromWallet, redirected_id: wallet_id});
-			});
+			return response.send({redirected_id: wallet_id});
 		})
 	});
 
@@ -69,13 +68,13 @@ require('./modules/sqlite_tables.js').create().then(function(){
 		if(!validationUtils.isNonemptyString(exchange))
 			return response.status(400).send('Wrong exchange id');
 		const wallet_ids = exchanges.getExchangeWalletIds(exchange);
-		console.log(wallet_ids);
-		const redirected_ids = await explorer.getRedirections(wallet_ids);
+		const redirected_ids = await explorer.getUniqueRedirections(wallet_ids);
+		const redirections_from = await explorer.getRedirectionsFrom(wallet_ids);
 		explorer.getTransactionsFromWallets(redirected_ids, page, function(assocTxsFromWallet){
 			return response.send({
 				txs: assocTxsFromWallet, 
 				wallet_ids: wallet_ids, 
-				redirected_ids: redirected_ids, 
+				redirections_from: redirections_from, 
 				name: exchanges.getExchangeName(exchange),
 			});
 		});
@@ -86,18 +85,29 @@ require('./modules/sqlite_tables.js').create().then(function(){
 		if(!validationUtils.isNonemptyString(exchange))
 			return response.status(400).send('Wrong exchange id');
 		const wallet_ids = exchanges.getExchangeWalletIds(exchange);
-			return response.send(wallet_ids);
+			return response.send({wallet_ids});
+	})
+
+	app.get('/api/exchange-wallets-infos/:exchange/', async function(request, response){
+		const exchange = request.params.exchange;
+		if(!validationUtils.isNonemptyString(exchange))
+			return response.status(400).send('Wrong exchange id');
+		const wallet_ids = exchanges.getExchangeWalletIds(exchange);
+		console.log(wallet_ids)
+		const objRedirectionsAndInfos = await explorer.getRedirectionsAndInfos(wallet_ids);
+			return response.send(objRedirectionsAndInfos);
 	})
 
 
-	app.get('/api/wallet-addresses/:id/:page', function(request, response){
+	app.get('/api/wallet-addresses/:id/:page', async function(request, response){
 		const page = request.params.page ? Number(request.params.page) : 0;
 		const id = Number(request.params.id);
 		if (!validationUtils.isNonnegativeInteger(id))
 			return response.status(400).send('Wrong wallet id');
 		if (!validationUtils.isNonnegativeInteger(page))
 			return response.status(400).send('Wrong page');
-		explorer.getAddressesFromWallet(id, page, function(objAddresses){
+		const redirected_ids = await explorer.getUniqueRedirections([id]);
+		explorer.getAddressesFromWallet(redirected_ids[0], page, function(objAddresses){
 			return response.send(objAddresses);
 		});
 	});
@@ -105,7 +115,6 @@ require('./modules/sqlite_tables.js').create().then(function(){
 
 	app.get('/api/txid/:tx_id', function(request, response){
 		const tx_id = request.params.tx_id;
-		console.log(tx_id);
 		if (!validationUtils.isValidHexadecimal(tx_id, 64))
 			return response.status(400).send('Wrong tx id');
 		explorer.getTransactionFromTxId(tx_id, function(assocTxs){
@@ -152,7 +161,6 @@ require('./modules/sqlite_tables.js').create().then(function(){
 	});
 
 	app.get('/api/operations', function(request, response){
-		console.log('/api/operations');
 		return response.send(aa_handler.getAllOperations());
 	});
 
@@ -160,12 +168,10 @@ require('./modules/sqlite_tables.js').create().then(function(){
 		const id = Number(request.params.id);
 		const address = request.params.id;
 		if (validationUtils.isNonnegativeInteger(id)){
-			const redirected_ids = await explorer.getRedirections([id]);
+			const redirected_ids = await explorer.getUniqueRedirections([id]);
 			return response.send({redirected_id: redirected_ids[0]});
 		} else if (validate(address)){
-			console.log("validate " + address);
 			explorer.getWalletIdFromAddress(address, function(wallet_id){
-				console.log("getWalletIdFromAddress " + wallet_id);
 				return response.send({redirected_id: wallet_id});
 			});
 		} else 			
@@ -187,7 +193,7 @@ require('./modules/sqlite_tables.js').create().then(function(){
 		});
 	});
 
-	app.get('/api/Donors-ranking/', function(request, response){
+	app.get('/api/donors-ranking/', function(request, response){
 		aa_handler.getDonorsRanking(function(rankingRows){
 			return response.send(rankingRows);
 		});

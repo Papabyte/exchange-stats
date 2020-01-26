@@ -12,7 +12,7 @@
 				<contributors-ranking/>
 			</b-tab-item>
 			<b-tab-item :label="$t('crowdSourcingDonorsTitle')">
-				<Donors-ranking/>
+				<donors-ranking/>
 			</b-tab-item>
 		</b-tabs>
 	</div>

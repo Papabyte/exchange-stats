@@ -55,7 +55,9 @@
 						</b-table-column>
 
 						<b-table-column field="nb_addresses" :label="$t('rankingTableColNbAddresses')" sortable>
+							<router-link :to="'/wallets-for-exchange/'+ props.row.exchange_id">
 							{{ props.row.nb_addresses ? props.row.nb_addresses.toLocaleString() : '' }}
+							</router-link>
 						</b-table-column>
 
 						<b-table-column field="total_btc_wallet" :label="$t('rankingTableColTotalBtcWallet')" sortable>

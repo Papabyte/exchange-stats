@@ -1,6 +1,7 @@
 <template>
 	<div class="row">
 		<b-field
+			:message="text_error"
 			:type="type">
 			<b-input
 					:placeholder="index == 0 ? (isRequired ? $t('urlInputsFirstHolder') : $t('urlInputsFirstHolderOptional')) : $t('urlInputsNextHolder')"
@@ -8,7 +9,6 @@
 					v-model="url"
 			/>
 		</b-field>
-		<span v-if="text_error" class="pt-3">{{text_error}}</span>
 	</div>
 </template>
 

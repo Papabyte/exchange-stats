@@ -75,7 +75,7 @@
 		},
 		methods: {
 			getData () {
-				this.axios.get('/api/Donors-ranking/').then((response) => {
+				this.axios.get('/api/donors-ranking/').then((response) => {
 					this.items = response.data
 					this.totalRows = this.items.length
 					this.isSpinnerActive = false

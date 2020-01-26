@@ -10,6 +10,7 @@ const storage = require('ocore/storage.js');
 const db = require('ocore/db.js');
 const social_networks = require('./social_networks.js');
 const eventBus = require('ocore/event_bus.js');
+const explorer = require('./explorer.js');
 
 const exchanges = require('./exchanges.js')
 
@@ -17,6 +18,7 @@ var assocAllPoolsById = {};
 var assocAllPoolsByExchange = {};
 var currentActivePools = [];
 
+var assocExchangeByRedirectedWalletId = {};
 var assocExchangeByWalletId = {};
 
 var assocAllOperations = {};
@@ -321,7 +323,7 @@ function indexRewardPools(objStateVars){
 }
 
 //we read state vars to read all past and ongoing operations and sort them in different associative arrays
-function indexOperations(objStateVars){
+async function indexOperations(objStateVars){
 	indexStakedByKeyAndAddress(objStateVars);
 	indexProofUrls(objStateVars);
 	
@@ -396,6 +398,12 @@ function indexOperations(objStateVars){
 	});
 
 	assocAllOperations = assocOperations;
+
+	const assocRedirections = await explorer.getRedirections(Object.keys(_assocExchangeByWalletId));
+	for (var key in assocRedirections){
+		assocExchangeByRedirectedWalletId[key] = _assocExchangeByWalletId[assocRedirections[key]];
+	}
+
 	assocExchangeByWalletId = _assocExchangeByWalletId;
 	assocPendingOperationsByExchange = _assocPendingOperationsByExchange;
 	assocPendingOperationsByWalletId = _assocPendingOperationsByWalletId;
@@ -536,6 +544,10 @@ function getPendingOperationsForWalletId(wallet_id){
 
 function getIsWalletOnOperation(wallet_id){
 	return !!assocWalletOnOperation[wallet_id];
+}
+
+function getExchangeByRedirectedWalletId(wallet_id){
+	return assocExchangeByRedirectedWalletId[wallet_id];
 }
 
 function getExchangeByWalletId(wallet_id){
@@ -696,6 +708,7 @@ exports.getAllPools = getAllPools;
 exports.getAllOperations = getAllOperations;
 exports.getPendingOperationsForExchange = getPendingOperationsForExchange;
 exports.getBestPoolForExchange = getBestPoolForExchange;
+exports.getExchangeByRedirectedWalletId = getExchangeByRedirectedWalletId;
 exports.getExchangeByWalletId = getExchangeByWalletId;
 exports.getOperationHistory = getOperationHistory;
 exports.getContributorsRanking = getContributorsRanking;

@@ -81,6 +81,9 @@
 										</b-tooltip>
 									</span>
 								</div>
+								<div class="is-inline" v-if="redirections_from[wallet]">
+								{{$t('explorerTransactionsRedirectedTo')}}<wallet-id :id="Number(redirections_from[wallet])" />
+								</div>
 							</span>
 						</div>
 						<div class="column has-text-right" v-if="exchange">
@@ -207,6 +210,7 @@
 				addr_count: null,
 				progressive_display_level: 1,
 				timerId: null,
+				redirections_from: {},
 				per_page: 20,
 			}
 		},
@@ -317,24 +321,27 @@
 				this.total_on_wallets = null
 				this.tx_id = null
 				this.addr_count = null
+				this.redirections_from = {}
 
 				if (Number(this.request_input)) { // it's a wallet id
 					this.blockTitle = this.$t('explorerTransactionsTransactionsForWallet') + this.request_input
 					this.axios.get('/api/wallet/' + this.request_input + '/' + (this.currentPage - 1)).then((response) => {
 						this.progressive_display_level = 1
-						this.blockTitle = this.$t('explorerTransactionsTransactionsForWallet') + response.data.redirected_id
+						const redirected_id = Number(Object.keys(response.data.redirections_from)[0])
+						this.blockTitle = this.$t('explorerTransactionsTransactionsForWallet') + redirected_id
 						if (response.data.txs) {
 							this.transactions = response.data.txs.txs
 							this.count_total = response.data.txs.count_total
 							this.per_page = response.data.txs.per_page
 							this.txs_displayed = response.data.txs.txs_displayed
-							this.redirected_ids = [response.data.redirected_id]
+							this.redirected_ids = Object.keys(response.data.redirections_from)
+							this.redirections_from = response.data.redirections_from
 							this.total_on_wallets = response.data.txs.total_on_wallets
 							this.addr_count = response.data.txs.addr_count
 						} else {
 							this.failoverText = this.$t('explorerTransactionsNoTransactionsFound') + this.request_input
 						}
-						this.wallet_id = Number(response.data.redirected_id)
+						this.wallet_id = redirected_id
 						this.walletOwner = response.data.exchange
 						this.isSpinnerActive = false
 						this.updateMeta()
@@ -370,7 +377,8 @@
 							this.per_page = response.data.txs.per_page
 							this.txs_displayed = response.data.txs.txs_displayed
 							this.exchangeWallets = response.data.wallet_ids
-							this.redirected_ids = response.data.redirected_ids
+							this.redirected_ids = Object.keys(response.data.redirections_from)
+							this.redirections_from = response.data.redirections_from
 							this.total_on_wallets = response.data.txs.total_on_wallets
 							this.addr_count = response.data.txs.addr_count
 						} else if (response.data.wallet_ids.length == 0) {

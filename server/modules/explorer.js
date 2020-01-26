@@ -47,7 +47,9 @@ async function getAddressesFromWallet(id, page, handle){
 		per_page: ADDR_PER_PAGE,
 		addr_count: addr_count, 
 		addresses: addressesRows,
-		exchange: aa_handler.getExchangeByWalletId(id) || null
+		exchange: aa_handler.getExchangeByRedirectedWalletId(id) || null,
+		exchange: aa_handler.getExchangeByRedirectedWalletId(id) || null
+
 	});
 }
 
@@ -110,12 +112,12 @@ function createTxsAssociativeArray(rows){
 		assocTxsFromWallet[row.tx_id].from = {
 			id: row.from_id,
 			amount: row.amount_from,
-			exchange: aa_handler.getExchangeByWalletId(row.from_id) 
+			exchange: aa_handler.getExchangeByRedirectedWalletId(row.from_id) 
 		} ;
 		assocTxsFromWallet[row.tx_id].to.push({
 			address: row.address, id: row.to_id,
 			amount: row.amount_to, 
-			exchange: aa_handler.getExchangeByWalletId(row.to_id)
+			exchange: aa_handler.getExchangeByRedirectedWalletId(row.to_id)
 		}) ;
 	});
 	return assocTxsFromWallet;
@@ -123,7 +125,7 @@ function createTxsAssociativeArray(rows){
 
 // when a wallet is merged into another, there is a redirection from the former to the latter
 // this function returns an array in which wallets having redirections have been replaced by the redirected id, wallets ids are unique in the returned array
-function getRedirections(arrIds){
+function getUniqueRedirections(arrIds){
 	return new Promise(async function(resolve){
 		if (arrIds.length == 0)
 			return resolve([]);
@@ -140,8 +142,81 @@ function getRedirections(arrIds){
 		}
 	});
 }
+
+function getRedirections(arrIds){
+	return new Promise(async function(resolve){
+		if (arrIds.length == 0)
+			return resolve({});
+		const idsSqlFilter = arrIds.join(",");
+		const rows = await db.query("SELECT \n\
+			CASE WHEN redirection IS NOT NULL THEN redirection \n\
+			ELSE id \n\
+			END redirection_id,\n\
+			id\n\
+		FROM btc_wallets WHERE id IN (" +idsSqlFilter +")");
+		const assocRedirections = {};
+		rows.forEach(function(row){
+			assocRedirections[row.redirection_id] = row.id;
+		})
+		return resolve(assocRedirections);
+	});
+}
+
+function getRedirectionsFrom(arrIds){
+	return new Promise(async function(resolve){
+		if (arrIds.length == 0)
+			return resolve({});
+		const idsSqlFilter = arrIds.join(",");
+		const rows = await db.query("SELECT \n\
+			CASE WHEN redirection IS NOT NULL THEN redirection \n\
+			ELSE id \n\
+			END redirection_id,\n\
+			id\n\
+		FROM btc_wallets WHERE id IN (" +idsSqlFilter +")");
+		const assocRedirectionsFrom = {};
+		rows.forEach(function(row){
+			assocRedirectionsFrom[row.id] = row.redirection_id;
+		})
+		return resolve(assocRedirectionsFrom);
+	});
+}
+
+
+function getRedirectionsAndInfos(arrIds){
+	return new Promise(async function(resolve){
+		if (arrIds.length == 0)
+			return resolve({});
+		const idsSqlFilter = arrIds.join(",");
+		const rows = await db.query("SELECT \n\
+			CASE WHEN redirection IS NOT NULL THEN redirection \n\
+			ELSE id \n\
+			END redirection_id,\n\
+			id,\n\
+			CASE WHEN redirection IS NOT NULL THEN (SELECT balance FROM btc_wallets WHERE id=t1.redirection) \n\
+			ELSE  balance\n\
+			END balance,\n\
+			CASE WHEN redirection IS NOT NULL THEN (SELECT addr_count FROM btc_wallets WHERE id=t1.redirection) \n\
+			ELSE addr_count\n\
+			END addr_count\n\
+		FROM btc_wallets AS t1 WHERE id IN (" +idsSqlFilter +")");
+		const assocRedirections = {};
+		rows.forEach(function(row){
+			assocRedirections[row.redirection_id] = {
+				from_id: row.id,
+				balance: row.balance,
+				addr_count: row.addr_count
+			}
+		});
+		return resolve(assocRedirections);
+	});
+}
+
+
 exports.getTransactionsFromWallets = getTransactionsFromWallets;
-exports.getRedirections = getRedirections;
+exports.getUniqueRedirections = getUniqueRedirections;
 exports.getTransactionFromTxId = getTransactionFromTxId;
 exports.getWalletIdFromAddress = getWalletIdFromAddress;
 exports.getAddressesFromWallet = getAddressesFromWallet;
+exports.getRedirections = getRedirections;
+exports.getRedirectionsAndInfos = getRedirectionsAndInfos;
+exports.getRedirectionsFrom = getRedirectionsFrom;

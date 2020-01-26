@@ -24,7 +24,14 @@ export default new Router({
 			component: lazyLoading('components/ExchangesStats'),
 			props: true
 		},
-
+		{	name: 'explorerWalletsForExchange',
+			path: '/wallets-for-exchange/:url_input',
+			component: lazyLoading('components/Explorer'),
+			props:  route => ({
+				url_input: route.params.url_input,
+				showWallets: true,
+			})
+		},
 		{
 			name: 'explorerAddressesPaged',
 			path: '/explorer/addresses/:url_input/:page',
@@ -32,7 +39,7 @@ export default new Router({
 			props:  route => ({
 				url_input: route.params.url_input,
 				page: route.params.page,
-				show_addresses: true,
+				showAddresses: true,
 			})
 		},
 		{
@@ -41,7 +48,7 @@ export default new Router({
 			component: lazyLoading('components/Explorer'),
 			props:  route => ({
 				url_input: route.params.url_input,
-				show_addresses: true,
+				showAddresses: true,
 			})
 		},
 		{
