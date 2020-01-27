@@ -42,7 +42,7 @@
 						<div class="title is-6"><b>{{$t('operationHistoryCommit')}}</b> - {{item.time}} 
 						- Unit: <unit-link :unit="item.unit"/>
 						</div>
-						<div class="is-inline text-break">
+						<div class="is-inline">
 							<span v-if="item.paid_out" class="is-inline"><b><byte-amount :amount="item.paid_out"/></b> paid to <b>{{item.concerned_address}}</b></span>
 						</div>
 					</div>
@@ -50,7 +50,7 @@
 						<div class="title is-6"><b>{{$t('operationHistoryWithdraw')}}</b> - {{item.time}}
 							- Unit: <unit-link :unit="item.unit"/>
 						</div>
-						<div class="is-inline text-break">
+						<div class="is-inline">
 							<span v-if="item.paid_out" class="is-inline"><b><byte-amount :amount="item.paid_out"/></b> paid to <b>{{item.concerned_address}}</b></span>
 						</div>
 					</div>

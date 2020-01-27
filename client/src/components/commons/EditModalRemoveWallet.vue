@@ -170,7 +170,7 @@
 		created() {
 				if (!this.selectedWalletId && this.selectedExchange) {
 					this.axios.get('/api/exchange-wallets/' + this.selectedExchange).then((response) => {
-						this.wallet_choices = response.data
+						this.wallet_choices = response.data.wallet_ids
 					})
 				}
 				if (this.propWalletId && this.assocExchangesById[this.selectedExchange] && this.assocExchangesById[this.selectedExchange].name)// we have a wallet id as prop and exchange input is valid, let's go to check

@@ -6,11 +6,8 @@
 				<h5 class="title is-5 d-inline-block is-marginless mr-05">
 					{{$t('explorerAddressesCountInWallet',{count:count_total})}}</h5>
 				<wallet-id :id="Number(request_input)"/>
-
-
-				
 			</div>
-						<div class="row" v-if="walletOwner">
+				<div class="row" v-if="walletOwner">
 					<h5 class="title is-5">{{$t('explorerAddressesBelongTo')}}</h5>
 					<div class="field has-addons">
 						<span class="control">
