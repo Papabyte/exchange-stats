@@ -73,13 +73,13 @@
 			</div>
 			<div class="container" v-if="link" fluid>
 				<div class="row">
-					{{$t('editModalLinkHeader')}}
+					{{$t('donateModalLinkHeader')}}
 				</div>
 				<div class="row">
 					<wallet-link :link="link" />
 				</div>
 				<div class="row">
-					{{$t('editModalLinkFooter')}}
+					{{$t('donateModalLinkFooter')}}
 				</div>
 			</div>
 		</section>

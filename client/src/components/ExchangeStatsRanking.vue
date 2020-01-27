@@ -49,9 +49,7 @@
 									{{ column.label }}<v-icon name='help-circle' class="tip-icon"/>
 								</b-tooltip>
 							</template> 
-								<span v-if="props.row.last_day_deposits||props.row.last_day_withdrawals">
-									{{props.row.reported_ratio.toPrecision(3)}}
-								</span>
+								{{props.row.reported_ratio}}
 						</b-table-column>
 
 						<b-table-column field="nb_addresses" :label="$t('rankingTableColNbAddresses')" sortable>
@@ -148,8 +146,8 @@
 							row.trend = row.trend.split('@').map(function (value) {
 								return Number(value)
 							})
-
-						row.reported_ratio = row.reported_volume/((row.last_day_deposits + row.last_day_withdrawals)/2)
+						if (row.reported_volume && (row.last_day_deposits || row.last_day_withdrawals))
+							row.reported_ratio = (row.reported_volume/((row.last_day_deposits + row.last_day_withdrawals)/2)).toPrecision(3)
 					})
 					this.data = response.data
 				})
