@@ -43,13 +43,13 @@
 							<BtcAmount :amount="props.row.reported_volume"/>
 						</b-table-column>
 
-							<b-table-column field="reported_ratio" :label="$t('rankingTableColReportedReportedRatio')" sortable>
+						<b-table-column field="reported_ratio" :label="$t('rankingTableColReportedReportedRatio')" sortable>
 							<template slot="header" slot-scope="{ column }">
 								<b-tooltip type="is-info" :label="$t('rankingTableColReportedReportedRatioTip')">
 									{{ column.label }}<v-icon name='help-circle' class="tip-icon"/>
 								</b-tooltip>
 							</template> 
-								{{props.row.reported_ratio}}
+								<span v-if="props.row.reported_ratio"> {{props.row.reported_ratio.toPrecision(3)}} </span>
 						</b-table-column>
 
 						<b-table-column field="nb_addresses" :label="$t('rankingTableColNbAddresses')" sortable>
@@ -147,7 +147,7 @@
 								return Number(value)
 							})
 						if (row.reported_volume && (row.last_day_deposits || row.last_day_withdrawals))
-							row.reported_ratio = (row.reported_volume/((row.last_day_deposits + row.last_day_withdrawals)/2)).toPrecision(3)
+							row.reported_ratio = row.reported_volume/((row.last_day_deposits + row.last_day_withdrawals)/2)
 					})
 					this.data = response.data
 				})
