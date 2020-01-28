@@ -1,3 +1,32 @@
+
+Skip to content
+Pull requests
+Issues
+Marketplace
+Explore
+@sientelo
+sientelo /
+exchange-stats
+forked from Papabyte/counterstats
+
+0
+0
+
+    2
+
+Code
+Pull requests 0
+Actions
+Projects 0
+Wiki
+Security
+Insights
+Settings
+exchange-stats/client/src/locales/en.json
+@Papabyte Papabyte dynamic meta descriptions f0acb17 on Nov 2, 2019
+@Papabyte
+@sientelo
+174 lines (173 sloc) 16 KB
 {
 	"editModalRemoveXFromX" : "Remove wallet {wallet} from exchange {exchange}",
 	"editModalAddXToX": "Add wallet {wallet} to exchange {exchange}",
@@ -159,16 +188,32 @@
 	"faqPageTitle" : "Frequently asked questions - {website_name}",
 	"faqMetaDescription" : "Everything about onchain activity ranking, wallet explorer and counterstake protocol.",
 	"faqQuestion1" :" What is this website?",
-	"faqAnswer1" :"This website has 3 different parts.<ul><li>1: a wallet explorer that indexes BTC blockchain by wallets or group of wallets belonging to an exchange.</li><li>2: a ranking of crypto exchanges based on their on-chain activity.</li><li>3: a crowdsourcing page that is an interface to an Autonomous Agent running on O<sub>byte</sub>. Counterstake protocol is the name of the mechanism that gives incentives to users that provide accurate identification of BTC wallets used by crypto exchanges.</li><ul>",
-	"faqQuestion2" : "How exchange statistics are made?",
-	"faqAnswer2" : "Every hour, the BTC blockchain is analyzed to evaluate transactions going to and from wallets that supposedly belong to them. The statistics are not completely accurate, since activity from deposit addresses or addresses newly generated can be missing. Though not perfect, it provides good estimations about their real activity.",
-	"faqQuestion3" : "What is special about this explorer?",
-	"faqAnswer3" : "Our explorer groups addresses that are known to belong to the same wallet. All addresses presented here are inputs of transactions merged into a wallet. Wallets can also be merged when addresses that already belong to a wallet are seen as inputs of the same transaction. In this case the ID of the wallet that contains the most addresses is kept, while the other one is redirected. When a wallet is reputed to belong to an exchange, it is labelled as such, making life easy for those interested in monitoring transactions going to and from exchanges.",
-	"faqQuestion4" : "Who does the crowdsourcing?",
-	"faqAnswer4" : "We rely on users to label wallets used by exchanges. Users interact with an <a href='https://medium.com/obyte/introducing-autonomous-agents-6fe12fb12aa3'>Autonomous Agent</a> directly from their <a href='https://obyte.org/'>O<sub>byte</sub> wallet</a> after having clicked a link that prefills data to be sent. All information displayed is read from AA state variables.",
-	"faqQuestion5" : "What is the counterstake protocol?",
-	"faqAnswer5" : "It's a consensus mechanism that aims to feed the Obyte ledger with accurate real world data. First rewards have to be donated by a sponsor, then an operation is initiated by a contributor. For this usecase, the operation is either adding a wallet to an exchange or removing the wallet to an exchange. This is expressed by a question that can be answered by YES or NO. The initiator sends {initial_stake} GB as stake and provides one or several URLs proving that the answer is YES. If it is convincing enough, the operation period goes to its end and the initiator receives his initial stake and the reward. If proofs are not convincing, one can challenge the position and stake Obyte Bytes on NO. If the amount on NO reaches {coeff}x the amount that is staked on YES, the outcome is reversed. The initiator would then lose its stake miss out on the reward, while the challenger would receive all the stake. It's always possible to inverse again the outcome by putting more Bytes at stake and reach {coeff}x the amount staked of the opposite. The challenge ends after {period} days without counterstaking. When several users stake on the same position, gains are shared pro-rata of their contribution.",
-	"faqQuestion6" : "Is this opensource?",
-	"faqAnswer6" : "Yes! Github-link. We hope it will inspire other developers to create cool application based on the counterstake protocol. If you want to contribute to this website please join the <a href='http://discord.obyte.org'>Obyte Discord</a> to discuss your plans with us."
+	"faqAnswer1" :"This website has 3 different parts.<ul><li>1: a wallet explorer that indexes the BTC blockchain by wallets or group of wallets belonging to an exchange.</li><li>2: a ranking of crypto exchanges based on their on-chain activity.</li><li>3: a crowdsourcing page that is an interface to an Autonomous Agent running on O<sub>byte</sub>. Counterstake protocol is the name of the mechanism that gives incentives to users that provide accurate identification of BTC wallets used by crypto exchanges.</li><ul>",
+	"faqQuestion2" : "How are exchange statistics produced?",
+	"faqAnswer2" : "Every hour, the BTC blockchain is analyzed to evaluate transactions going to and from wallets that supposedly belong to them. The statistics are not completely accurate, since activity from deposit addresses or newly generated addresses can be missing. Though not perfect, it provides good estimates about their real activity.",
+	"faqQuestion3" : "What is a wallet? ",
+	"faqAnswer3" : "A wallet is a collection of BTC addresses belonging to the same entity. Addresses are grouped into a wallet when they were seen together as inputs of a BTC transaction.",
+	"faqQuestion4" : "What is special about this explorer?",
+	"faqAnswer4" : "The explorer groups addresses that are known to belong to the same wallet. All addresses presented here are inputs of transactions merged into a wallet. Wallets can also be merged when addresses that already belong to a wallet are seen as inputs of the same transaction. In this case the ID of the wallet that contains the most addresses is kept, while the other one is redirected. When a wallet is reputed to belong to an exchange, it is labelled as such, making life easier for those interested in monitoring transactions going to and from exchanges.",
+	"faqQuestion5" : "Who does the crowdsourcing?",
+	"faqAnswer5" : "We rely on users to label wallets used by exchanges. Users interact with an <a href='https://medium.com/obyte/introducing-autonomous-agents-6fe12fb12aa3'>Autonomous Agent</a> directly from their <a href='https://obyte.org/'>O<sub>byte</sub> wallet</a> after clicking a link that prefills the data to be sent. All information displayed is read from Autonomous Agent state variables.",
+	"faqQuestion6" : "What is the counterstake protocol?",
+	"faqAnswer6" : "It's a consensus mechanism that aims to feed the Obyte ledger with accurate real world data. Initial rewards have to be donated by a sponsor, and an operation is then initiated by a contributor. In this use case, the operation is either adding a wallet to an exchange or removing the wallet from an exchange. This is expressed by a question that can be answered by YES or NO. The initiator sends {initial_stake} GB as stake and provides one or several URLs as evidence to show that the answer is YES. If it is convincing enough, the operation period ends and the initiator receives his initial stake and a reward in Bytes, the native currency of the Obyte platform. If the evidence supplied is not thought to be convincing enough by other people, they can challenge the position and stake Bytes on NO. If the amount on NO reaches {coeff}x the amount that is staked on YES, the outcome is reversed. The initiator would then lose its stake and miss out on the reward, while the challenger would receive the whole stake. It's always possible to inverse the outcome again by staking more Bytes to reach {coeff}x the amount of the opposite stake. The challenge ends after {period} days without counterstaking. When several users stake on the same position, gains are shared pro-rata of their contribution.",
+	"faqQuestion7" : "Is this opensource?",
+	"faqAnswer7" : "Yes! See the Counterstats <a href='https://github.com/Papabyte/counterstats/'>GitHub repository</a>. We hope it will inspire other developers to create cool application based on the counterstake protocol. If you want to contribute to this website please lets us know on <a href='http://discord.obyte.org'>Obyte Discord</a> or <a href='https://www.reddit.com/r/obyte'>the Obyte subreddit</a>."
 }
+
+    © 2020 GitHub, Inc.
+    Terms
+    Privacy
+    Security
+    Status
+    Help
+
+    Contact GitHub
+    Pricing
+    API
+    Training
+    Blog
+    About
 
