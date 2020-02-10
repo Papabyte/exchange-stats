@@ -53,7 +53,7 @@ export default {
 					exchange:this.getExchangeNameFromOperationId(event.operation_id)
 				})
 			else if (event.event_type == 'withdraw' && event.operation.outcome == 'out')
-				message+= this.$t('eventMessageCommitRemovingWallet', {
+				message+= this.$t('eventMessageWithdraw', {
 					contributor: event.nickname || event.concerned_address,
 					amount: this.getByteAmountString(event.paid_out), 
 				})
