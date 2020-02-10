@@ -348,7 +348,6 @@ function downloadBlockAndParse(blockheight, handle){
 	})
 }
 
-
 function getLastBlockHeight( handle){
 	request({
 		url: "https://blockchain.info/latestblock"
@@ -375,7 +374,6 @@ function getLastProcessedHeight(){
 		return resolve((await db.query("SELECT MAX(block_height) as height FROM processed_blocks"))[0].height);
 	});
 }
-
 
 
 exports.getLastProcessedHeight = getLastProcessedHeight;

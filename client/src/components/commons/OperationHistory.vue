@@ -39,7 +39,7 @@
 						</div>
 					</div>
 					<div class="box" v-if="item.event_type =='commit'" >
-						<div class="title is-6"><b>{{$t('operationHistoryCommit')}}</b> - {{item.time}} 
+						<div class="title is-6"><b>{{$t('operationHistoryCommit')}}</b> - {{item.time}}
 						- Unit: <unit-link :unit="item.unit"/>
 						</div>
 						<div class="is-inline">

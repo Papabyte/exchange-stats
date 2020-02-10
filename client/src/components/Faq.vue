@@ -81,13 +81,6 @@
 </script>
 
 <style lang='scss' scoped>
-	.question {
 
-	}
-
-	.answer {
-
-
-	}
 
 </style>

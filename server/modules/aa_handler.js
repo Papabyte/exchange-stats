@@ -80,12 +80,12 @@ function indexAaParameters(){
 function indexFromStateVars(handle){
 	if (!handle)
 		handle = ()=>{};
-	getStateVarsForPrefixes(["pool_","operation_","pair_", "nickname_"], function(error, objStateVars){
+	getStateVarsForPrefixes(["pool_","operation_","pair_", "nickname_"], async function(error, objStateVars){
 		if (error){
 			console.log(error);
 			return handle();
 		}
-		indexOperations(objStateVars);
+		await indexOperations(objStateVars);
 		indexRewardPools(objStateVars);
 		indexNicknames(objStateVars);
 		handle();
@@ -270,15 +270,15 @@ function updateOperationsHistory(){
 							(?,?,?,?,?,?,?,?,?,?,?)",[objEvent.operation_id, objEvent.paid_in, objEvent.paid_out, objEvent.concerned_address, objEvent.pair, objEvent.event_type, row.mci, row.aa_address, JSON.stringify(objEvent.event_data), row.trigger_unit, row.timestamp],
 							function(result){
 								if (result.affectedRows === 1){
-									//if the event is a commit, we update its ranking right
+									//if the event is a commit, we update its ranking right now
 									if (objEvent.event_type == 'commit')
 										exchanges.updateRankingRow(getExchangeFromOperationKey(objEvent.operation_id), {});
 
+										objEvent.concerned_address_nickname = assocNicknamesByAddress[objEvent.concerned_address] || objEvent.concerned_address;
+										objEvent.event_data.committer = assocNicknamesByAddress[objEvent.event_data.committer] || objEvent.event_data.committer;
 									social_networks.notify(
-										objEvent.event_type, 
-										assocAllOperations[objEvent.operation_id], 
-										assocNicknamesByAddress[objEvent.concerned_address] || objEvent.concerned_address, 
-										objEvent.event_data
+										objEvent, 
+										assocAllOperations[objEvent.operation_id]
 									);
 								}
 								cb();
@@ -349,7 +349,6 @@ async function indexOperations(objStateVars){
 		operation.wallet_id = Number(wallet_id);
 		operation.exchange = exchange;
 		operation.number = Number(objStateVars[pairKey + "_number"]);
-
 
 		if (objStateVars[pairKey + "_committed_outcome"] == "in") {
 			if(!assocWalletIdsByExchange[exchange])
