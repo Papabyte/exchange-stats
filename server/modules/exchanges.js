@@ -8,6 +8,7 @@ const async = require('async');
 
 const db = require('ocore/db.js');
 var assocWalletIdsByExchange = null;
+var assocPendingOperationsByExchange = null;
 
 const assocExchanges = {};
 
@@ -175,6 +176,10 @@ async function getExchangeHistory(exchange, handle){
 
 function getLastRanking(handle){
 	db.query("SELECT * FROM last_exchanges_ranking", function(rows){
+		rows.forEach(function(row){
+			if (assocPendingOperationsByExchange[row.exchange_id])
+				row.has_operation = true;
+		})
 		handle(rows);
 	});
 }
@@ -207,6 +212,11 @@ function setWalletIdsByExchange(obj){
 	}
 }
 
+function setPendingOperationsByExchange(obj){
+	assocPendingOperationsByExchange = obj;
+}
+
+
 
 exports.getLastRanking = getLastRanking;
 exports.getExchangeWalletIds = getExchangeWalletIds;
@@ -215,3 +225,4 @@ exports.getExchangeName = getExchangeName;
 exports.setWalletIdsByExchange = setWalletIdsByExchange;
 exports.getExchangeHistory = getExchangeHistory;
 exports.updateRankingRow = updateRankingRow;
+exports.setPendingOperationsByExchange = setPendingOperationsByExchange;

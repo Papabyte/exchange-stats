@@ -409,6 +409,7 @@ async function indexOperations(objStateVars){
 	assocWalletOnOperation = _assocWalletOnOperation;
 	assocLastOperationForPair= _assocLastOperationForPair;
 	exchanges.setWalletIdsByExchange(assocWalletIdsByExchange);
+	exchanges.setPendingOperationsByExchange(assocPendingOperationsByExchange);
 }
 
 // read state vars that are like 'operation_abcc_8094_1_url_proof_for_in_1' and index data in assocProofsByKeyAndOutcome and assocProofsByPairAndOutcome
