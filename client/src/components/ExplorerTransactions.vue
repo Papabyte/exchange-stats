@@ -336,7 +336,7 @@
 							this.count_total = response.data.txs.count_total
 							this.per_page = response.data.txs.per_page
 							this.txs_displayed = response.data.txs.txs_displayed
-							this.redirected_ids = Object.keys(response.data.redirections_from)
+							this.redirected_ids = Object.values(response.data.redirections_from)
 							this.redirections_from = response.data.redirections_from
 							this.total_on_wallets = response.data.txs.total_on_wallets
 							this.addr_count = response.data.txs.addr_count
@@ -379,7 +379,7 @@
 							this.per_page = response.data.txs.per_page
 							this.txs_displayed = response.data.txs.txs_displayed
 							this.exchangeWallets = response.data.wallet_ids
-							this.redirected_ids = Object.keys(response.data.redirections_from)
+							this.redirected_ids = Object.values(response.data.redirections_from)
 							this.redirections_from = response.data.redirections_from
 							this.total_on_wallets = response.data.txs.total_on_wallets
 							this.addr_count = response.data.txs.addr_count

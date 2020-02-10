@@ -33,8 +33,8 @@
 				</div>
 			</div>
 			<div class="column destination">
-				<div v-for="(t_out,index) in transaction.to" :key="index" class="columns fw-w">
-					<div class="column is-4">
+				<div v-for="(t_out,index) in transaction.to" :key="index" class="columns is-multiline">
+					<div class="column">
 						<wallet-id v-if="t_out.id" label="Wallet: " :id="t_out.id"/>
 						<span v-else>
 							<div class="button is-warning is-unknown">
@@ -42,10 +42,10 @@
 							</div>
 						</span>
 					</div>
-					<div class="column is-4" v-if="t_out.exchange">
+					<div class="column" v-if="t_out.exchange">
 						<exchange :label="$t('explorerTransactionLabelExchange')" :id="t_out.exchange"/>
 					</div>
-					<div class="column is-4">
+					<div class="column">
 						<btc-amount :label="$t('explorerTransactionLabelAmount')" :amount="t_out.amount"
 												:isPositive="about_ids.indexOf(t_out.id)>-1"/>
 					</div>
