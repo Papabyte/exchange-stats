@@ -30,11 +30,11 @@
 
 					<template slot-scope="props">
 
-						<b-table-column field="name" :label="$t('rankingTableColName')" sortable>
+						<b-table-column field="name" :label="$t('rankingTableColName')" custom-key='name' sortable>
 							{{ props.row.name }}
 						</b-table-column>
 
-						<b-table-column field="reported_volume" :label="$t('rankingTableColReportedVolume')" sortable>
+						<b-table-column field="reported_volume" :label="$t('rankingTableColReportedVolume')" custom-key='reported_volume' sortable :custom-sort="sortVolume">
 							<template slot="header" slot-scope="{ column }">
 								<b-tooltip type="is-info" :label="$t('rankingTableColReportedVolumeTip')">
 									{{ column.label }} <v-icon name='help-circle' class="tip-icon"/>
@@ -43,7 +43,7 @@
 							<BtcAmount :amount="props.row.reported_volume"/>
 						</b-table-column>
 
-						<b-table-column field="reported_ratio" :label="$t('rankingTableColReportedReportedRatio')" sortable>
+						<b-table-column field="reported_ratio" :label="$t('rankingTableColReportedReportedRatio')" custom-key='reported_ratio' sortable>
 							<template slot="header" slot-scope="{ column }">
 								<b-tooltip type="is-info" :label="$t('rankingTableColReportedReportedRatioTip')">
 									{{ column.label }}<v-icon name='help-circle' class="tip-icon"/>
@@ -52,34 +52,34 @@
 								<span v-if="props.row.reported_ratio"> {{props.row.reported_ratio.toPrecision(3)}} </span>
 						</b-table-column>
 
-						<b-table-column field="nb_addresses" :label="$t('rankingTableColNbAddresses')" sortable>
+						<b-table-column field="nb_addresses" :label="$t('rankingTableColNbAddresses')" custom-key='nb_addresses' sortable>
 							<router-link :to="'/wallets-for-exchange/'+ props.row.exchange_id">
 							{{ props.row.nb_addresses ? props.row.nb_addresses.toLocaleString() : '' }}
 							</router-link>
 						</b-table-column>
 
-						<b-table-column field="total_btc_wallet" :label="$t('rankingTableColTotalBtcWallet')" sortable>
+						<b-table-column field="total_btc_wallet" :label="$t('rankingTableColTotalBtcWallet')" custom-key='total_btc_wallet' sortable>
 							<router-link v-if="props.row.total_btc_wallet"
 											:to="'/explorer/'+ props.row.exchange_id">
 								<BtcAmount v-if="props.row.total_btc_wallet" :amount="props.row.total_btc_wallet"/>
 							</router-link>
 						</b-table-column>
 
-						<b-table-column field="last_day_deposits" :label="$t('rankingTableColLastDayDeposits')" sortable>
+						<b-table-column field="last_day_deposits" :label="$t('rankingTableColLastDayDeposits')" custom-key='last_day_deposits' sortable>
 							<BtcAmount v-if="props.row.last_day_deposits" :amount="props.row.last_day_deposits"/>
 						</b-table-column>
 
-						<b-table-column field="last_day_withdrawals" :label="$t('rankingTableColLastDayWithdrawals')" sortable>
+						<b-table-column field="last_day_withdrawals" :label="$t('rankingTableColLastDayWithdrawals')" custom-key='last_day_withdrawals' sortable>
 							<BtcAmount v-if="props.row.last_day_withdrawals" :amount="props.row.last_day_withdrawals"/>
 						</b-table-column>
 
-						<b-table-column field="actions" :label="$t('rankingTableColTrend')" :visible="isVisible">
+						<b-table-column field="trend" :label="$t('rankingTableColTrend')" custom-key='trend'  :visible="isVisible">
 							<router-link :to="{name: 'exchangesStats', params: { exchange: props.row.exchange_id } }">
 								<exchange-trend v-if="props.row.trend" :data="props.row.trend"/>
 							</router-link>
 						</b-table-column>
 
-						<b-table-column field="actions" :label="$t('rankingTableColAction')">
+						<b-table-column field="actions" custom-key='trend' :label="$t('rankingTableColAction')">
 							<contribute :row="props.row" />
 						</b-table-column>
 					</template>
@@ -161,6 +161,22 @@
 			toggle (row) {
 				this.$refs.table.toggleDetails(row)
 			},
+			sortVolume(a,b, isAsc){
+				console.log(isAsc)
+				if (isAsc){
+					if(a.reported_volume > a.reported_volume)
+						return 1
+					else
+						return -1
+				} else {
+					if(a.reported_volume <= a.reported_volume)
+						return 1
+					else
+						return -1
+				}
+
+
+			}
 		},
 		mounted () {
 			this.loadData()

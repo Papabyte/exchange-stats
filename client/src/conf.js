@@ -7,4 +7,5 @@ exports.challenge_coeff = 1.5;
 exports.gb_to_bytes = 1000000000;
 exports.website_name = "Counterstats.org - testnet beta";
 exports.blacklisted_domains = ['coinmarketcap.com', 'https://coingecko.com/'];
-exports.github ='https://github.com/Papabyte/counterstats/';
+exports.github = 'https://github.com/byteball/counterstats/';
+exports.protocol =  testnet ? "obyte-tn" : "obyte";
