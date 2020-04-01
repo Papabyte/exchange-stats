@@ -2,6 +2,7 @@ const conf = require('ocore/conf.js');
 const lightWallet = require('ocore/light_wallet.js');
 const myWitnesses = require('ocore/my_witnesses.js');
 const async = require('async');
+const isUrl = require('is-url')
 const mutex = require('ocore/mutex.js');
 const network = require('ocore/network.js');
 const wallet_general = require('ocore/wallet_general.js');
@@ -11,7 +12,6 @@ const db = require('ocore/db.js');
 const social_networks = require('./social_networks.js');
 const eventBus = require('ocore/event_bus.js');
 const explorer = require('./explorer.js');
-
 const exchanges = require('./exchanges.js')
 
 var assocAllPoolsById = {};
@@ -194,7 +194,8 @@ function parseEvent(trigger, objResponse){
 			if (trigger.data["url_" + i]){
 				if(!objEvent.event_data.proof_urls)
 				objEvent.event_data.proof_urls = [];
-				objEvent.event_data.proof_urls.push(trigger.data["url_" + i]);
+				if (isUrl(trigger.data["url_" + i]))
+					objEvent.event_data.proof_urls.push(trigger.data["url_" + i]);
 			}
 		}
 	}
@@ -419,7 +420,7 @@ function indexProofUrls(objStateVars){
 	for (var key in objStateVars){
 		if (key.indexOf("operation_") == 0){
 		var splitKey = key.split('_');
-		 if (splitKey[4] == "url" && splitKey[5] == "proof"){
+		 if (splitKey[4] == "url" && splitKey[5] == "proof" && isUrl(objStateVars[key])){
 			var outcome = splitKey[7];
 			var operation_key = splitKey[0] + '_' + splitKey[1] + '_' + splitKey[2] + '_' + splitKey[3];
 			var pair = splitKey[1] + '_' + splitKey[2];
@@ -431,9 +432,9 @@ function indexProofUrls(objStateVars){
 			assocProofsByKeyAndOutcome[operation_key][outcome].push(objStateVars[key]);
 
 			if (!assocProofsByPairAndOutcome[pair])
-			assocProofsByPairAndOutcome[pair] = {};
+				assocProofsByPairAndOutcome[pair] = {};
 			if(!assocProofsByPairAndOutcome[pair][outcome])
-			assocProofsByPairAndOutcome[pair][outcome] = [];
+				assocProofsByPairAndOutcome[pair][outcome] = [];
 			assocProofsByPairAndOutcome[pair][outcome].push(objStateVars[key]);
 		 }
 		}
