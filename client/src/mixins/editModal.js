@@ -122,7 +122,6 @@ export default {
 		},
 		handleOk (bvModalEvt) {
 			bvModalEvt.preventDefault()
-			const base64url = require('base64url')
 			const data = {
 				exchange: this.selectedExchange,
 				pool_id: this.bestPoolId,
@@ -145,7 +144,7 @@ export default {
 				data.add_wallet_id = this.targetedWalletId
 
 			const json_string = JSON.stringify(data)
-			const base64data = base64url(json_string)
+			const base64data = encodeURIComponent(btoa(json_string))
 			this.link = conf.protocol + ':' + conf.aa_address + '?amount='
 				+ this.stakeAmount + '&base64data=' + base64data
 		}
