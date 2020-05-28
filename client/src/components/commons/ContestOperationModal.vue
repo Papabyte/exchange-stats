@@ -173,7 +173,6 @@ export default {
 		},
 		handleOk(bvModalEvt){
 				bvModalEvt.preventDefault()	;
-				const base64url = require('base64url');
 				const data = {
 						exchange: this.operationItem.exchange
 				};

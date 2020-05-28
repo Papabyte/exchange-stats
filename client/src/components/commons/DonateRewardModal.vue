@@ -158,7 +158,6 @@
 			},
 			handleOk (bvModalEvt) {
 				bvModalEvt.preventDefault()
-				const base64url = require('base64url')
 				const data = {
 					number_of_rewards: this.nb_reward,
 					reward_amount: this.amount * conf.gb_to_bytes,

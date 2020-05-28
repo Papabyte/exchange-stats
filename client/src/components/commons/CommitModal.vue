@@ -56,7 +56,6 @@
 		},
 		methods: {
 			createLink (address) {
-				const base64url = require('base64url')
 				const data = {
 					exchange: this.operationItem.exchange,
 					commit: 1,

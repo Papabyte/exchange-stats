@@ -65,7 +65,6 @@
 			},
 			handleOk (bvModalEvt) {
 				bvModalEvt.preventDefault()
-				const base64url = require('base64url')
 				const data = {
 					nickname: this.nickname,
 				}
