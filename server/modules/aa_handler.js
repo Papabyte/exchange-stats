@@ -67,9 +67,9 @@ function refresh(){
 	lightWallet.refreshLightClientHistory();
 }
 
-// we get the parameters that are set by control address, node is to be restarted when they are changed
+// we get the parameters that are set by control address, node should be restarted after they are changed
 function indexAaParameters(){
-	getStateVarsForPrefixes(["min_stak","min_rewar"], function(error, objStateVars){
+	getStateVarsForPrefixes(conf.aa_address, ["min_stak","min_rewar"], function(error, objStateVars){
 		if (error)
 			throw Error("couldn't get AA parameters");
 			assocAaParameters.min_stake = Number(objStateVars['min_stake']);
@@ -80,7 +80,7 @@ function indexAaParameters(){
 function indexFromStateVars(handle){
 	if (!handle)
 		handle = ()=>{};
-	getStateVarsForPrefixes(["pool_","operation_","pair_", "nickname_"], async function(error, objStateVars){
+	getStateVarsForPrefixes(conf.aa_address, ["pool_","operation_","pair_", "nickname_"], async function(error, objStateVars){
 		if (error){
 			console.log(error);
 			return handle();
@@ -93,53 +93,50 @@ function indexFromStateVars(handle){
 }
 
 
-function getStateVarsForPrefixes(arrPrefixes, handle){
-	async.reduce(arrPrefixes, {}, function(memo, item, cb) {
-		getStateVarsRangeForPrefix(item, "0", "z", function(error, result ){
-			if (error)
-				return cb(error);
-			else
-				return cb(null, Object.assign(memo, result));
-		});
-	}, function(error, result){
-		if (error)
-			return handle(error);
-		else
-			return handle(null, result);
-	})
-}
-
-// since hub returns a limited number of state vars, this function read them by chunk when limit is reached
-function getStateVarsRangeForPrefix(prefix, start, end, handle){
-	const CHUNK_SIZE = 2000;
-	network.requestFromLightVendor('light/get_aa_state_vars', {
-		address: conf.aa_address,
-		var_prefix_from: prefix + start,
-		var_prefix_to: prefix + end,
-		limit: CHUNK_SIZE
-	}, function(ws, request, objResponse){
-		if (objResponse.error)
-			return handle(objResponse.error);
-
-		if (Object.keys(objResponse).length >= CHUNK_SIZE){
-			const delimiter =  Math.floor((end.charCodeAt(0) - start.charCodeAt(0)) / 2 + start.charCodeAt(0));
-			async.parallel([function(cb){
-				getStateVarsRange(prefix, start, String.fromCharCode(delimiter), cb)
-			},
-			function(cb){
-				getStateVarsRange(prefix, String.fromCharCode(delimiter +1), end, cb)
-			}
-			], function(error, results){
-				if (error)
-					return handle(error);
-				else
-					return handle(null, {...results[0], ...results[1]});
-			})
-		} else {
-			return handle(null, objResponse);
-		}
+function getStateVarsForPrefixes(aa_address, arrPrefixes, handle){
+	Promise.all(arrPrefixes.map((prefix)=>{
+		return getStateVarsForPrefix(aa_address, prefix)
+	})).then((arrResults)=>{
+		return handle(null, Object.assign({}, ...arrResults));
+	}).catch((error)=>{
+		return handle(error);
 	});
 }
+
+function getStateVarsForPrefix(aa_address, prefix, start = '0', end = 'z'){
+	return new Promise(function(resolve, reject){
+		const CHUNK_SIZE = 2000;
+
+		if (start === end)
+			return getStateVarsForPrefix(aa_address, prefix + start,  '0', 'z').then(resolve).catch(reject); // we append prefix to split further
+
+		network.requestFromLightVendor('light/get_aa_state_vars', {
+			address: aa_address,
+			var_prefix_from: prefix + start,
+			var_prefix_to: prefix + end,
+			limit: CHUNK_SIZE
+		}, function(ws, request, objResponse){
+			if (objResponse.error)
+				return reject(objResponse.error);
+
+			if (Object.keys(objResponse).length >= CHUNK_SIZE){ // we reached the limit, let's split in two ranges and try again
+				const delimiter =  Math.floor((end.charCodeAt(0) - start.charCodeAt(0)) / 2 + start.charCodeAt(0));
+				Promise.all([
+					getStateVarsForPrefix(aa_address, prefix, start, String.fromCharCode(delimiter)),
+					getStateVarsForPrefix(aa_address, prefix, String.fromCharCode(delimiter +1), end)
+				]).then(function(results){
+					return resolve({...results[0], ...results[1]});
+				}).catch(function(error){
+					return reject(error);
+				})
+			} else{
+				return resolve(objResponse);
+			}
+
+		});
+	});
+}
+
 
 // we dry run AA with units just sent to it, parse unconfirmed events and store them in assocUnconfirmedEvents
 function treatUnconfirmedEvents(arrUnits){
