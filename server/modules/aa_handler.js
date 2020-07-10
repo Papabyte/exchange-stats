@@ -45,8 +45,15 @@ myWitnesses.readMyWitnesses(function (arrWitnesses) {
 }, 'ignore');
 
 
+lightWallet.setLightVendorHost(conf.hub);
+
+eventBus.on('connected', function(ws){
+	network.initWitnessesIfNecessary(ws, start);
+});
+
+
 function start(){
-	lightWallet.setLightVendorHost(conf.hub);
+
 	// the AA address is watched so we receive transactions implying it
 	wallet_general.addWatchedAddress(conf.aa_address, function(error){
 		if (error)
